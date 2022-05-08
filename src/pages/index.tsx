@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import type { NextPage } from 'next';
+import io from 'socket.io-client';
+
 import Grid from '@mui/material/Grid';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
@@ -13,7 +15,9 @@ import Button from '@mui/material/Button';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import LockOpenOutlinedIcon from '@mui/icons-material/LockOpenOutlined';
 
+
 const Home: NextPage = () => {
+  const [socket, setSocket] = useState(null);
   const [activeRooms, setActiveRooms] = useState([
     /* Example format:
     {
@@ -24,6 +28,39 @@ const Home: NextPage = () => {
     }
     */
   ]);
+
+  const [inputRoomName, setInputRoomName] = useState('');
+  const [inputRoomPassword, setInputRoomPassword] = useState('');
+
+  useEffect(() => {
+    const newSocket = io(`http://${window.location.hostname}:3000`);
+    setSocket(newSocket);
+    return () => newSocket.close();
+  }, []);
+
+  useEffect(() => {
+    if (!socket) return;
+    
+    const Event_allRooms = (rooms) => {
+      setActiveRooms(rooms);
+    };
+
+    socket.on('allRooms', Event_allRooms);
+
+    return () => {
+      socket.off('allRooms', Event_allRooms);
+    };
+  }, [socket]);
+
+  const buttonCreateRoom = () => {
+    if (!socket) return;
+    socket.emit('createRoom', {
+      name: inputRoomName,
+      password: inputRoomPassword,
+    }, (res) => {
+      console.dir(res);
+    });
+  };
 
   return (
     <Container maxWidth="sm">
@@ -37,7 +74,7 @@ const Home: NextPage = () => {
           alignItems: 'center',
         }}
       >
-        <Typography variant="h2" component="h1" color="primary" mb={2}>
+        <Typography variant="h2" component="h1" color="primary" mb={5}>
           kelp
         </Typography>
         <Grid container spacing={2}>
@@ -54,14 +91,19 @@ const Home: NextPage = () => {
                   label="Room name"
                   variant="outlined"
                   fullWidth
+                  value={inputRoomName}
+                  onChange={(e) => setInputRoomName(e.target.value)}
                 />
                 <TextField
                   id="input_createRoom_roomPassword"
                   label="Room password (optional)"
                   variant="outlined"
                   fullWidth
+                  value={inputRoomPassword}
+                  onChange={(e) => setInputRoomPassword(e.target.value)}
+                  type="password"
                 />
-                <Button variant="contained">Create Room</Button>
+                <Button variant="contained" onClick={buttonCreateRoom}>Create Room</Button>
               </Stack>
             </Paper>
           </Grid>
@@ -95,7 +137,7 @@ const Home: NextPage = () => {
                           direction="column"
                           justifyContent="center"
                           alignItems="flex-start" 
-                          spacing={1}
+                          spacing={0}
                           sx={{ flex: 1 }}
                         >
                           <Typography variant="h6" component="h6">
