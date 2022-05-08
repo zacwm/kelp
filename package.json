@@ -4,7 +4,8 @@
   "description": "A slimy torrent downloader and syncing client",
   "main": "./src/server.ts",
   "scripts": {
-    "start": "npx ts-node ."
+    "start": "npx ts-node .",
+    "watch": "npx nodemon --exec \"npm start\""
   },
   "repository": {
     "type": "git",
@@ -31,6 +32,7 @@
     "mongoose": "^6.3.2",
     "next": "^12.1.6",
     "socket.io": "^4.5.0",
+    "socket.io-client": "^4.5.0",
     "webtorrent": "^1.8.16"
   },
   "devDependencies": {
@@ -39,6 +41,7 @@
     "@typescript-eslint/parser": "^5.22.0",
     "eslint": "^8.15.0",
     "eslint-plugin-react": "^7.29.4",
+    "nodemon": "^2.0.16",
     "typescript": "^4.6.4"
   }
 }
