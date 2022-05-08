@@ -27,7 +27,7 @@ nextApp.prepare().then(async() => {
 
     socket.on('disconnect', () => {
       console.log('client disconnected');
-    })
+    });
   });
 
   app.all('*', (req: any, res: any) => nextHandler(req, res));

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import type { NextPage } from 'next';
-import Grid from "@mui/material/Grid";
+import Grid from '@mui/material/Grid';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import Link from '@mui/material/Link';
@@ -124,7 +124,7 @@ const Home: NextPage = () => {
                 spacing={2}
               >
                 <Typography variant="caption" component="span">
-                  Version: {require('../../package.json').version}
+                  Version: 1.0.0
                 </Typography>
                 <Link
                   href="https://github.com/zacimac/kelp"
