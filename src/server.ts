@@ -15,9 +15,11 @@ nextApp.prepare().then(async() => {
     const io: socketio.Server = new socketio.Server();
     io.attach(server);
 
+    /* # Endpoints for torrent and subtitles will be here 
     app.get('/hello', async (_: Request, res: Response) => {
         res.send('Hello World');
     });
+    */
 
     io.on('connection', (socket: socketio.Socket) => {
         console.log('connection');
