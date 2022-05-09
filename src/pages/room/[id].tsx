@@ -5,6 +5,7 @@ import io from 'socket.io-client';
 
 import PasswordRequestWindow from '../../components/PasswordRequestWindow';
 import Player from '../../components/Player';
+import UserList from '../../components/UserList';
 
 import Backdrop from '@mui/material/Backdrop';
 import Box from '@mui/material/Box';
@@ -19,7 +20,6 @@ import AccordionDetails from '@mui/material/AccordionDetails';
 import TextField from '@mui/material/TextField';
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 
 const Room: NextPage = () => {
   const router = useRouter();
@@ -191,35 +191,7 @@ const Room: NextPage = () => {
                       <Typography variant="h6" component="h6" color="primary">Users</Typography>
                     </AccordionSummary>
                     <AccordionDetails>
-                      <Stack
-                        direction="column"
-                        alignItems="stretch"
-                        justifyContent="flex-start"
-                        spacing={1}
-                      >
-                        <Paper elevation={5} sx={{ p: 1 }}>
-                          <Stack
-                            direction="row"
-                            alignItems="center"
-                            justifyContent="space-between"
-                            spacing={1}
-                          >
-                            <AccountCircleIcon />
-                            <Typography sx={{ flex: 1 }}>User 1</Typography>
-                          </Stack>
-                        </Paper>
-                        <Paper elevation={5} sx={{ p: 1 }}>
-                          <Stack
-                            direction="row"
-                            alignItems="center"
-                            justifyContent="space-between"
-                            spacing={1}
-                          >
-                            <AccountCircleIcon />
-                            <Typography sx={{ flex: 1 }}>User 1</Typography>
-                          </Stack>
-                        </Paper>
-                      </Stack>
+                      <UserList users={roomData?.users} />
                     </AccordionDetails>
                   </Accordion>
                 </Box>

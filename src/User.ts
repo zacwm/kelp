@@ -1,5 +1,3 @@
-import { v4 as uuid } from 'uuid';
-
 interface UserInterface {
   id: string;
   name: string;
@@ -10,9 +8,9 @@ class User implements UserInterface {
   id: string;
   name: string;
 
-  constructor(name: string) {
-    this.id = uuid();
-    this.name = name;
+  constructor(id: string) {
+    this.id = id;
+    this.name = null;
   }
 
   setName(name: string): void {

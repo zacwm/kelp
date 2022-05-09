@@ -9,6 +9,7 @@ import next, { NextApiHandler } from 'next';
 import * as socketio from 'socket.io';
 import Room from './RoomManager/Room';
 import RoomManager from './RoomManager';
+import User from './User';
 
 const port: number = config.port || 3000;
 const nextApp = next({ dev: config.devMode });
@@ -31,12 +32,14 @@ nextApp.prepare().then(async() => {
   */
 
   io.on('connection', (socket: socketio.Socket) => {
-    console.log('connection');
+    let user;
+    let currentRoom;
 
     io.emit('allRooms', Rooms.getRoomList());
 
     socket.on('disconnect', () => {
-      console.log('client disconnected');
+      if (!currentRoom) return;
+      currentRoom.removeUser(user.id);
     });
 
     // Room related events
@@ -64,9 +67,16 @@ nextApp.prepare().then(async() => {
       if (!room) return callback({ error: 'Room does not exist', roomNotFound: true });
       if (room.hasPassword() && (!roomData.password || roomData.password === '')) return callback({ error: 'Room requires a password', passwordRequest: true });
       if (room.hasPassword() && roomData.password !== room.getPassword()) return callback({ error: 'Room password is incorrect', passwordRequest: true });
+      currentRoom = room;
+      user = new User(socket.id);
+      room.addUser(user);
       callback({ room: {
         name: room.name,
-        users: room.getUsers(),
+        users: room.getUsers().map(user => {
+          return {
+            name: user.name || null,
+          };
+        }),
       } });
     });
   });
