@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import * as React from 'react';
 import type { NextPage } from 'next';
 import io from 'socket.io-client';
 
@@ -11,34 +11,29 @@ import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import TextField from '@mui/material/TextField';
 import Button from '@mui/material/Button';
+import Alert from '@mui/material/Alert';
+import Collapse from '@mui/material/Collapse';
 
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import LockOpenOutlinedIcon from '@mui/icons-material/LockOpenOutlined';
 
 
 const Home: NextPage = () => {
-  const [socket, setSocket] = useState(null);
-  const [activeRooms, setActiveRooms] = useState([
-    /* Example format:
-    {
-      id: "sad-cloud",
-      name: 'Room 1',
-      hasPassword: false,
-      status: 'downloading',
-    }
-    */
-  ]);
+  const [socket, setSocket] = React.useState(null);
+  const [activeRooms, setActiveRooms] = React.useState([]);
+  const [createRoomPending, setCreateRoomPending] = React.useState(false);
+  const [createRoomErrorMessage, setCreateRoomErrorMessage] = React.useState(null);
 
-  const [inputRoomName, setInputRoomName] = useState('');
-  const [inputRoomPassword, setInputRoomPassword] = useState('');
+  const [inputRoomName, setInputRoomName] = React.useState('');
+  const [inputRoomPassword, setInputRoomPassword] = React.useState('');
 
-  useEffect(() => {
+  React.useEffect((): any => {
     const newSocket = io(`http://${window.location.hostname}:3000`);
     setSocket(newSocket);
     return () => newSocket.close();
   }, []);
 
-  useEffect(() => {
+  React.useEffect((): any => {
     if (!socket) return;
     
     const Event_allRooms = (rooms) => {
@@ -52,13 +47,29 @@ const Home: NextPage = () => {
     };
   }, [socket]);
 
-  const buttonCreateRoom = () => {
+  function timeout(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
+  const buttonCreateRoom = async (): Promise<void> => {
     if (!socket) return;
+    if (createRoomPending) return;
+    setCreateRoomPending(true);
+    if (createRoomErrorMessage) {
+      setCreateRoomErrorMessage(null);
+      await timeout(300);
+    }
     socket.emit('createRoom', {
       name: inputRoomName,
       password: inputRoomPassword,
     }, (res) => {
-      console.dir(res);
+      setCreateRoomPending(false);
+      if (res.error) return setCreateRoomErrorMessage(res.error);
+      if (res.roomId) {
+        window.location.href = `/room/${res.roomId}`;
+      } else {
+        setCreateRoomErrorMessage('Unknown error');
+      }
     });
   };
 
@@ -93,6 +104,8 @@ const Home: NextPage = () => {
                   fullWidth
                   value={inputRoomName}
                   onChange={(e) => setInputRoomName(e.target.value)}
+                  disabled={createRoomPending}
+                  autoComplete="off"
                 />
                 <TextField
                   id="input_createRoom_roomPassword"
@@ -102,8 +115,30 @@ const Home: NextPage = () => {
                   value={inputRoomPassword}
                   onChange={(e) => setInputRoomPassword(e.target.value)}
                   type="password"
+                  disabled={createRoomPending}
+                  autoComplete="off"
                 />
-                <Button variant="contained" onClick={buttonCreateRoom}>Create Room</Button>
+                <Button
+                  variant="contained"
+                  onClick={buttonCreateRoom}
+                  disabled={createRoomPending}
+                >Create Room</Button>
+                <Collapse
+                  in={createRoomErrorMessage} 
+                  sx={{
+                    width: '100%',
+                  }}
+                >
+                  <Alert
+                    severity="error"
+                    variant="filled"
+                    sx={{
+                      width: '100%',
+                    }}
+                  >
+                    {createRoomErrorMessage}
+                  </Alert>
+                </Collapse>
               </Stack>
             </Paper>
           </Grid>
