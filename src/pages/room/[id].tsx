@@ -17,6 +17,7 @@ import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import TextField from '@mui/material/TextField';
+import Slide from '@mui/material/Slide';
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import AccountCircleIcon from '@mui/icons-material/AccountCircle';
@@ -31,6 +32,8 @@ const Room: NextPage = () => {
   const [roomNotFound, setRoomNotFound] = React.useState(false);
   const [openPRW, setOpenPRW] = React.useState(false);
 
+  const [menuVisible, setMenuVisible] = React.useState(true);
+
   React.useEffect((): any => {
     const newSocket = io(`http://${window.location.hostname}:3000`);
     setSocket(newSocket);
@@ -40,6 +43,7 @@ const Room: NextPage = () => {
   React.useEffect((): any => {
     if (!socket) return;
     if (!id) return;
+    if (roomData) return;
     setLoadingRoomData(true);
     if (password) {
       router.push(`/room/${id}`, undefined, { shallow: true });
@@ -127,8 +131,12 @@ const Room: NextPage = () => {
             height: '100%',
           }}
         >
-          <Grid item xs={9.5}>
-            <Player roomData={roomData} />
+          <Grid item xs={menuVisible ? 9.5 : 12}>
+            <Player
+              roomData={roomData}
+              menuVisible={menuVisible}
+              toggleMenu={() => setMenuVisible(!menuVisible)}
+            />
           </Grid>
           <Grid 
             item 
@@ -217,7 +225,7 @@ const Room: NextPage = () => {
                   }}
                 >
                   <Typography variant="caption" component="span" color="primary">
-                    Kelp
+                    kelp
                   </Typography>
                   <Typography variant="caption" component="span">
                     Version 1.0.0

@@ -6,6 +6,9 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
 
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
+
 function LinearProgressWithLabel(props: LinearProgressProps & { value: number }) {
   return (
     <Box sx={{ display: 'flex', alignItems: 'center' }}>
@@ -23,9 +26,11 @@ function LinearProgressWithLabel(props: LinearProgressProps & { value: number })
 
 type Props = {
   roomData: any;
+  menuVisible: boolean;
+  toggleMenu: () => void;
 }
 
-const Player: React.FC<Props> = ({ roomData }) => {
+const Player: React.FC<Props> = ({ roomData, menuVisible, toggleMenu }) => {
   const [videoData, setVideoData] = React.useState(null);
 
   React.useEffect(() => {
@@ -61,9 +66,33 @@ const Player: React.FC<Props> = ({ roomData }) => {
                 background: 'linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 100%)',
                 padding: 2,
               }}>
-                <Typography>
-                  {'Hello'}
-                </Typography>
+                <Stack
+                  direction="row"
+                  alignItems="center"
+                  justifyContent="space-between"
+                  spacing={2}
+                >
+                  <Typography>
+                    {'Hello'}
+                  </Typography>
+                  {
+                    menuVisible ? (
+                      <ArrowForwardIosIcon 
+                        onClick={toggleMenu}
+                        sx={{
+                          cursor: 'pointer',
+                        }}
+                      />
+                    ) : (
+                      <ArrowBackIosIcon 
+                        onClick={toggleMenu}
+                        sx={{
+                          cursor: 'pointer',
+                        }}
+                      />
+                    )
+                  }
+                </Stack>
               </Box>
               <video width="100%" height="100%" autoPlay>
                 <source src={videoData.src} type="video/mp4" />
