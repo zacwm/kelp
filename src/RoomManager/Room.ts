@@ -1,31 +1,26 @@
 import { v4 as uuid } from 'uuid';
 
 interface RoomInterface {
-  getId(): string;
-  getName(): string;
+  id: string;
+  name: string;
   setName(name: string): void;
   setPassword(password: string): void;
   hasPassword(): boolean;
-  validatePassword(password: string): boolean;
+  getPassword(): string;
+  getAuthToken(): string;
 }
 
 class Room implements RoomInterface {
-  private id: string;
-  private name: string;
+  id: string;
+  name: string;
   private password: string;
+  private authToken: string;
 
   constructor(name: string, password?: string) {
     this.id = uuid();
     this.name = name;
     this.password = password || '';
-  }
-
-  getId(): string {
-    return this.id;
-  }
-
-  getName(): string {
-    return this.name;
+    this.authToken = uuid(); // TODO: Replace with a heavier token...
   }
 
   setName(name: string): void {
@@ -40,8 +35,12 @@ class Room implements RoomInterface {
     return this.password !== '';
   }
 
-  validatePassword(password: string): boolean {
-    return this.password === password;
+  getPassword(): string {
+    return this.password;
+  }
+
+  getAuthToken(): string {
+    return this.authToken;
   }
 }
 

@@ -1,8 +1,9 @@
 import Room from './Room';
 
 interface RoomManagerInterface {
-  getRooms(): Room[];
+  getRoomList(): any[];
   createRoom(name: string): Room;
+  getRoomById(id: string): Room;
 }
 
 class RoomManager implements RoomManagerInterface {
@@ -12,11 +13,11 @@ class RoomManager implements RoomManagerInterface {
     this.rooms = [];
   }
 
-  getRooms(): any {
+  getRoomList(): any {
     return this.rooms.map(room => {
       return {
-        id: room.getId(),
-        name: room.getName(),
+        id: room.id,
+        name: room.name,
         hasPassword: room.hasPassword(),
         status: 'unknown',
       };
@@ -27,6 +28,10 @@ class RoomManager implements RoomManagerInterface {
     const newRoom = new Room(name, password);
     this.rooms.push(newRoom);
     return newRoom;
+  }
+
+  getRoomById(id: string): Room {
+    return this.rooms.find(room => room.id === id);
   }
 }
 
