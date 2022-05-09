@@ -6,7 +6,9 @@ import io from 'socket.io-client';
 import PasswordRequestWindow from '../../components/PasswordRequestWindow';
 import Player from '../../components/Player';
 
+import Backdrop from '@mui/material/Backdrop';
 import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
 import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
@@ -14,16 +16,19 @@ import Typography from '@mui/material/Typography';
 import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
+import TextField from '@mui/material/TextField';
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import AccountCircleIcon from '@mui/icons-material/AccountCircle';
 
 const Room: NextPage = () => {
   const router = useRouter();
-  const { id } = router.query;
+  const { id, password } = router.query;
 
   const [socket, setSocket] = React.useState(null);
   const [loadingRoomData, setLoadingRoomData] = React.useState(true);
   const [roomData, setRoomData] = React.useState(null);
+  const [roomNotFound, setRoomNotFound] = React.useState(false);
   const [openPRW, setOpenPRW] = React.useState(false);
 
   React.useEffect((): any => {
@@ -36,9 +41,13 @@ const Room: NextPage = () => {
     if (!socket) return;
     if (!id) return;
     setLoadingRoomData(true);
-    socket.emit('joinRoom', { id }, (res) => {
+    if (password) {
+      router.push(`/room/${id}`, undefined, { shallow: true });
+    }
+    socket.emit('joinRoom', { id, password }, (res) => {
       console.dir(res);
       setLoadingRoomData(false);
+      if (res.roomNotFound) return setRoomNotFound(true);
       if (res.passwordRequest) return setOpenPRW(true);
       if (res.error) return;
       setRoomData(res.room);
@@ -52,6 +61,7 @@ const Room: NextPage = () => {
     socket.emit('joinRoom', { id, password }, (res) => {
       console.dir(res);
       setLoadingRoomData(false);
+      if (res.roomNotFound) return setRoomNotFound(true);
       if (res.error) return callback(res);
       setOpenPRW(false);
       setRoomData(res.room);
@@ -73,6 +83,28 @@ const Room: NextPage = () => {
   
   return (
     <React.Fragment>
+      <Backdrop
+        sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 2 }}
+        open={roomNotFound}
+      >
+        <Paper sx={{ px: 4, py: 2 }}>
+          <Stack
+            direction="column"
+            alignItems="center"
+            justifyContent="center"
+            spacing={2}
+          >
+            <Typography variant="h4" component="h4" mb={1}>
+              Room not found
+            </Typography>
+            <Button variant="contained" onClick={() => {
+              router.push('/');
+            }}>
+              Go to menu
+            </Button>
+          </Stack>
+        </Paper>
+      </Backdrop>
       <PasswordRequestWindow
         open={openPRW}
         isLoading={loadingRoomData}
@@ -88,7 +120,6 @@ const Room: NextPage = () => {
       >
         <Grid
           container
-          spacing={0.5}
           direction="row"
           justifyContent="space-between"
           alignItems="stretch"
@@ -97,7 +128,7 @@ const Room: NextPage = () => {
           }}
         >
           <Grid item xs={9.5}>
-            <Player roomId={id} />
+            <Player roomData={roomData} />
           </Grid>
           <Grid 
             item 
@@ -125,10 +156,13 @@ const Room: NextPage = () => {
                       aria-controls="panel1a-content"
                       id="panel1a-header"
                     >
-                      <Typography>Room</Typography>
+                      <Typography variant="h6" component="h6" color="primary">Room</Typography>
                     </AccordionSummary>
                     <AccordionDetails>
-                      
+                      <TextField
+                        label="Torrent URL"
+                        fullWidth
+                      />
                     </AccordionDetails>
                   </Accordion>
                   <Accordion defaultExpanded disableGutters>
@@ -137,13 +171,38 @@ const Room: NextPage = () => {
                       aria-controls="panel2a-content"
                       id="panel2a-header"
                     >
-                      <Typography>Users</Typography>
+                      <Typography variant="h6" component="h6" color="primary">Users</Typography>
                     </AccordionSummary>
                     <AccordionDetails>
-                      <Typography>
-                        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse
-                        malesuada lacus ex, sit amet blandit leo lobortis eget.
-                      </Typography>
+                      <Stack
+                        direction="column"
+                        alignItems="stretch"
+                        justifyContent="flex-start"
+                        spacing={1}
+                      >
+                        <Paper elevation={5} sx={{ p: 1 }}>
+                          <Stack
+                            direction="row"
+                            alignItems="center"
+                            justifyContent="space-between"
+                            spacing={1}
+                          >
+                            <AccountCircleIcon />
+                            <Typography sx={{ flex: 1 }}>User 1</Typography>
+                          </Stack>
+                        </Paper>
+                        <Paper elevation={5} sx={{ p: 1 }}>
+                          <Stack
+                            direction="row"
+                            alignItems="center"
+                            justifyContent="space-between"
+                            spacing={1}
+                          >
+                            <AccountCircleIcon />
+                            <Typography sx={{ flex: 1 }}>User 1</Typography>
+                          </Stack>
+                        </Paper>
+                      </Stack>
                     </AccordionDetails>
                   </Accordion>
                 </Box>
