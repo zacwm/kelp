@@ -123,23 +123,24 @@ const Home: NextPage = () => {
                   onClick={buttonCreateRoom}
                   disabled={createRoomPending}
                 >Create Room</Button>
-                <Collapse
-                  in={createRoomErrorMessage} 
+              </Stack>
+              <Collapse
+                in={createRoomErrorMessage} 
+                sx={{
+                  width: '100%',
+                }}
+              >
+                <Alert
+                  severity="error"
+                  variant="filled"
                   sx={{
+                    mt: 2,
                     width: '100%',
                   }}
                 >
-                  <Alert
-                    severity="error"
-                    variant="filled"
-                    sx={{
-                      width: '100%',
-                    }}
-                  >
-                    {createRoomErrorMessage}
-                  </Alert>
-                </Collapse>
-              </Stack>
+                  {createRoomErrorMessage}
+                </Alert>
+              </Collapse>
             </Paper>
           </Grid>
           <Grid item xs={12}>
@@ -182,7 +183,9 @@ const Home: NextPage = () => {
                             Status: {room.status}
                           </Typography>
                         </Stack>
-                        <Button variant="contained">Join Room</Button>
+                        <Button variant="contained" onClick={() => {
+                          window.location.href = `/room/${room.id}`;
+                        }}>Join Room</Button>
                       </Stack>
                     </Paper>
                   ))

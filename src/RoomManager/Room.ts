@@ -1,4 +1,5 @@
 import { v4 as uuid } from 'uuid';
+import User from '../User';
 
 interface RoomInterface {
   id: string;
@@ -8,6 +9,7 @@ interface RoomInterface {
   hasPassword(): boolean;
   getPassword(): string;
   getAuthToken(): string;
+  addUser(user: User): void;
 }
 
 class Room implements RoomInterface {
@@ -15,12 +17,14 @@ class Room implements RoomInterface {
   name: string;
   private password: string;
   private authToken: string;
+  private users: User[];
 
   constructor(name: string, password?: string) {
     this.id = uuid();
     this.name = name;
     this.password = password || '';
     this.authToken = uuid(); // TODO: Replace with a heavier token...
+    this.users = [];
   }
 
   setName(name: string): void {
@@ -41,6 +45,14 @@ class Room implements RoomInterface {
 
   getAuthToken(): string {
     return this.authToken;
+  }
+
+  addUser(user: User): void {
+    this.users.push(user);
+  }
+
+  getUsers(): User[] {
+    return this.users;
   }
 }
 

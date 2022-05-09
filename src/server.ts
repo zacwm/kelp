@@ -2,6 +2,7 @@
 
 import config from '../config.json';
 
+import path from 'path';
 import express, { Express, /* Request, Response */ } from 'express';
 import * as http from 'http';
 import next, { NextApiHandler } from 'next';
@@ -19,6 +20,8 @@ nextApp.prepare().then(async() => {
   const app: Express = express();
   const server: http.Server = http.createServer(app);
   const io: socketio.Server = new socketio.Server();
+
+  app.use(express.static(path.join(__dirname, './public')));
   io.attach(server);
   
   /* # Endpoints for torrent files and subtitles will be here 
@@ -56,13 +59,15 @@ nextApp.prepare().then(async() => {
       io.emit('allRooms', Rooms.getRoomList());
     });
 
-    socket.on('getRoom', (roomData: any, callback: any) => {
+    socket.on('joinRoom', (roomData: any, callback: any) => {
       const room: Room = Rooms.getRoomById(roomData.id);
-      console.dir(roomData);
       if (!room) return callback({ error: 'Room does not exist' });
       if (room.hasPassword() && (!roomData.password || roomData.password === '')) return callback({ error: 'Room requires a password', passwordRequest: true });
       if (room.hasPassword() && roomData.password !== room.getPassword()) return callback({ error: 'Room password is incorrect', passwordRequest: true });
-      callback({ room: room.name });
+      callback({ room: {
+        name: room.name,
+        users: room.getUsers(),
+      } });
     });
   });
 
