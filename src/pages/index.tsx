@@ -66,7 +66,7 @@ const Home: NextPage = () => {
       setCreateRoomPending(false);
       if (res.error) return setCreateRoomErrorMessage(res.error);
       if (res.roomId) {
-        window.location.href = `/room/${res.roomId}`;
+        window.location.href = inputRoomPassword ? `/room/${res.roomId}?password=${inputRoomPassword}` : `/room/${res.roomId}`;
       } else {
         setCreateRoomErrorMessage('Unknown error');
       }
