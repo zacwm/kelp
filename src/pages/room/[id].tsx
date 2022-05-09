@@ -158,19 +158,29 @@ const Room: NextPage = () => {
                 }}
               >
                 <Box>
-                  <Accordion defaultExpanded disableGutters>
+                  <Accordion disableGutters>
                     <AccordionSummary
                       expandIcon={<ExpandMoreIcon />}
                       aria-controls="panel1a-content"
                       id="panel1a-header"
                     >
-                      <Typography variant="h6" component="h6" color="primary">Room</Typography>
+                      <Typography variant="h6" component="h6" color="primary">Torrent</Typography>
                     </AccordionSummary>
                     <AccordionDetails>
-                      <TextField
-                        label="Torrent URL"
-                        fullWidth
-                      />
+                      <Stack
+                        direction="column"
+                        alignItems="center"
+                        justifyContent="space-between"
+                        spacing={2}
+                      >
+                        <TextField
+                          label="Torrent URL"
+                          fullWidth
+                        />
+                        <Button variant="contained">
+                          Set torrent
+                        </Button>
+                      </Stack>
                     </AccordionDetails>
                   </Accordion>
                   <Accordion defaultExpanded disableGutters>
