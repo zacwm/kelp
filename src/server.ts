@@ -61,7 +61,7 @@ nextApp.prepare().then(async() => {
 
     socket.on('joinRoom', (roomData: any, callback: any) => {
       const room: Room = Rooms.getRoomById(roomData.id);
-      if (!room) return callback({ error: 'Room does not exist' });
+      if (!room) return callback({ error: 'Room does not exist', roomNotFound: true });
       if (room.hasPassword() && (!roomData.password || roomData.password === '')) return callback({ error: 'Room requires a password', passwordRequest: true });
       if (room.hasPassword() && roomData.password !== room.getPassword()) return callback({ error: 'Room password is incorrect', passwordRequest: true });
       callback({ room: {
