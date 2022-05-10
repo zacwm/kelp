@@ -1,5 +1,5 @@
 import * as React from 'react';
-import io from 'socket.io-client';
+import type { Socket } from 'socket.io-client';
 
 import LinearProgress, { LinearProgressProps } from '@mui/material/LinearProgress';
 import Box from '@mui/material/Box';
@@ -32,12 +32,13 @@ function LinearProgressWithLabel(props: LinearProgressProps & { value: number })
 }
 
 type Props = {
+  socket: Socket;
   roomData: any;
   menuVisible: boolean;
   toggleMenu: () => void;
 }
 
-const Player: React.FC<Props> = ({ roomData, menuVisible, toggleMenu }) => {
+const Player: React.FC<Props> = ({ socket, roomData, menuVisible, toggleMenu }) => {
   const [videoData, setVideoData] = React.useState(null);
   const [videoState, setVideoState] = React.useState({
     playing: true,
@@ -78,11 +79,29 @@ const Player: React.FC<Props> = ({ roomData, menuVisible, toggleMenu }) => {
   React.useEffect(() => {
     if (roomData) {
       setVideoData({
-        src: 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/Sintel.mp4',
-        title: 'Sintel',
+        src: 'http://localhost:3000/test.mp4',
+        title: 'Dog of Wisdom',
       });
     }
   }, [roomData]);
+
+  // Socket events
+  React.useEffect(() => {
+    console.dir('socket state changed');
+    if (!socket) return;
+
+    const videoUpdateState = (data: any) => {
+      console.dir(data);
+      if (data.roomId !== roomData.id) return;
+      setVideoState(data.newState);
+    };
+
+    socket.on('videoUpdateState', videoUpdateState);
+
+    return () => {
+      socket.off('videoUpdateState', videoUpdateState);
+    };
+  }, [roomData, socket]);
 
   // Video state management
   React.useEffect(() => {
@@ -98,17 +117,25 @@ const Player: React.FC<Props> = ({ roomData, menuVisible, toggleMenu }) => {
     }
   }, [videoData, videoState]);
 
-  // Volume control
+  // User Events
+  // - Volume control
   React.useEffect(() => {
     if (!videoData) return;
     if (!videoElemRef) return;
     if (!videoElemRef.current) return;
     videoElemRef.current.volume = inputVolumeSlider / 100;
-  }, [videoData, inputVolumeSlider]);
+  }, [inputVolumeSlider]);
 
   const volumeSliderChange = (event: Event, newValue: number | number[]) => {
     if (!videoData) return;
     setInputVolumeSlider(newValue as number);
+  };
+
+  // - Play/pause
+  const buttonPlayback = () => {
+    socket.emit('videoChangePlayback', {
+      id: roomData.id,
+    }, !videoState.playing);
   };
   
   return (
@@ -142,7 +169,7 @@ const Player: React.FC<Props> = ({ roomData, menuVisible, toggleMenu }) => {
                     top: 0,
                     left: 0,
                     width: '100%',
-                    background: 'linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 100%)',
+                    background: 'linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.0) 100%)',
                     padding: 2,
                   }}
                   onMouseEnter={() => setMouseOverControls(true) }
@@ -182,7 +209,7 @@ const Player: React.FC<Props> = ({ roomData, menuVisible, toggleMenu }) => {
                     bottom: 0,
                     left: 0,
                     width: '100%',
-                    background: 'linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.2) 100%)',
+                    background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.0) 100%)',
                     padding: 2,
                   }}
                   onMouseEnter={() => setMouseOverControls(true) }
@@ -194,12 +221,31 @@ const Player: React.FC<Props> = ({ roomData, menuVisible, toggleMenu }) => {
                       justifyContent="space-between"
                       spacing={2}
                     >
-                      <Typography>
-                        {'Hello'}
-                      </Typography>
+                      {
+                        videoState.playing ? (
+                          <PauseIcon
+                            onClick={buttonPlayback}
+                            sx={{
+                              cursor: 'pointer',
+                            }}
+                          />
+                        ) : (
+                          <PlayArrowIcon
+                            onClick={buttonPlayback}
+                            sx={{
+                              cursor: 'pointer',
+                            }}
+                          />
+                        )
+                      }
                       <Stack spacing={2} direction="row" sx={{ mb: 1, minWidth: 150 }} alignItems="center">
                         <VolumeDown />
-                        <Slider aria-label="Volume" value={inputVolumeSlider} onChange={volumeSliderChange} />
+                        <Slider
+                          aria-label="Volume"
+                          value={inputVolumeSlider}
+                          onChange={volumeSliderChange}
+                          valueLabelDisplay="auto"
+                        />
                         <VolumeUp />
                       </Stack>
                     </Stack>

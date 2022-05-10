@@ -132,6 +132,7 @@ const Room: NextPage = () => {
         >
           <Grid item xs={menuVisible ? 9.5 : 12}>
             <Player
+              socket={socket}
               roomData={roomData}
               menuVisible={menuVisible}
               toggleMenu={() => setMenuVisible(!menuVisible)}

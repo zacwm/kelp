@@ -71,6 +71,7 @@ nextApp.prepare().then(async() => {
       user = new User(socket.id);
       room.addUser(user);
       callback({ room: {
+        id: room.id,
         name: room.name,
         users: room.getUsers().map(user => {
           return {
@@ -80,10 +81,11 @@ nextApp.prepare().then(async() => {
       } });
     });
 
-    socket.on('videoChangePlaying', (roomData: any, playing: boolean) => {
+    socket.on('videoChangePlayback', (roomData: any, playing: boolean) => {
+      console.dir([roomData, playing]);
       if (!currentRoom) return;
       if (currentRoom.id !== roomData.id) return;
-      
+
       io.emit('videoUpdateState', {
         roomId: currentRoom.id,
         newState: {
