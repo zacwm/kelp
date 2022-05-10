@@ -207,11 +207,11 @@ const Home: NextPage = () => {
                   Version: 1.0.0
                 </Typography>
                 <Link
-                  href="https://github.com/zacimac/kelp"
+                  component="a"
                   target="_blank"
+                  href="https://github.com/zacimac/kelp"
                   rel="noopener"
                   variant="caption"
-                  component="span"
                 >
                   GitHub
                 </Link>
