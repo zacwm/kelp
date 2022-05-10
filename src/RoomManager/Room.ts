@@ -10,6 +10,8 @@ interface RoomInterface {
   getPassword(): string;
   getAuthToken(): string;
   addUser(user: User): void;
+  getUsers(): User[];
+  removeUser(userId: string): void;
 }
 
 class Room implements RoomInterface {
@@ -53,6 +55,10 @@ class Room implements RoomInterface {
 
   getUsers(): User[] {
     return this.users;
+  }
+
+  removeUser(userId: string): void {
+    this.users = this.users.filter(user => user.id !== userId);
   }
 }
 
