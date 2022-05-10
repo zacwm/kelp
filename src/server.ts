@@ -79,6 +79,18 @@ nextApp.prepare().then(async() => {
         }),
       } });
     });
+
+    socket.on('videoChangePlaying', (roomData: any, playing: boolean) => {
+      if (!currentRoom) return;
+      if (currentRoom.id !== roomData.id) return;
+      
+      io.emit('videoUpdateState', {
+        roomId: currentRoom.id,
+        newState: {
+          playing,
+        }
+      });
+    });
   });
 
   app.all('*', (req: any, res: any) => nextHandler(req, res));
