@@ -1,4 +1,5 @@
 import Room from './Room';
+import * as SocketIO from 'socket.io';
 
 interface RoomManagerInterface {
   getRoomList(): any[];
@@ -7,9 +8,11 @@ interface RoomManagerInterface {
 }
 
 class RoomManager implements RoomManagerInterface {
+  private SocketServer: SocketIO.Server;
   private rooms: Room[];
 
-  constructor() {
+  constructor(SocketServer: SocketIO.Server) {
+    this.SocketServer = SocketServer;
     this.rooms = [];
   }
 
@@ -25,7 +28,7 @@ class RoomManager implements RoomManagerInterface {
   }
 
   createRoom(name: string, password?: string): Room {
-    const newRoom = new Room(name, password);
+    const newRoom = new Room(this.SocketServer, name, password);
     this.rooms.push(newRoom);
     return newRoom;
   }

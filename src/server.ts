@@ -6,7 +6,7 @@ import path from 'path';
 import express, { Express, /* Request, Response */ } from 'express';
 import * as http from 'http';
 import next, { NextApiHandler } from 'next';
-import * as socketio from 'socket.io';
+import * as SocketIO from 'socket.io';
 import Room from './RoomManager/Room';
 import RoomManager from './RoomManager';
 import User from './User';
@@ -16,22 +16,22 @@ const nextApp = next({ dev: config.devMode });
 const nextHandler: NextApiHandler = nextApp.getRequestHandler();
 
 nextApp.prepare().then(async() => {
-  const Rooms = new RoomManager();
-
+  
   const app: Express = express();
   const server: http.Server = http.createServer(app);
-  const io: socketio.Server = new socketio.Server();
-
+  const io: SocketIO.Server = new SocketIO.Server();
+  
   app.use(express.static(path.join(__dirname, './public')));
   io.attach(server);
   
+  const Rooms = new RoomManager(io);
   /* # Endpoints for torrent files and subtitles will be here 
   app.get('/hello', async (_: Request, res: Response) => {
       res.send('Hello World');
   });
   */
 
-  io.on('connection', (socket: socketio.Socket) => {
+  io.on('connection', (socket: SocketIO.Socket) => {
     let user;
     let currentRoom;
 
@@ -39,7 +39,7 @@ nextApp.prepare().then(async() => {
 
     socket.on('disconnect', () => {
       if (!currentRoom) return;
-      currentRoom.removeUser(user.id);
+      Rooms.getRoomById(currentRoom).removeUser(user.id);
     });
 
     // Room related events
@@ -67,7 +67,7 @@ nextApp.prepare().then(async() => {
       if (!room) return callback({ error: 'Room does not exist', roomNotFound: true });
       if (room.hasPassword() && (!roomData.password || roomData.password === '')) return callback({ error: 'Room requires a password', passwordRequest: true });
       if (room.hasPassword() && roomData.password !== room.getPassword()) return callback({ error: 'Room password is incorrect', passwordRequest: true });
-      currentRoom = room;
+      currentRoom = room.id;
       user = new User(socket.id);
       room.addUser(user);
       callback({ room: {
@@ -78,20 +78,32 @@ nextApp.prepare().then(async() => {
             name: user.name || null,
           };
         }),
+        videoState: room.getPlaybackState(),
       } });
     });
 
-    socket.on('videoChangePlayback', (roomData: any, playing: boolean) => {
-      console.dir([roomData, playing]);
-      if (!currentRoom) return;
-      if (currentRoom.id !== roomData.id) return;
+    socket.on('videoChangePlaybackPlaying', (roomData: any, playing: boolean) => {
+      if (currentRoom !== roomData.id) return;
 
-      io.emit('videoUpdateState', {
-        roomId: currentRoom.id,
-        newState: {
-          playing,
-        }
-      });
+      Rooms.getRoomById(currentRoom).setPlaying(playing);
+    });
+
+    socket.on('videoChangePlaybackTime', (roomData: any, time: number) => {
+      if (currentRoom !== roomData.id) return;
+
+      Rooms.getRoomById(currentRoom).setTimePosition(time);
+    });
+
+    socket.on('videoChangePlayback', (roomData: any, playing: boolean) => {
+      if (currentRoom !== roomData.id) return;
+
+      Rooms.getRoomById(currentRoom).setPlaying(playing);
+    });
+
+    socket.on('videoEndedEvent', (roomData: any) => {
+      if (currentRoom !== roomData.id) return;
+
+      Rooms.getRoomById(currentRoom).runEndEvent();
     });
   });
 

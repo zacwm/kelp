@@ -40,9 +40,9 @@ type Props = {
 
 const Player: React.FC<Props> = ({ socket, roomData, menuVisible, toggleMenu }) => {
   const [videoData, setVideoData] = React.useState(null);
-  const [videoState, setVideoState] = React.useState({
-    playing: true,
-  });
+  const [videoState, setVideoState] = React.useState(null);
+
+  const [videoTimePosition, setVideoTimePosition] = React.useState(0);
 
   const [mouseOverVideo, setMouseOverVideo] = React.useState(false);
   const [mouseRecentMove, setMouseRecentMove] = React.useState(false);
@@ -77,21 +77,19 @@ const Player: React.FC<Props> = ({ socket, roomData, menuVisible, toggleMenu }) 
   }, [mouseOverVideo, mouseRecentMove, mouseOverControls]);
 
   React.useEffect(() => {
-    if (roomData) {
-      setVideoData({
-        src: 'http://localhost:3000/test.mp4',
-        title: 'Dog of Wisdom',
-      });
-    }
+    if (!roomData) return;
+    setVideoData({
+      src: 'http://localhost:3000/test.mp4',
+      title: 'Dog of Wisdom',
+    });
+    setVideoState(roomData.videoState);
   }, [roomData]);
 
   // Socket events
   React.useEffect(() => {
-    console.dir('socket state changed');
     if (!socket) return;
 
     const videoUpdateState = (data: any) => {
-      console.dir(data);
       if (data.roomId !== roomData.id) return;
       setVideoState(data.newState);
     };
@@ -117,6 +115,37 @@ const Player: React.FC<Props> = ({ socket, roomData, menuVisible, toggleMenu }) 
     }
   }, [videoData, videoState]);
 
+  React.useEffect(() => {
+    if (!videoData) return;
+    if (!videoState) return;
+    if (!videoElemRef) return;
+    
+    console.dir(videoState);
+  }, [videoState]);
+
+  // Video time position montioring
+  React.useEffect(() => {
+    if (!videoData) return;
+    if (!videoState) return;
+    if (!videoElemRef) return;
+
+    videoElemRef.current.ontimeupdate = () => {
+      // If video is over 2 seconds behind or ahead, set it to the correct position
+      if (videoElemRef.current.currentTime > videoState.timePosition + 2) {
+        videoElemRef.current.currentTime = videoState.timePosition;
+      } else if (videoElemRef.current.currentTime < videoState.timePosition - 2) {
+        videoElemRef.current.currentTime = videoState.timePosition;
+      }
+    };
+
+    videoElemRef.current.onended = () => {
+      console.info('Video ended');
+      socket.emit('videoEndedEvent', {
+        id: roomData.id,
+      });
+    };
+  }, [roomData, videoData, videoState]);
+
   // User Events
   // - Volume control
   React.useEffect(() => {
@@ -133,7 +162,7 @@ const Player: React.FC<Props> = ({ socket, roomData, menuVisible, toggleMenu }) 
 
   // - Play/pause
   const buttonPlayback = () => {
-    socket.emit('videoChangePlayback', {
+    socket.emit('videoChangePlaybackPlaying', {
       id: roomData.id,
     }, !videoState.playing);
   };
@@ -222,20 +251,22 @@ const Player: React.FC<Props> = ({ socket, roomData, menuVisible, toggleMenu }) 
                       spacing={2}
                     >
                       {
-                        videoState.playing ? (
-                          <PauseIcon
-                            onClick={buttonPlayback}
-                            sx={{
-                              cursor: 'pointer',
-                            }}
-                          />
-                        ) : (
-                          <PlayArrowIcon
-                            onClick={buttonPlayback}
-                            sx={{
-                              cursor: 'pointer',
-                            }}
-                          />
+                        videoState && (
+                          videoState.playing ? (
+                            <PauseIcon
+                              onClick={buttonPlayback}
+                              sx={{
+                                cursor: 'pointer',
+                              }}
+                            />
+                          ) : (
+                            <PlayArrowIcon
+                              onClick={buttonPlayback}
+                              sx={{
+                                cursor: 'pointer',
+                              }}
+                            />
+                          )
                         )
                       }
                       <Stack spacing={2} direction="row" sx={{ mb: 1, minWidth: 150 }} alignItems="center">
