@@ -62,7 +62,6 @@ const Room: NextPage = () => {
     if (!id) return;
     setLoadingRoomData(true);
     socket.emit('joinRoom', { id, password }, (res) => {
-      console.dir(res);
       setLoadingRoomData(false);
       if (res.roomNotFound) return setRoomNotFound(true);
       if (res.error) return callback(res);
