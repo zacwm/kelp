@@ -1,5 +1,7 @@
 import * as React from 'react';
 import type { Socket } from 'socket.io-client';
+import ReactPlayer from 'react-player';
+import { SnackbarProvider, VariantType, useSnackbar } from 'notistack';
 
 import LinearProgress, { LinearProgressProps } from '@mui/material/LinearProgress';
 import Box from '@mui/material/Box';
@@ -39,6 +41,8 @@ type Props = {
 }
 
 const Player: React.FC<Props> = ({ socket, roomData, menuVisible, toggleMenu }) => {
+  const { enqueueSnackbar } = useSnackbar();
+
   const [videoData, setVideoData] = React.useState(null);
   const [videoState, setVideoState] = React.useState(null);
 
@@ -51,7 +55,7 @@ const Player: React.FC<Props> = ({ socket, roomData, menuVisible, toggleMenu }) 
 
   const [inputVolumeSlider, setInputVolumeSlider] = React.useState<number>(50);
 
-  const videoElemRef = React.useRef<HTMLVideoElement>(null);
+  const refPlayer = React.useRef<ReactPlayer>(null);
 
   let mouseStopTimeout = null;
   React.useEffect(() => {
@@ -78,26 +82,41 @@ const Player: React.FC<Props> = ({ socket, roomData, menuVisible, toggleMenu }) 
 
   React.useEffect(() => {
     if (!roomData) return;
-    setVideoData({
-      src: 'http://localhost:3000/test.mp4',
-      title: 'Dog of Wisdom',
-    });
+    console.dir(roomData);
+    setVideoData(roomData.videoData);
     setVideoState(roomData.videoState);
   }, [roomData]);
 
   // Socket events
   React.useEffect(() => {
+    if (!roomData) return;
     if (!socket) return;
+
+    const videoUpdateData = (data: any) => {
+      if (data.roomId !== roomData.id) return;
+      setVideoData(data.newData);
+    };
 
     const videoUpdateState = (data: any) => {
       if (data.roomId !== roomData.id) return;
       setVideoState(data.newState);
     };
 
+    const videoUpdateTimePosition = (data: any) => {
+      if (data.roomId !== roomData.id) return;
+      if (!refPlayer) return;
+
+      refPlayer.current.seekTo(data.newTimePosition);
+    };
+
+    socket.on('videoUpdateData', videoUpdateData);
     socket.on('videoUpdateState', videoUpdateState);
+    socket.on('videoUpdateTimePosition', videoUpdateTimePosition);
 
     return () => {
+      socket.off('videoUpdateData', videoUpdateData);
       socket.off('videoUpdateState', videoUpdateState);
+      socket.off('videoUpdateTimePosition', videoUpdateTimePosition);
     };
   }, [roomData, socket]);
 
@@ -105,55 +124,44 @@ const Player: React.FC<Props> = ({ socket, roomData, menuVisible, toggleMenu }) 
   React.useEffect(() => {
     if (!videoData) return;
     if (!videoState) return;
-    if (!videoElemRef) return;
 
     // Check if the video is playing
-    if (videoState.playing) {
-      videoElemRef.current.play();
-    } else {
-      videoElemRef.current.pause();
-    }
+    
   }, [videoData, videoState]);
 
   React.useEffect(() => {
     if (!videoData) return;
     if (!videoState) return;
-    if (!videoElemRef) return;
     
     console.dir(videoState);
   }, [videoState]);
 
-  // Video time position montioring
-  React.useEffect(() => {
+  const playerOnProgress = ({ playedSeconds, played }: any) => {
     if (!videoData) return;
     if (!videoState) return;
-    if (!videoElemRef) return;
+    if (!refPlayer) return;
 
-    videoElemRef.current.ontimeupdate = () => {
-      // If video is over 2 seconds behind or ahead, set it to the correct position
-      if (videoElemRef.current.currentTime > videoState.timePosition + 2) {
-        videoElemRef.current.currentTime = videoState.timePosition;
-      } else if (videoElemRef.current.currentTime < videoState.timePosition - 2) {
-        videoElemRef.current.currentTime = videoState.timePosition;
-      }
-    };
+    if (playedSeconds > videoState.timePosition + 2) {
+      refPlayer.current.seekTo(videoState.timePosition);
+      enqueueSnackbar('Your player was over 2 seconds ahead. Resyncing...', { variant: 'warning' });
+    } else if (playedSeconds < videoState.timePosition - 2) {
+      refPlayer.current.seekTo(videoState.timePosition);
+      enqueueSnackbar('Your player was over 2 seconds behind. Resyncing...', { variant: 'warning' });
+    }
 
-    videoElemRef.current.onended = () => {
-      console.info('Video ended');
-      socket.emit('videoEndedEvent', {
-        id: roomData.id,
-      });
-    };
-  }, [roomData, videoData, videoState]);
+    setVideoTimePosition(played);
+  };
+
+  const playerEnded = () => {
+    if (!videoData) return;
+    if (!videoState) return;
+
+    socket.emit('videoEndedEvent', {
+      id: roomData.id,
+    });
+  };
 
   // User Events
-  // - Volume control
-  React.useEffect(() => {
-    if (!videoData) return;
-    if (!videoElemRef) return;
-    if (!videoElemRef.current) return;
-    videoElemRef.current.volume = inputVolumeSlider / 100;
-  }, [inputVolumeSlider]);
 
   const volumeSliderChange = (event: Event, newValue: number | number[]) => {
     if (!videoData) return;
@@ -181,13 +189,14 @@ const Player: React.FC<Props> = ({ socket, roomData, menuVisible, toggleMenu }) 
             height: '100vh',
           }}
         >
-          {videoData?.src ? (
+          {videoData?.url ? (
             <Box
               onMouseOver={() => setMouseOverVideo(true) }
               onMouseOut={() => setMouseOverVideo(false) }
               sx={{
                 height: '100%',
                 width: '100%',
+                cursor: showVideoOverlay ? 'default' : 'none',
               }}
             >
               <Fade in={showVideoOverlay ? true : false}>
@@ -269,7 +278,18 @@ const Player: React.FC<Props> = ({ socket, roomData, menuVisible, toggleMenu }) 
                           )
                         )
                       }
-                      <Stack spacing={2} direction="row" sx={{ mb: 1, minWidth: 150 }} alignItems="center">
+                      <Stack spacing={2} direction="row" sx={{ mb: 1, flex: 1 }} alignItems="center">
+                        <Slider
+                          aria-label="time-indicator"
+                          value={videoTimePosition}
+                          defaultValue={0}
+                          min={0}
+                          max={0.999999}
+                          step={0.0001}
+                          disabled
+                        />
+                      </Stack>
+                      <Stack spacing={2} direction="row" sx={{ mb: 1, minWidth: 200 }} alignItems="center">
                         <VolumeDown />
                         <Slider
                           aria-label="Volume"
@@ -283,14 +303,17 @@ const Player: React.FC<Props> = ({ socket, roomData, menuVisible, toggleMenu }) 
                   </Box>
                 </Box>
               </Fade>
-              <video
+              <ReactPlayer
+                ref={refPlayer}
+                url={videoData.url}
+                playing={videoState?.playing}
+                volume={inputVolumeSlider / 100}
                 width="100%"
                 height="100%"
-                ref={videoElemRef}
-              >
-                <source src={videoData.src} type="video/mp4" />
-                Your browser does not support HTML video.
-              </video>
+
+                onProgress={playerOnProgress}
+                onEnded={playerEnded}
+              />
             </Box>
           ) : (
             <Box
@@ -314,9 +337,9 @@ const Player: React.FC<Props> = ({ socket, roomData, menuVisible, toggleMenu }) 
                       Preparing room...
                     </Typography>
                     <Typography variant="h6" component="h6" mb={1}>
-                      Status: {videoData.preparing.stage}
+                      Status: {videoData.stage}
                     </Typography>
-                    { videoData.preparing.progress && ( <LinearProgressWithLabel value={videoData.preparing.progress} /> ) }
+                    { videoData.percentage && ( <LinearProgressWithLabel value={videoData.percentage} /> ) }
                   </Paper>
                 )}
               </Stack>
@@ -328,4 +351,19 @@ const Player: React.FC<Props> = ({ socket, roomData, menuVisible, toggleMenu }) 
   );
 };
 
-export default Player;
+const NotistackIntegration: React.FC<Props> = (props) => {
+  return (
+    <SnackbarProvider
+      maxSnack={5}
+      hideIconVariant={true}
+      anchorOrigin={{
+        vertical: 'top',
+        horizontal: 'center',
+      }}
+    >
+      <Player {...props} />
+    </SnackbarProvider>
+  );
+};
+
+export default NotistackIntegration;
