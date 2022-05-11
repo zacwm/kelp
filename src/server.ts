@@ -1,7 +1,5 @@
 // kelp - Server
-
-import config from '../config.json';
-
+import 'dotenv/config';
 import path from 'path';
 import express, { Express, Request, Response } from 'express';
 import * as http from 'http';
@@ -11,8 +9,8 @@ import Room from './RoomManager/Room';
 import RoomManager from './RoomManager';
 import User from './User';
 
-const port: number = config.port || 3000;
-const nextApp = next({ dev: config.devMode });
+const port: number = process.env.PORT || 3000;
+const nextApp = next({ dev: process.env.DEV_MODE || false });
 const nextHandler: NextApiHandler = nextApp.getRequestHandler();
 
 nextApp.prepare().then(async() => {
@@ -31,17 +29,8 @@ nextApp.prepare().then(async() => {
   });
   */
 
-  app.get('/test1/:id', async (req: Request, res: Response) => {
-    const id: string = req.params.id;
-    Rooms.getRoomById(id).setStatus('Downloading torrent', 50);
-    res.send({ done: true });
-  });
-
-  app.get('/test2/:id', async (req: Request, res: Response) => {
-    const id: string = req.params.id;
-    Rooms.getRoomById(id).setStatus('ready', 100);
-    res.send({ done: true });
-  });
+  // TODO: Test stream host, remove when done
+  app.use('/streams', express.static(path.join(__dirname, './streams')));
 
   io.on('connection', (socket: SocketIO.Socket) => {
     let user;

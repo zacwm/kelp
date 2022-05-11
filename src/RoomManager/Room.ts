@@ -47,8 +47,8 @@ class Room implements RoomInterface {
     this.users = [];
     this.status = 'preparing';
     this.statusPercentage = 0;
-    this.videoTitle = 'Dog of Wisdom';
-    this.videoURL = 'http://localhost:3000/test.mp4';
+    this.videoTitle = 'A Silent Voice';
+    this.videoURL = 'https://kelp.sneeze.xyz/streams/test/output.m3u8';
     this.playbackPlaying = false;
     this.playbackTimePosition = 0;
     this.playbackTimePositionTimeout = null;

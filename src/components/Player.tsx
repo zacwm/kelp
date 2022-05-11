@@ -161,6 +161,11 @@ const Player: React.FC<Props> = ({ socket, roomData, menuVisible, toggleMenu }) 
     });
   };
 
+  const playerOnError = (error: any) => {
+    console.error(error);
+    enqueueSnackbar('Something went wrong with the video. Try refreshing?', { variant: 'error' });
+  };
+
   // User Events
 
   const volumeSliderChange = (event: Event, newValue: number | number[]) => {
@@ -313,6 +318,7 @@ const Player: React.FC<Props> = ({ socket, roomData, menuVisible, toggleMenu }) 
 
                 onProgress={playerOnProgress}
                 onEnded={playerEnded}
+                onError={playerOnError}
               />
             </Box>
           ) : (

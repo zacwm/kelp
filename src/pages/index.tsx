@@ -28,7 +28,7 @@ const Home: NextPage = () => {
   const [inputRoomPassword, setInputRoomPassword] = React.useState('');
 
   React.useEffect((): any => {
-    const newSocket = io(`http://${window.location.hostname}:3000`);
+    const newSocket = io(`https://${window.location.hostname}`);
     setSocket(newSocket);
     return () => newSocket.close();
   }, []);
