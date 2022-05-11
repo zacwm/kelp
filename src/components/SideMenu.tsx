@@ -2,10 +2,8 @@ import * as React from 'react';
 import type { Socket } from 'socket.io-client';
 import UserList from './UserList';
 
-import Backdrop from '@mui/material/Backdrop';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import Grid from '@mui/material/Grid';
 import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
@@ -81,41 +79,43 @@ const SideMenu: React.FC<Props> = ({ socket, roomData }) => {
               <UserList users={roomData?.users} />
             </AccordionDetails>
           </Accordion>
-          <Accordion disableGutters>
-            <AccordionSummary
-              expandIcon={<ExpandMoreIcon />}
-              aria-controls="panel1a-content"
-              id="panel1a-header"
-            >
-              <Typography variant="h6" component="h6" color="primary">Testing stuff</Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-              <Stack
-                direction="column"
-                alignItems="center"
-                justifyContent="space-between"
-                spacing={2}
+          { process.env.MODE === 'development' && (
+            <Accordion disableGutters>
+              <AccordionSummary
+                expandIcon={<ExpandMoreIcon />}
+                aria-controls="panel1a-content"
+                id="panel1a-header"
               >
-                <TextField
-                  label="seconds"
-                  value={inputTimePosition}
-                  onChange={(e) => {
-                    setInputTimePosition(e.target.value);
-                  }}
-                  fullWidth
-                />
-                <Button variant="contained" onClick={buttonSubmitTimeChange}>
-                  Set
-                </Button>
-                <Button variant="contained" onClick={() => socket.emit('playerTest', roomData.id, 0)}>
-                  [0] Status 1
-                </Button>
-                <Button variant="contained" onClick={() => socket.emit('playerTest', roomData.id, 1)}>
-                  [1] Status 2
-                </Button>
-              </Stack>
-            </AccordionDetails>
-          </Accordion>
+                <Typography variant="h6" component="h6" color="primary">Testing stuff</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Stack
+                  direction="column"
+                  alignItems="center"
+                  justifyContent="space-between"
+                  spacing={2}
+                >
+                  <TextField
+                    label="seconds"
+                    value={inputTimePosition}
+                    onChange={(e) => {
+                      setInputTimePosition(e.target.value);
+                    }}
+                    fullWidth
+                  />
+                  <Button variant="contained" onClick={buttonSubmitTimeChange}>
+                    Set
+                  </Button>
+                  <Button variant="contained" onClick={() => socket.emit('playerTest', roomData.id, 0)}>
+                    [0] Status 1
+                  </Button>
+                  <Button variant="contained" onClick={() => socket.emit('playerTest', roomData.id, 1)}>
+                    [1] Status 2
+                  </Button>
+                </Stack>
+              </AccordionDetails>
+            </Accordion>
+          )}
         </Box>
         <Stack
           direction="row"
