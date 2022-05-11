@@ -5,6 +5,7 @@ interface RoomManagerInterface {
   getRoomList(): any[];
   createRoom(name: string): Room;
   getRoomById(id: string): Room;
+  getRoomCount(): number;
 }
 
 class RoomManager implements RoomManagerInterface {
@@ -35,6 +36,10 @@ class RoomManager implements RoomManagerInterface {
 
   getRoomById(id: string): Room {
     return this.rooms.find(room => room.id === id);
+  }
+
+  getRoomCount(): number {
+    return this.rooms.length;
   }
 }
 

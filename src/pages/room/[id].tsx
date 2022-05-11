@@ -21,6 +21,7 @@ const Room: NextPage = () => {
 
   const [socket, setSocket] = React.useState(null);
   const [loadingRoomData, setLoadingRoomData] = React.useState(true);
+  const [userId, setUserId] = React.useState(null);
   const [roomData, setRoomData] = React.useState(null);
   const [roomNotFound, setRoomNotFound] = React.useState(false);
   const [openPRW, setOpenPRW] = React.useState(false);
@@ -32,6 +33,22 @@ const Room: NextPage = () => {
     setSocket(newSocket);
     return () => newSocket.close();
   }, []);
+
+  React.useEffect((): any => {
+    if (!socket) return;
+    if (!roomData) return;
+
+    const onUpdateRoom = (data: any) => {
+      if (roomData.id !== data.id) return;
+      setRoomData(data);
+    };
+
+    socket.on('updateRoom', onUpdateRoom);
+
+    return () => {
+      socket.off('updateRoom', onUpdateRoom);
+    };
+  }, [roomData, socket]);
 
   React.useEffect((): any => {
     if (!socket) return;
@@ -47,6 +64,7 @@ const Room: NextPage = () => {
       if (res.roomNotFound) return setRoomNotFound(true);
       if (res.passwordRequest) return setOpenPRW(true);
       if (res.error) return;
+      setUserId(res.user);
       setRoomData(res.room);
     });
   }, [socket, id]);
@@ -56,10 +74,12 @@ const Room: NextPage = () => {
     if (!id) return;
     setLoadingRoomData(true);
     socket.emit('joinRoom', { id, password }, (res) => {
+      console.dir(res);
       setLoadingRoomData(false);
       if (res.roomNotFound) return setRoomNotFound(true);
       if (res.error) return callback(res);
       setOpenPRW(false);
+      setUserId(res.user);
       setRoomData(res.room);
     });
   };
@@ -138,7 +158,7 @@ const Room: NextPage = () => {
               height: '100%',
             }}
           >
-            <SideMenu socket={socket} roomData={roomData} />
+            <SideMenu socket={socket} roomData={roomData} userId={userId} />
           </Grid>
         </Grid>
       </Box>

@@ -17,9 +17,10 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 type Props = {
   socket: Socket;
   roomData: any;
+  userId: string;
 }
 
-const SideMenu: React.FC<Props> = ({ socket, roomData }) => {
+const SideMenu: React.FC<Props> = ({ socket, roomData, userId }) => {
   const [inputTimePosition, setInputTimePosition] = React.useState('');
 
   const buttonSubmitTimeChange = () => {
@@ -76,7 +77,7 @@ const SideMenu: React.FC<Props> = ({ socket, roomData }) => {
               <Typography variant="h6" component="h6" color="primary">Users</Typography>
             </AccordionSummary>
             <AccordionDetails>
-              <UserList users={roomData?.users} />
+              <UserList roomData={roomData} userId={userId} />
             </AccordionDetails>
           </Accordion>
           <Accordion disableGutters>

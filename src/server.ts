@@ -40,11 +40,25 @@ nextApp.prepare().then(async() => {
 
     socket.on('disconnect', () => {
       if (!currentRoom) return;
-      Rooms.getRoomById(currentRoom).removeUser(user.id);
+      const room: Room = Rooms.getRoomById(currentRoom);
+      room.removeUser(user.id);
+      io.emit('updateRoom', {
+        id: room.id,
+        name: room.name,
+        users: room.getUsers().map(userItem => {
+          return {
+            id: userItem.id,
+            name: userItem.name || null,
+          };
+        }),
+        videoData: room.getVideoData(),
+        videoState: room.status === 'ready' ? room.getPlaybackState() : null,
+      });
     });
 
     // Room related events
     socket.on('createRoom', (roomData: any, callback: any) => {
+      if (Rooms.getRoomCount() >= parseInt(process.env.ROOM_LIMIT)) return callback({ error: 'Room limit reached... Wait till rooms have closed...' });
       // Validate room name...
       if (typeof roomData.name !== 'string') return callback({ error: 'Room name must be a string' });
       if (roomData.name.length < 1) return callback({ error: 'Room name is required' });
@@ -71,17 +85,33 @@ nextApp.prepare().then(async() => {
       currentRoom = room.id;
       user = new User(socket.id);
       room.addUser(user);
-      callback({ room: {
+      callback({
+        user: user.id,
+        room: {
+          id: room.id,
+          name: room.name,
+          users: room.getUsers().map(userItem => {
+            return {
+              id: userItem.id,
+              name: userItem.name || null,
+            };
+          }),
+          videoData: room.getVideoData(),
+          videoState: room.status === 'ready' ? room.getPlaybackState() : null,
+        }
+      });
+      io.emit('updateRoom', {
         id: room.id,
         name: room.name,
-        users: room.getUsers().map(user => {
+        users: room.getUsers().map(userItem => {
           return {
-            name: user.name || null,
+            id: userItem.id,
+            name: userItem.name || null,
           };
         }),
         videoData: room.getVideoData(),
         videoState: room.status === 'ready' ? room.getPlaybackState() : null,
-      } });
+      });
     });
 
     socket.on('videoChangePlaybackPlaying', (roomData: any, playing: boolean) => {
