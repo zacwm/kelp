@@ -87,7 +87,7 @@ const SideMenu: React.FC<Props> = ({ socket, roomData }) => {
               aria-controls="panel1a-content"
               id="panel1a-header"
             >
-              <Typography variant="h6" component="h6" color="primary">Playback (testing)</Typography>
+              <Typography variant="h6" component="h6" color="primary">Testing stuff</Typography>
             </AccordionSummary>
             <AccordionDetails>
               <Stack
@@ -106,6 +106,12 @@ const SideMenu: React.FC<Props> = ({ socket, roomData }) => {
                 />
                 <Button variant="contained" onClick={buttonSubmitTimeChange}>
                   Set
+                </Button>
+                <Button variant="contained" onClick={() => socket.emit('playerTest', roomData.id, 0)}>
+                  [0] Status 1
+                </Button>
+                <Button variant="contained" onClick={() => socket.emit('playerTest', roomData.id, 1)}>
+                  [1] Status 2
                 </Button>
               </Stack>
             </AccordionDetails>

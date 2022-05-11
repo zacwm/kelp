@@ -3,8 +3,6 @@ import User from '../User';
 import * as SocketIO from 'socket.io';
 
 interface RoomInterface {
-  id: string;
-  name: string;
   setName(name: string): void;
   setPassword(password: string): void;
   hasPassword(): boolean;
@@ -13,9 +11,12 @@ interface RoomInterface {
   addUser(user: User): void;
   getUsers(): User[];
   removeUser(userId: string): void;
+  getVideoData(): any;
   getPlaybackState(): any;
   setTimePosition(time: number): void;
   runEndEvent(): void;
+  // Internal
+  setStatus(status: string, percentage: number): void;
 }
 
 class Room implements RoomInterface {
@@ -25,8 +26,13 @@ class Room implements RoomInterface {
   private password: string;
   private authToken: string;
   private users: User[];
+  // Room preparing status
+  status: string;
+  statusPercentage: number;
+  private torrentURL: string;
   // Video data
-  private videoTitle = 'Video';
+  private videoTitle: string;
+  private videoURL: string;
   // Video playback data...
   private playbackPlaying: boolean;
   private playbackTimePosition: number;
@@ -39,6 +45,10 @@ class Room implements RoomInterface {
     this.password = password || '';
     this.authToken = uuid(); // TODO: Replace with a heavier token...
     this.users = [];
+    this.status = 'preparing';
+    this.statusPercentage = 0;
+    this.videoTitle = 'Dog of Wisdom';
+    this.videoURL = 'http://localhost:3000/test.mp4';
     this.playbackPlaying = false;
     this.playbackTimePosition = 0;
     this.playbackTimePositionTimeout = null;
@@ -74,6 +84,21 @@ class Room implements RoomInterface {
 
   removeUser(userId: string): void {
     this.users = this.users.filter(user => user.id !== userId);
+  }
+
+  getVideoData(): any {
+    if (this.status !== 'ready') {
+      return {
+        preparing: true,
+        stage: this.status,
+        percentage: this.statusPercentage,
+      };
+    } else {
+      return {
+        url: this.videoURL,
+        title: this.videoTitle,
+      };
+    }
   }
 
   getPlaybackState(): any {
@@ -118,6 +143,19 @@ class Room implements RoomInterface {
     clearInterval(this.playbackTimePositionTimeout);
     this.playbackTimePosition = 0;
     this.playbackPlaying = false;
+    this.SocketServer.emit('videoUpdateState', {
+      roomId: this.id,
+      newState: this.getPlaybackState(),
+    });
+  }
+
+  setStatus(status: string, percentage: number): void {
+    this.status = status;
+    this.statusPercentage = percentage;
+    this.SocketServer.emit('videoUpdateData', {
+      roomId: this.id,
+      newData: this.getVideoData(),
+    });
     this.SocketServer.emit('videoUpdateState', {
       roomId: this.id,
       newState: this.getPlaybackState(),

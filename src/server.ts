@@ -3,7 +3,7 @@
 import config from '../config.json';
 
 import path from 'path';
-import express, { Express, /* Request, Response */ } from 'express';
+import express, { Express, Request, Response } from 'express';
 import * as http from 'http';
 import next, { NextApiHandler } from 'next';
 import * as SocketIO from 'socket.io';
@@ -30,6 +30,18 @@ nextApp.prepare().then(async() => {
       res.send('Hello World');
   });
   */
+
+  app.get('/test1/:id', async (req: Request, res: Response) => {
+    const id: string = req.params.id;
+    Rooms.getRoomById(id).setStatus('Downloading torrent', 50);
+    res.send({ done: true });
+  });
+
+  app.get('/test2/:id', async (req: Request, res: Response) => {
+    const id: string = req.params.id;
+    Rooms.getRoomById(id).setStatus('ready', 100);
+    res.send({ done: true });
+  });
 
   io.on('connection', (socket: SocketIO.Socket) => {
     let user;
@@ -78,7 +90,8 @@ nextApp.prepare().then(async() => {
             name: user.name || null,
           };
         }),
-        videoState: room.getPlaybackState(),
+        videoData: room.getVideoData(),
+        videoState: room.status === 'ready' ? room.getPlaybackState() : null,
       } });
     });
 
@@ -92,6 +105,7 @@ nextApp.prepare().then(async() => {
       if (currentRoom !== roomData.id) return;
 
       Rooms.getRoomById(currentRoom).setTimePosition(time);
+      io.emit('videoUpdateTimePosition', { roomId: roomData.id, newTimePosition: time });
     });
 
     socket.on('videoChangePlayback', (roomData: any, playing: boolean) => {
@@ -104,6 +118,18 @@ nextApp.prepare().then(async() => {
       if (currentRoom !== roomData.id) return;
 
       Rooms.getRoomById(currentRoom).runEndEvent();
+    });
+
+    // Testing sockets
+    socket.on('playerTest', (id: string, type: number) => {
+      switch (type) {
+      case 0:
+        Rooms.getRoomById(id).setStatus('Downloading torrent', 50);
+        break;
+      case 1:
+        Rooms.getRoomById(id).setStatus('ready', 100);
+        break;
+      }
     });
   });
 
