@@ -45,6 +45,7 @@ const Player: React.FC<Props> = ({ socket, roomData, menuVisible, toggleMenu }) 
 
   const [videoData, setVideoData] = React.useState(null);
   const [videoState, setVideoState] = React.useState(null);
+  const refVideoStateCheckTimeout = React.useRef(null);
 
   const [videoTimePosition, setVideoTimePosition] = React.useState(0);
 
@@ -82,9 +83,11 @@ const Player: React.FC<Props> = ({ socket, roomData, menuVisible, toggleMenu }) 
 
   React.useEffect(() => {
     if (!roomData) return;
-    console.dir(roomData);
     setVideoData(roomData.videoData);
-    setVideoState(roomData.videoState);
+    setVideoState({
+      ...roomData.videoState,
+      updated: Date.now(),
+    });
   }, [roomData]);
 
   // Socket events
@@ -99,7 +102,10 @@ const Player: React.FC<Props> = ({ socket, roomData, menuVisible, toggleMenu }) 
 
     const videoUpdateState = (data: any) => {
       if (data.roomId !== roomData.id) return;
-      setVideoState(data.newState);
+      setVideoState({
+        ...data.newState,
+        updated: Date.now(),
+      });
     };
 
     const videoUpdateTimePosition = (data: any) => {
@@ -120,20 +126,30 @@ const Player: React.FC<Props> = ({ socket, roomData, menuVisible, toggleMenu }) 
     };
   }, [roomData, socket]);
 
-  // Video state management
+  // If video state is playing but hasn't been updated for 2 seconds, pause it.
   React.useEffect(() => {
-    if (!videoData) return;
     if (!videoState) return;
+    if (!videoState.playing) {
+      if (refVideoStateCheckTimeout.current) clearTimeout(refVideoStateCheckTimeout.current);
+      return;
+    }
 
-    // Check if the video is playing
-    
-  }, [videoData, videoState]);
+    if (refVideoStateCheckTimeout.current) clearTimeout(refVideoStateCheckTimeout.current);
+    refVideoStateCheckTimeout.current = setTimeout(() => {
+      if (!videoState.updated) return;
+      if (videoState.updated + 2000 < Date.now()) {
+        setVideoState({
+          ...videoState,
+          playing: false,
+        });
+        enqueueSnackbar('Server hasn\'t responded with syncing data for over 2 seconds... Video has been paused.', {
+          variant: 'error',
+          autoHideDuration: 10000,
+        });
+      }
+    }, 2000);
 
-  React.useEffect(() => {
-    if (!videoData) return;
-    if (!videoState) return;
-    
-    console.dir(videoState);
+
   }, [videoState]);
 
   const playerOnProgress = ({ playedSeconds, played }: any) => {
@@ -360,7 +376,7 @@ const Player: React.FC<Props> = ({ socket, roomData, menuVisible, toggleMenu }) 
 const NotistackIntegration: React.FC<Props> = (props) => {
   return (
     <SnackbarProvider
-      maxSnack={5}
+      maxSnack={8}
       hideIconVariant={true}
       anchorOrigin={{
         vertical: 'top',
