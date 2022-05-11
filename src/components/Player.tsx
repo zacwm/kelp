@@ -1,7 +1,7 @@
 import * as React from 'react';
 import type { Socket } from 'socket.io-client';
 import ReactPlayer from 'react-player';
-import { SnackbarProvider, VariantType, useSnackbar } from 'notistack';
+import { SnackbarProvider, useSnackbar } from 'notistack';
 
 import LinearProgress, { LinearProgressProps } from '@mui/material/LinearProgress';
 import Box from '@mui/material/Box';
