@@ -79,43 +79,41 @@ const SideMenu: React.FC<Props> = ({ socket, roomData }) => {
               <UserList users={roomData?.users} />
             </AccordionDetails>
           </Accordion>
-          { process.env.MODE === 'development' && (
-            <Accordion disableGutters>
-              <AccordionSummary
-                expandIcon={<ExpandMoreIcon />}
-                aria-controls="panel1a-content"
-                id="panel1a-header"
+          <Accordion disableGutters>
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon />}
+              aria-controls="panel1a-content"
+              id="panel1a-header"
+            >
+              <Typography variant="h6" component="h6" color="primary">Testing stuff</Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <Stack
+                direction="column"
+                alignItems="center"
+                justifyContent="space-between"
+                spacing={2}
               >
-                <Typography variant="h6" component="h6" color="primary">Testing stuff</Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Stack
-                  direction="column"
-                  alignItems="center"
-                  justifyContent="space-between"
-                  spacing={2}
-                >
-                  <TextField
-                    label="seconds"
-                    value={inputTimePosition}
-                    onChange={(e) => {
-                      setInputTimePosition(e.target.value);
-                    }}
-                    fullWidth
-                  />
-                  <Button variant="contained" onClick={buttonSubmitTimeChange}>
-                    Set
-                  </Button>
-                  <Button variant="contained" onClick={() => socket.emit('playerTest', roomData.id, 0)}>
-                    [0] Status 1
-                  </Button>
-                  <Button variant="contained" onClick={() => socket.emit('playerTest', roomData.id, 1)}>
-                    [1] Status 2
-                  </Button>
-                </Stack>
-              </AccordionDetails>
-            </Accordion>
-          )}
+                <TextField
+                  label="seconds"
+                  value={inputTimePosition}
+                  onChange={(e) => {
+                    setInputTimePosition(e.target.value);
+                  }}
+                  fullWidth
+                />
+                <Button variant="contained" onClick={buttonSubmitTimeChange}>
+                  Set
+                </Button>
+                <Button variant="contained" onClick={() => socket.emit('playerTest', roomData.id, 0)}>
+                  [0] Status 1
+                </Button>
+                <Button variant="contained" onClick={() => socket.emit('playerTest', roomData.id, 1)}>
+                  [1] Status 2
+                </Button>
+              </Stack>
+            </AccordionDetails>
+          </Accordion>
         </Box>
         <Stack
           direction="row"

@@ -10,7 +10,7 @@ import RoomManager from './RoomManager';
 import User from './User';
 
 const port: number = +process.env.PORT || 3000;
-const nextApp = next({ dev: process.env.MODE === 'development'  });
+const nextApp = next({ dev: process.env.NODE_ENV === 'development'  });
 const nextHandler: NextApiHandler = nextApp.getRequestHandler();
 
 nextApp.prepare().then(async() => {
