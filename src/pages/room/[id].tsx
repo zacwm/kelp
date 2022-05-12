@@ -26,6 +26,8 @@ const Room: NextPage = () => {
   const [roomNotFound, setRoomNotFound] = React.useState(false);
   const [openPRW, setOpenPRW] = React.useState(false);
 
+  const [videoData, setVideoData] = React.useState(null);
+
   const [menuVisible, setMenuVisible] = React.useState(false);
 
   React.useEffect((): any => {
@@ -148,7 +150,12 @@ const Room: NextPage = () => {
               socket={socket}
               roomData={roomData}
               menuVisible={menuVisible}
-              toggleMenu={() => setMenuVisible(!menuVisible)}
+              toggleMenu={(value?: boolean) => {
+                if (value === undefined) return setMenuVisible(!menuVisible);
+                setMenuVisible(value);
+              }}
+              videoData={videoData}
+              setVideoData={setVideoData}
             />
           </Grid>
           <Grid 
@@ -158,7 +165,7 @@ const Room: NextPage = () => {
               height: '100%',
             }}
           >
-            <SideMenu socket={socket} roomData={roomData} userId={userId} />
+            <SideMenu socket={socket} roomData={roomData} userId={userId} videoData={videoData} />
           </Grid>
         </Grid>
       </Box>

@@ -2,6 +2,7 @@ import * as React from 'react';
 import type { Socket } from 'socket.io-client';
 import UserList from './UserList';
 
+import Backdrop from '@mui/material/Backdrop';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Paper from '@mui/material/Paper';
@@ -19,9 +20,26 @@ type Props = {
   socket: Socket;
   roomData: any;
   userId: string;
+  videoData: any;
 }
 
-const SideMenu: React.FC<Props> = ({ socket, roomData, userId }) => {
+const SideMenu: React.FC<Props> = ({ socket, roomData, userId, videoData }) => {
+  const [torrentPrompt, setTorrentPrompt] = React.useState(false);
+  const [inputTorrentUrl, setInputTorrentUrl] = React.useState('');
+
+  const onTorrentStart = () => {
+    if (!socket) return;
+    if (!roomData) return;
+    if (!inputTorrentUrl) return;
+    socket.emit('roomStartTorrent', {
+      id: roomData.id,
+      url: inputTorrentUrl,
+    }, (res) => {
+      if (res.error) alert(res.error);
+    });
+  };
+
+  // TODO: Testing stuff below
   const [inputTimePosition, setInputTimePosition] = React.useState('');
 
   const buttonSubmitTimeChange = () => {
@@ -31,133 +49,184 @@ const SideMenu: React.FC<Props> = ({ socket, roomData, userId }) => {
   };
   
   return (
-    <Paper
-      elevation={2}
-      square
-    >
-      <Stack
-        direction="column"
-        alignItems="stretch"
-        justifyContent="space-between"
+    <React.Fragment>
+      <Backdrop
+        open={[0, 1].includes(videoData?.statusCode) && torrentPrompt}
         sx={{
-          height: '100vh',
+          zIndex: 9999,
         }}
       >
-        <Box>
-          <Accordion disableGutters>
-            <AccordionSummary
-              expandIcon={<ExpandMoreIcon />}
-              aria-controls="panel1a-content"
-              id="panel1a-header"
-            >
-              <Typography variant="h6" component="h6" color="primary">Room settings</Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-              <Stack
-                direction="column"
-                alignItems="center"
-                justifyContent="space-between"
-                spacing={2}
-              >
-                <TextField
-                  label="Torrent URL"
-                  fullWidth
-                />
-                <Button variant="contained">
-                  Download torent
-                </Button>
-              </Stack>
-            </AccordionDetails>
-          </Accordion>
-          <Accordion defaultExpanded disableGutters>
-            <AccordionSummary
-              expandIcon={<ExpandMoreIcon />}
-              aria-controls="panel2a-content"
-              id="panel2a-header"
-            >
-              <Typography variant="h6" component="h6" color="primary">Users</Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-              <UserList roomData={roomData} userId={userId} />
-            </AccordionDetails>
-          </Accordion>
-          <Accordion disableGutters>
-            <AccordionSummary
-              expandIcon={<ExpandMoreIcon />}
-              aria-controls="panel1a-content"
-              id="panel1a-header"
-            >
-              <Typography variant="h6" component="h6" color="primary">Testing stuff</Typography>
-            </AccordionSummary>
-            <AccordionDetails>
-              <Stack
-                direction="column"
-                alignItems="center"
-                justifyContent="space-between"
-                spacing={2}
-              >
-                <TextField
-                  label="seconds"
-                  value={inputTimePosition}
-                  onChange={(e) => {
-                    setInputTimePosition(e.target.value);
-                  }}
-                  fullWidth
-                />
-                <Button variant="contained" onClick={buttonSubmitTimeChange}>
-                  Set
-                </Button>
-                <Button variant="contained" onClick={() => socket.emit('playerTest', roomData.id, 0)}>
-                  [0] Status 1
-                </Button>
-                <Button variant="contained" onClick={() => socket.emit('playerTest', roomData.id, 1)}>
-                  [1] Status 2
-                </Button>
-                <Button variant="contained" onClick={() => socket.emit('playerTest', roomData.id, 2)}>
-                  [2] Download torrent
-                </Button>
-                <Button variant="contained" onClick={() => socket.emit('playerTest', roomData.id, 3)}>
-                  [3] Stop torrent
-                </Button>
-                <Button variant="contained" onClick={() => socket.emit('playerTest', roomData.id, 4)}>
-                  [4] Convert test mkv
-                </Button>
-              </Stack>
-            </AccordionDetails>
-          </Accordion>
-        </Box>
-        <Stack
-          direction="row"
-          alignItems="center"
-          justifyContent="center"
-          spacing={2}
+        <Paper
+          elevation={24}
           sx={{
-            p: 1,
-            borderTop: '1px solid #555',
+            p: 4
           }}
         >
-          <Link
-            component="a"
-            href="/"
-            variant="caption"
+          <Stack
+            direction="column"
+            alignItems="center"
+            justifyContent="flex-start"
+            spacing={2}
           >
-            kelp
-          </Link>
-          <Typography variant="caption" component="span">
-            Version 1.0.0
-          </Typography>
-          <Link
-            component="a"
-            target="_blank"
-            href="https://github.com/zacimac/kelp"
-            rel="noopener"
-            variant="caption"
+            <Typography variant="h5" component="h5">
+              Start a torrent download...
+            </Typography>
+            <TextField
+              id="torrent-input"
+              label="Torrent or magnet link"
+              variant="outlined"
+              fullWidth
+              value={inputTorrentUrl}
+              onChange={(e) => setInputTorrentUrl(e.target.value)}
+            />
+            <Typography variant="body1" component="p" color="red">
+              If the room already has a torrent playing, using this will delete the current torrent and start a new one.
+            </Typography>
+            <Stack
+              direction="row"
+              alignItems="center"
+              justifyContent="center"
+              spacing={1}
+            >
+              <Button variant="contained" onClick={() => setTorrentPrompt(false)}>
+                Close
+              </Button>
+              <Button variant="contained" onClick={onTorrentStart}>
+                Start Download
+              </Button>
+            </Stack>
+          </Stack>
+        </Paper>
+      </Backdrop>
+
+      <Paper
+        elevation={2}
+        square
+      >
+        <Stack
+          direction="column"
+          alignItems="stretch"
+          justifyContent="space-between"
+          sx={{
+            height: '100vh',
+          }}
+        >
+          <Box>
+            <Accordion disableGutters>
+              <AccordionSummary
+                expandIcon={<ExpandMoreIcon />}
+                aria-controls="panel1a-content"
+                id="panel1a-header"
+              >
+                <Typography variant="h6" component="h6" color="primary">Room settings</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Stack
+                  direction="column"
+                  alignItems="center"
+                  justifyContent="space-between"
+                  spacing={2}
+                >
+                  { [0, 1].includes(videoData?.statusCode) && (
+                    <Button variant="contained" onClick={() => setTorrentPrompt(true)}>
+                      Download torent
+                    </Button>
+                  ) }
+                  { ![0, 1].includes(videoData?.statusCode) && (
+                    <Button variant="contained">
+                      Stop Download
+                    </Button>
+                  ) }
+                </Stack>
+              </AccordionDetails>
+            </Accordion>
+            <Accordion defaultExpanded disableGutters>
+              <AccordionSummary
+                expandIcon={<ExpandMoreIcon />}
+                aria-controls="panel2a-content"
+                id="panel2a-header"
+              >
+                <Typography variant="h6" component="h6" color="primary">Users</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <UserList roomData={roomData} userId={userId} />
+              </AccordionDetails>
+            </Accordion>
+            <Accordion disableGutters>
+              <AccordionSummary
+                expandIcon={<ExpandMoreIcon />}
+                aria-controls="panel1a-content"
+                id="panel1a-header"
+              >
+                <Typography variant="h6" component="h6" color="primary">Testing stuff</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Stack
+                  direction="column"
+                  alignItems="center"
+                  justifyContent="space-between"
+                  spacing={2}
+                >
+                  <TextField
+                    label="seconds"
+                    value={inputTimePosition}
+                    onChange={(e) => {
+                      setInputTimePosition(e.target.value);
+                    }}
+                    fullWidth
+                  />
+                  <Button variant="contained" onClick={buttonSubmitTimeChange}>
+                    Set
+                  </Button>
+                  <Button variant="contained" onClick={() => socket.emit('playerTest', roomData.id, 2)}>
+                    [2] Download torrent
+                  </Button>
+                  <Button variant="contained" onClick={() => socket.emit('playerTest', roomData.id, 3)}>
+                    [3] Stop torrent
+                  </Button>
+                  <Button variant="contained" onClick={() => socket.emit('playerTest', roomData.id, 4)}>
+                    [4] Convert test mkv
+                  </Button>
+                  <Button variant="contained" onClick={() => socket.emit('playerTest', roomData.id, 5)}>
+                    [5] Convert test mp4
+                  </Button>
+                </Stack>
+              </AccordionDetails>
+            </Accordion>
+          </Box>
+          <Stack
+            direction="row"
+            alignItems="center"
+            justifyContent="center"
+            spacing={2}
+            sx={{
+              p: 1,
+              borderTop: '1px solid #555',
+            }}
           >
-            GitHub
-          </Link>
+            <Link
+              component="a"
+              href="/"
+              variant="caption"
+            >
+              kelp
+            </Link>
+            <Typography variant="caption" component="span">
+              Version 1.0.0
+            </Typography>
+            <Link
+              component="a"
+              target="_blank"
+              href="https://github.com/zacimac/kelp"
+              rel="noopener"
+              variant="caption"
+            >
+              GitHub
+            </Link>
+          </Stack>
         </Stack>
-      </Stack>
-    </Paper>
+      </Paper>
+    </React.Fragment>
   );
 };
 

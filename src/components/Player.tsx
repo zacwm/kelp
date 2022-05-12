@@ -11,6 +11,7 @@ import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
 import Fade from '@mui/material/Fade';
 import Slider from '@mui/material/Slider';
+import Tooltip from '@mui/material/Tooltip';
 
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
@@ -18,6 +19,7 @@ import VolumeDown from '@mui/icons-material/VolumeDown';
 import VolumeUp from '@mui/icons-material/VolumeUp';
 import PauseIcon from '@mui/icons-material/Pause';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
+import FullscreenIcon from '@mui/icons-material/Fullscreen';
 
 function LinearProgressWithLabel(props: LinearProgressProps & { value: number }) {
   return (
@@ -38,17 +40,20 @@ type Props = {
   socket: Socket;
   roomData: any;
   menuVisible: boolean;
-  toggleMenu: () => void;
+  videoData: any;
+  setVideoData: any;
+  toggleMenu: (forceValue?: boolean) => void;
 }
 
-const Player: React.FC<Props> = ({ socket, roomData, menuVisible, toggleMenu }) => {
+const Player: React.FC<Props> = ({ socket, roomData, menuVisible, videoData, setVideoData, toggleMenu }) => {
   const { enqueueSnackbar } = useSnackbar();
 
-  const [videoData, setVideoData] = React.useState(null);
   const [videoState, setVideoState] = React.useState(null);
   const refVideoStateCheckTimeout = React.useRef(null);
 
   const [videoTimePosition, setVideoTimePosition] = React.useState(0);
+  const [videoPlayedSeconds, setVideoPlayedSeconds] = React.useState(0);
+  const [videoDuration, setVideoDuration] = React.useState(0);
 
   const [mouseOverVideo, setMouseOverVideo] = React.useState(false);
   const [mouseRecentMove, setMouseRecentMove] = React.useState(false);
@@ -56,6 +61,7 @@ const Player: React.FC<Props> = ({ socket, roomData, menuVisible, toggleMenu }) 
   const [showVideoOverlay, setShowVideoOverlay] = React.useState(false);
 
   const [inputVolumeSlider, setInputVolumeSlider] = React.useState<number>(50);
+  const [fullscreenMode, setFullscreenMode] = React.useState(false);
 
   const refPlayer = React.useRef<ReactPlayer>(null);
 
@@ -127,6 +133,16 @@ const Player: React.FC<Props> = ({ socket, roomData, menuVisible, toggleMenu }) 
     };
   }, [roomData, socket]);
 
+  React.useEffect(() => {
+    if (fullscreenMode && !document.fullscreenElement) {
+      document.documentElement.requestFullscreen();
+      toggleMenu(false);
+    } else if (document.fullscreenElement) {
+      document.exitFullscreen();
+      toggleMenu(true);
+    }
+  }, [fullscreenMode]);
+
   // If video state is playing but hasn't been updated for 2 seconds, pause it.
   React.useEffect(() => {
     if (!videoState) return;
@@ -158,8 +174,6 @@ const Player: React.FC<Props> = ({ socket, roomData, menuVisible, toggleMenu }) 
     if (!videoState) return;
     if (!refPlayer) return;
 
-    console.dir(playedSeconds);
-
     if (playedSeconds > videoState.timePosition + 2) {
       refPlayer.current.seekTo(videoState.timePosition);
       enqueueSnackbar('Your player was over 2 seconds ahead. Resyncing...', { variant: 'warning' });
@@ -168,6 +182,7 @@ const Player: React.FC<Props> = ({ socket, roomData, menuVisible, toggleMenu }) 
       enqueueSnackbar('Your player was over 2 seconds behind. Resyncing...', { variant: 'warning' });
     }
 
+    setVideoPlayedSeconds(playedSeconds);
     setVideoTimePosition(played);
   };
 
@@ -185,8 +200,12 @@ const Player: React.FC<Props> = ({ socket, roomData, menuVisible, toggleMenu }) 
     enqueueSnackbar('Something went wrong with the video. Try refreshing?', { variant: 'error' });
   };
 
-  // User Events
+  const playerOnDuration = (duration: number) => {
+    console.dir(duration);
+    setVideoDuration(duration);
+  };
 
+  // User Events
   const volumeSliderChange = (event: Event, newValue: number | number[]) => {
     if (!videoData) return;
     setInputVolumeSlider(newValue as number);
@@ -213,7 +232,7 @@ const Player: React.FC<Props> = ({ socket, roomData, menuVisible, toggleMenu }) 
             height: '100vh',
           }}
         >
-          {videoData?.url ? (
+          {videoData?.statusCode === 0 && videoData?.url ? (
             <Box
               onMouseOver={() => setMouseOverVideo(true) }
               onMouseOut={() => setMouseOverVideo(false) }
@@ -243,23 +262,19 @@ const Player: React.FC<Props> = ({ socket, roomData, menuVisible, toggleMenu }) 
                       justifyContent="space-between"
                       spacing={2}
                     >
-                      <Typography>
-                        {videoData.title || 'No Title'}
+                      <Typography color={!videoData.title ? 'primary' : 'default'}>
+                        {videoData.title || 'kelp'}
                       </Typography>
                       {
                         menuVisible ? (
                           <ArrowForwardIosIcon 
-                            onClick={toggleMenu}
-                            sx={{
-                              cursor: 'pointer',
-                            }}
+                            onClick={() => { toggleMenu(); }}
+                            sx={{ cursor: 'pointer' }}
                           />
                         ) : (
                           <ArrowBackIosIcon 
-                            onClick={toggleMenu}
-                            sx={{
-                              cursor: 'pointer',
-                            }}
+                            onClick={() => { toggleMenu(); }}
+                            sx={{ cursor: 'pointer' }}
                           />
                         )
                       }
@@ -302,17 +317,25 @@ const Player: React.FC<Props> = ({ socket, roomData, menuVisible, toggleMenu }) 
                           )
                         )
                       }
-                      <Stack spacing={2} direction="row" sx={{ mb: 1, flex: 1 }} alignItems="center">
-                        <Slider
-                          aria-label="time-indicator"
-                          value={videoTimePosition}
-                          defaultValue={0}
-                          min={0}
-                          max={0.999999}
-                          step={0.0001}
-                          disabled
-                        />
-                      </Stack>
+                      <Typography>
+                        {videoPlayedSeconds !== 0 && formatSeconds(videoPlayedSeconds)}
+                      </Typography>
+                      <Tooltip title="To adjust time, use the side menu." placement="top" followCursor>
+                        <Stack spacing={2} direction="row" sx={{ mb: 1, flex: 1 }} alignItems="center">
+                          <Slider
+                            aria-label="time-indicator"
+                            value={videoTimePosition}
+                            defaultValue={0}
+                            min={0}
+                            max={0.999999}
+                            step={0.0001}
+                            disabled
+                          />
+                        </Stack>
+                      </Tooltip>
+                      <Typography>
+                        {formatSeconds(videoDuration || 0)}
+                      </Typography>
                       <Stack spacing={2} direction="row" sx={{ mb: 1, minWidth: 200 }} alignItems="center">
                         <VolumeDown />
                         <Slider
@@ -323,6 +346,10 @@ const Player: React.FC<Props> = ({ socket, roomData, menuVisible, toggleMenu }) 
                         />
                         <VolumeUp />
                       </Stack>
+                      <FullscreenIcon 
+                        onClick={() => setFullscreenMode(!fullscreenMode)}
+                        sx={{ cursor: 'pointer' }}
+                      />
                     </Stack>
                   </Box>
                 </Box>
@@ -350,6 +377,7 @@ const Player: React.FC<Props> = ({ socket, roomData, menuVisible, toggleMenu }) 
                 onProgress={playerOnProgress}
                 onEnded={playerEnded}
                 onError={playerOnError}
+                onDuration={playerOnDuration}
               />
             </Box>
           ) : (
@@ -368,7 +396,7 @@ const Player: React.FC<Props> = ({ socket, roomData, menuVisible, toggleMenu }) 
                   height: '100%',
                 }}
               >
-                {(videoData?.preparing && !videoData?.status) && (
+                {videoData?.statusCode === 1 && (
                   <Paper elevation={2} sx={{ p: 2, m: 1, minWidth: 400, maxWidth: 500 }}>
                     <Typography variant="h4" component="h4" mb={2} color="primary">
                       Waiting for a torrent...
@@ -378,14 +406,14 @@ const Player: React.FC<Props> = ({ socket, roomData, menuVisible, toggleMenu }) 
                     </Typography>
                   </Paper>
                 )}
-                {(videoData?.preparing && videoData?.status === 'Starting...') && (
+                {videoData?.statusCode === 2 && (
                   <Paper elevation={2} sx={{ p: 2, m: 1, minWidth: 400, maxWidth: 500 }}>
-                    <Typography variant="h4" component="h4" mb={2} color="primary">
+                    <Typography variant="h4" component="h4">
                       Starting download...
                     </Typography>
                   </Paper>
                 )}
-                {(videoData?.preparing && videoData?.status) && (
+                {videoData?.statusCode >= 3 && (
                   <Paper elevation={2} sx={{ p: 2, m: 1 }}>
                     <Stack
                       direction="column"
@@ -453,3 +481,18 @@ const NotistackIntegration: React.FC<Props> = (props) => {
 };
 
 export default NotistackIntegration;
+
+function formatSeconds(seconds) {
+  const date = new Date(seconds * 1000);
+  const hh = date.getUTCHours();
+  const mm = date.getUTCMinutes();
+  const ss = pad(date.getUTCSeconds());
+  if (hh) {
+    return `${hh}:${pad(mm)}:${ss}`;
+  }
+  return `${mm}:${ss}`;
+}
+
+function pad(string) {
+  return ('0' + string).slice(-2);
+}

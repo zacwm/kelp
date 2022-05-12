@@ -55,7 +55,7 @@ nextApp.prepare().then(async() => {
           };
         }),
         videoData: room.getVideoData(),
-        videoState: room.status === 'ready' ? room.getPlaybackState() : null,
+        videoState: room.statusCode === 0 ? room.getPlaybackState() : null,
       });
     });
 
@@ -100,7 +100,7 @@ nextApp.prepare().then(async() => {
             };
           }),
           videoData: room.getVideoData(),
-          videoState: room.status === 'ready' ? room.getPlaybackState() : null,
+          videoState: room.statusCode === 0 ? room.getPlaybackState() : null,
         }
       });
 
@@ -114,8 +114,18 @@ nextApp.prepare().then(async() => {
           };
         }),
         videoData: room.getVideoData(),
-        videoState: room.status === 'ready' ? room.getPlaybackState() : null,
+        videoState: room.statusCode === 0 ? room.getPlaybackState() : null,
       });
+    });
+
+    socket.on('roomStartTorrent', (data: any, callback: any) => {
+      if (currentRoom !== data.id) return;
+      const room: Room = Rooms.getRoomById(data.id);
+      if (!room) return;
+      const videoData: any = room.getVideoData();
+      if (![0, 1].includes(videoData.statusCode)) return;
+
+      room.startTorrent(data.url, callback);
     });
 
     socket.on('videoChangePlaybackPlaying', (roomData: any, playing: boolean) => {
@@ -146,20 +156,17 @@ nextApp.prepare().then(async() => {
     // Testing sockets
     socket.on('playerTest', (id: string, type: number) => {
       switch (type) {
-      case 0:
-        Rooms.getRoomById(id).setStatus('Downloading torrent', 50);
-        break;
-      case 1:
-        Rooms.getRoomById(id).setStatus('ready', 100);
-        break;
       case 2:
         Rooms.getRoomById(id).startTorrent('magnet:?xt=urn:btih:42DE3C3F9010426FD6F4546F0D9D2249EE7FFC7C&dn=I+Want+to+Eat+Your+Pancreas+2018+JAPANESE+1080p+BluRay+H264+AAC');
         break;
       case 3:
-        Rooms.getRoomById(id).destroyTorrent();
+        Rooms.getRoomById(id).resetRoom();
         break;
       case 4:
-        Rooms.getRoomById(id).convertTorrent(path.join(__dirname, '../test/test.mkv'));
+        Rooms.getRoomById(id).convertTorrent(path.join(__dirname, './test/test.mkv'), '.mkv');
+        break;
+      case 5:
+        Rooms.getRoomById(id).convertTorrent(path.join(__dirname, './test/batman.mp4'), '.mp4');
         break;
       }
     });
