@@ -43,6 +43,7 @@ class Room implements RoomInterface {
   private videoTitle: string;
   private videoURL: string;
   private videoSubtitle: string;
+  private videoExtra: any;
   // Video playback data...
   playbackPlaying: boolean;
   private playbackTimePosition: number;
@@ -114,6 +115,7 @@ class Room implements RoomInterface {
         url: this.videoURL,
         title: this.videoTitle,
         subtitle: this.videoSubtitle,
+        extra: this.videoExtra,
       };
     } else {
       return {
@@ -122,6 +124,7 @@ class Room implements RoomInterface {
         percentage: this.statusPercentage,
         timeRemaining: this.statusTimeRemaining,
         downloadSpeed: this.statusSpeed,
+        extra: this.videoExtra,
       };
     }
 
@@ -145,12 +148,12 @@ class Room implements RoomInterface {
     if (this.playbackPlaying) {
       // Create the syncing interval
       this.playbackTimePositionTimeout = setInterval(() => {
-        this.playbackTimePosition += 1;
+        this.playbackTimePosition += .2;
         this.SocketServer.emit('videoUpdateState', {
           roomId: this.id,
           newState: this.getPlaybackState(),
         });
-      }, 1000);
+      }, 200);
     } else {
       // If paused, it can be stopped...
       clearInterval(this.playbackTimePositionTimeout);
@@ -184,19 +187,33 @@ class Room implements RoomInterface {
     if (!this.wtClient) this.wtClient = new WebTorrent();
     this.wtClient.add(url, { path: path.join(__dirname, `../.temp/${this.id}`) }, (torrent: any) => {
       this.torrent = torrent;
+      const videoFile = torrent.files.find(file => ['.mkv', '.mp4'].includes(path.extname(file.path)));
+      if (!videoFile) {
+        torrent.destroy();
+        return this.setStatus(-1, 'No video file found in torrent...');
+      }
 
       this.torrentCheckInterval = setInterval(() => {
         if (this.torrent.done || !this.wtClient) return clearInterval(this.torrentCheckInterval);
-        console.log(`Room: ${this.id} | File: ${torrent.files[0].name} | ${(torrent.progress * 100).toFixed(2)}% @ ${formatBytes(torrent.downloadSpeed)}/sec`);
+
+        this.videoExtra = {
+          ...this.videoExtra,
+          maxDownloadSpeed: this.videoExtra?.maxDownloadSpeed || 0 < torrent.downloadSpeed ? torrent.downloadSpeed : this.videoExtra?.maxDownloadSpeed || 0,
+          lowDownloadSpeed: this.videoExtra?.lowDownloadSpeed || 0 > torrent.downloadSpeed ? torrent.downloadSpeed : this.videoExtra?.lowDownloadSpeed || 0,
+          torrentFiles: torrent.files.length,
+          torrentSize: formatBytes(torrent.length),
+        };
+
+        console.log(`Room: ${this.id} | Files: ${torrent.files.length} | ${(torrent.progress * 100).toFixed(2)}% @ ${formatBytes(torrent.downloadSpeed)}/sec`);
         this.setStatus(3, 'Downloading torrent...', torrent.progress * 100, torrent.timeRemaining, `${formatBytes(torrent.downloadSpeed)}/s`);
       }, 500);
 
       torrent.on('done', () => {
+        /* // TODO: This issue marked as a bug from over 2 years ago... https://github.com/webtorrent/webtorrent/issues/1931
         if (this.wtClient) this.wtClient.destory();
+        */
         if (this.torrentCheckInterval) clearInterval(this.torrentCheckInterval);
         this.videoTitle = torrent.name;
-        const videoFile = torrent.files.find(file => ['.mkv', '.mp4'].includes(path.extname(file.path)));
-        if (!videoFile) return this.setStatus(-1, 'No video file found in torrent...');
         this.convertTorrent(videoFile.path, path.extname(videoFile.path));
       });
     });
@@ -206,10 +223,9 @@ class Room implements RoomInterface {
     await fs.emptyDir(path.join(__dirname, `../.streams/${this.id}`));
     this.setStatus(4, 'Staring conversion...');
     if (this.ffmpegProcess) return;
-    await fs.emptyDir(path.join(__dirname, `../.streams/${this.id}`));
-    fs.pathExists(videoPath, (err, exists) => {
+    fs.pathExists(videoPath, async (err, exists) => {
       if (err) return console.log(err);
-      if (!exists) return console.log('File does not exist: ' + videoPath);
+      if (!exists) return this.setStatus(-1, 'Video file not found...');
 
       if (type === '.mkv') {
         // File exists, start converting...
@@ -247,6 +263,10 @@ class Room implements RoomInterface {
           if (videoStdout || videoStderr) {
             this.videoURL = `/streams/${this.id}/index.m3u8`;
             this.ffmpegProcess = null;
+            this.videoExtra = {
+              ...this.videoExtra,
+              hlsFileCount: fs.readdirSync(path.join(__dirname, `../.streams/${this.id}`)).length,
+            };
             this.setStatus(0, 'Ready');
           }
         });

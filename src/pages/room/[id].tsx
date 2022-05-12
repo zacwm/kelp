@@ -26,6 +26,7 @@ const Room: NextPage = () => {
   const [roomNotFound, setRoomNotFound] = React.useState(false);
   const [openPRW, setOpenPRW] = React.useState(false);
 
+  const [videoState, setVideoState] = React.useState(null);
   const [videoData, setVideoData] = React.useState(null);
 
   const [menuVisible, setMenuVisible] = React.useState(false);
@@ -154,6 +155,8 @@ const Room: NextPage = () => {
                 if (value === undefined) return setMenuVisible(!menuVisible);
                 setMenuVisible(value);
               }}
+              videoState={videoState}
+              setVideoState={setVideoState}
               videoData={videoData}
               setVideoData={setVideoData}
             />
@@ -165,7 +168,13 @@ const Room: NextPage = () => {
               height: '100%',
             }}
           >
-            <SideMenu socket={socket} roomData={roomData} userId={userId} videoData={videoData} />
+            <SideMenu
+              socket={socket}
+              roomData={roomData}
+              userId={userId}
+              videoState={videoState}
+              videoData={videoData}
+            />
           </Grid>
         </Grid>
       </Box>

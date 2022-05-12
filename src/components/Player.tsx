@@ -40,15 +40,16 @@ type Props = {
   socket: Socket;
   roomData: any;
   menuVisible: boolean;
+  videoState: any;
+  setVideoState: any;
   videoData: any;
   setVideoData: any;
   toggleMenu: (forceValue?: boolean) => void;
 }
 
-const Player: React.FC<Props> = ({ socket, roomData, menuVisible, videoData, setVideoData, toggleMenu }) => {
+const Player: React.FC<Props> = ({ socket, roomData, menuVisible, videoState, setVideoState, videoData, setVideoData, toggleMenu }) => {
   const { enqueueSnackbar } = useSnackbar();
 
-  const [videoState, setVideoState] = React.useState(null);
   const refVideoStateCheckTimeout = React.useRef(null);
 
   const [videoTimePosition, setVideoTimePosition] = React.useState(0);
@@ -201,7 +202,6 @@ const Player: React.FC<Props> = ({ socket, roomData, menuVisible, videoData, set
   };
 
   const playerOnDuration = (duration: number) => {
-    console.dir(duration);
     setVideoDuration(duration);
   };
 
@@ -396,6 +396,16 @@ const Player: React.FC<Props> = ({ socket, roomData, menuVisible, videoData, set
                   height: '100%',
                 }}
               >
+                {videoData?.statusCode === -1 && (
+                  <Paper elevation={2} sx={{ p: 2, m: 1, minWidth: 400, maxWidth: 500 }}>
+                    <Typography variant="h4" component="h4" color="error">
+                      There was an error...
+                    </Typography>
+                    <Typography variant="h6" component="h6">
+                      {videoData.status}
+                    </Typography>
+                  </Paper>
+                )}
                 {videoData?.statusCode === 1 && (
                   <Paper elevation={2} sx={{ p: 2, m: 1, minWidth: 400, maxWidth: 500 }}>
                     <Typography variant="h4" component="h4" mb={2} color="primary">

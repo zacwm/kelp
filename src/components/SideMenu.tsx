@@ -20,10 +20,11 @@ type Props = {
   socket: Socket;
   roomData: any;
   userId: string;
+  videoState: any;
   videoData: any;
 }
 
-const SideMenu: React.FC<Props> = ({ socket, roomData, userId, videoData }) => {
+const SideMenu: React.FC<Props> = ({ socket, roomData, userId, videoState, videoData }) => {
   const [torrentPrompt, setTorrentPrompt] = React.useState(false);
   const [inputTorrentUrl, setInputTorrentUrl] = React.useState('');
 
@@ -47,6 +48,11 @@ const SideMenu: React.FC<Props> = ({ socket, roomData, userId, videoData }) => {
       id: roomData.id,
     }, parseInt(inputTimePosition));
   };
+
+  React.useEffect(() => {
+    if (!videoState?.timePosition) return;
+    setInputTimePosition(Math.floor(videoState.timePosition || 0).toString());
+  }, [videoState]);
   
   return (
     <React.Fragment>
@@ -109,6 +115,8 @@ const SideMenu: React.FC<Props> = ({ socket, roomData, userId, videoData }) => {
           justifyContent="space-between"
           sx={{
             height: '100vh',
+            maxHeight: '100vh',
+            overflowY: 'auto',
           }}
         >
           <Box>
@@ -152,13 +160,19 @@ const SideMenu: React.FC<Props> = ({ socket, roomData, userId, videoData }) => {
                 <UserList roomData={roomData} userId={userId} />
               </AccordionDetails>
             </Accordion>
+          </Box>
+          <Stack
+            direction="column"
+            alignItems="stretch"
+            justifyContent="center"
+          >
             <Accordion disableGutters>
               <AccordionSummary
                 expandIcon={<ExpandMoreIcon />}
                 aria-controls="panel1a-content"
                 id="panel1a-header"
               >
-                <Typography variant="h6" component="h6" color="primary">Testing stuff</Typography>
+                <Typography variant="subtitle2" component="p">Testing buttons</Typography>
               </AccordionSummary>
               <AccordionDetails>
                 <Stack
@@ -176,7 +190,7 @@ const SideMenu: React.FC<Props> = ({ socket, roomData, userId, videoData }) => {
                     fullWidth
                   />
                   <Button variant="contained" onClick={buttonSubmitTimeChange}>
-                    Set
+                    Set seconds
                   </Button>
                   <Button variant="contained" onClick={() => socket.emit('playerTest', roomData.id, 2)}>
                     [2] Download torrent
@@ -193,36 +207,65 @@ const SideMenu: React.FC<Props> = ({ socket, roomData, userId, videoData }) => {
                 </Stack>
               </AccordionDetails>
             </Accordion>
-          </Box>
-          <Stack
-            direction="row"
-            alignItems="center"
-            justifyContent="center"
-            spacing={2}
-            sx={{
-              p: 1,
-              borderTop: '1px solid #555',
-            }}
-          >
-            <Link
-              component="a"
-              href="/"
-              variant="caption"
+            <Accordion disableGutters>
+              <AccordionSummary
+                expandIcon={<ExpandMoreIcon />}
+                aria-controls="panel1a-content"
+                id="panel1a-header"
+              >
+                <Typography variant="subtitle2" component="p">Extra info</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Stack
+                  direction="column"
+                  alignItems="center"
+                  justifyContent="space-between"
+                  spacing={2}
+                >
+                  {
+                    videoData?.extra ? Object.keys(videoData?.extra || {}).map((key) => (
+                      <Typography variant="body2" component="span" key={`extra_${key}`}>
+                        {key}: {videoData?.extra[key]}
+                      </Typography>
+                    )) : (
+                      <Typography variant="body1" component="span" color="primary">
+                        No information available
+                      </Typography>
+                    )
+                  }
+                </Stack>
+              </AccordionDetails>
+            </Accordion>
+            <Stack
+              direction="row"
+              alignItems="center"
+              justifyContent="center"
+              spacing={2}
+              sx={{
+                p: 1,
+                borderTop: '1px solid #555',
+              }}
             >
-              kelp
-            </Link>
-            <Typography variant="caption" component="span">
-              Version 1.0.0
-            </Typography>
-            <Link
-              component="a"
-              target="_blank"
-              href="https://github.com/zacimac/kelp"
-              rel="noopener"
-              variant="caption"
-            >
-              GitHub
-            </Link>
+              <Link
+                component="a"
+                href="/"
+                variant="caption"
+              >
+                kelp
+              </Link>
+              <Typography variant="caption" component="span">
+                Version 1.0.0
+              </Typography>
+              <Link
+                component="a"
+                target="_blank"
+                href="https://github.com/zacimac/kelp"
+                rel="noopener"
+                variant="caption"
+              >
+                GitHub
+              </Link>
+            </Stack>
           </Stack>
         </Stack>
       </Paper>
