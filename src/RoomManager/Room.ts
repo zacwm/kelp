@@ -271,32 +271,6 @@ class Room implements RoomInterface {
           }
         });
       }
-
-      // to hls
-      /*
-      this.ffmpegProcess = childProcess.exec(`ffmpeg -i "${videoPath}" -sn -c:v h264 -profile:v main -g 48 -keyint_min 48 -sc_threshold 0 -hls_time 10 -hls_playlist_type vod "${destinationPath}"`, (err, stdout, stderr) => {
-        if (err) return console.log(err);
-        console.log(stdout);
-        console.log(stderr);
-
-        this.status = 'ready';
-        this.videoURL = `/streams/${this.id}/index.m3u8`;
-        this.emitUpdateRoom();
-      });
-      */
-
-      /*
-      this.ffmpegProcess = childProcess.spawn(`ffmpeg -i "${videoPath}" -sn -c:v h264 -profile:v main -g 48 -keyint_min 48 -sc_threshold 0 -hls_time 10 -hls_playlist_type vod "${destinationPath}"`);
-      this.ffmpegProcess = childProcess.spawn('ffmpeg', ['-i', videoPath, '-sn', '-c:v', 'h264', '-profile:v', 'main', '-g', '48', '-keyint_min', '48', '-sc_threshold', '0', '-hls_time', '10', '-hls_playlist_type', 'vod', destinationPath]);
-      this.ffmpegProcess.stdout.on('data', function (data) {
-        console.log('stdout: ' + data.toString());
-      });
-      
-      this.ffmpegProcess.stderr.on('data', function (data) {
-        console.log('stderr: ' + data.toString());
-      });
-      */
-
     });
   }
 
