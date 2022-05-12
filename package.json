@@ -5,6 +5,7 @@
   "main": "./src/server.ts",
   "scripts": {
     "start": "npx ts-node .",
+    "torrentTest": "npx ts-node ./src/TorrentTest.ts",
     "watch": "npx nodemon --exec \"npm start\""
   },
   "repository": {
@@ -28,8 +29,11 @@
     "@mui/icons-material": "^5.6.2",
     "@mui/material": "^5.6.4",
     "@types/express": "^4.17.13",
+    "@types/webtorrent": "^0.109.3",
     "dotenv": "^16.0.1",
     "express": "^4.18.1",
+    "fs-extra": "^10.1.0",
+    "moment": "^2.29.3",
     "mongoose": "^6.3.2",
     "next": "^12.1.6",
     "notistack": "^2.0.4",

@@ -11,6 +11,7 @@ import Accordion from '@mui/material/Accordion';
 import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import TextField from '@mui/material/TextField';
+import Link from '@mui/material/Link';
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
@@ -63,7 +64,7 @@ const SideMenu: React.FC<Props> = ({ socket, roomData, userId }) => {
                   fullWidth
                 />
                 <Button variant="contained">
-                  Set torrent
+                  Download torent
                 </Button>
               </Stack>
             </AccordionDetails>
@@ -112,6 +113,15 @@ const SideMenu: React.FC<Props> = ({ socket, roomData, userId }) => {
                 <Button variant="contained" onClick={() => socket.emit('playerTest', roomData.id, 1)}>
                   [1] Status 2
                 </Button>
+                <Button variant="contained" onClick={() => socket.emit('playerTest', roomData.id, 2)}>
+                  [2] Download torrent
+                </Button>
+                <Button variant="contained" onClick={() => socket.emit('playerTest', roomData.id, 3)}>
+                  [3] Stop torrent
+                </Button>
+                <Button variant="contained" onClick={() => socket.emit('playerTest', roomData.id, 4)}>
+                  [4] Convert test mkv
+                </Button>
               </Stack>
             </AccordionDetails>
           </Accordion>
@@ -126,12 +136,25 @@ const SideMenu: React.FC<Props> = ({ socket, roomData, userId }) => {
             borderTop: '1px solid #555',
           }}
         >
-          <Typography variant="caption" component="span" color="primary">
+          <Link
+            component="a"
+            href="/"
+            variant="caption"
+          >
             kelp
-          </Typography>
+          </Link>
           <Typography variant="caption" component="span">
             Version 1.0.0
           </Typography>
+          <Link
+            component="a"
+            target="_blank"
+            href="https://github.com/zacimac/kelp"
+            rel="noopener"
+            variant="caption"
+          >
+            GitHub
+          </Link>
         </Stack>
       </Stack>
     </Paper>

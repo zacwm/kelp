@@ -4,9 +4,9 @@
 ### [What is kelp?](#what-is-kelp) | [Setup](#setup) | [Important](#important)
 
 ## What is kelp?
-Why is there so many streaming services?! And then watching it with friends so bad due to screensharing lag/compression/etc... Well this is my solution for it.
+kelp (with a lowercase 'k') is a torrent downloading and playback syncing server.
 
-'kelp' is intended to be hosted on a server with a good internet connection. It allows users to generate a room to allow other users to join via a URL. 
+kelp is intended to be hosted on a server with a good internet connection. It allows users to generate a room to allow other users to join via a URL. 
 
 The host before inviting users will enter a torrent/magnet URL and the server will begin downloading it. Once downloaded and users are invited, a player will appear and the host can optionally grant all or each user controller access to pause/play/skip throughout the video from the torrent.
 

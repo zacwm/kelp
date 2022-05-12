@@ -22,7 +22,6 @@ const UserList: React.FC<Props> = ({ roomData, userId }) => {
     // Format users, and if no name, add a count to make it unique.
     let nullUserCount = 0;
     for (let i = 0; i < roomData.users.length; i++) {
-      console.dir(roomData.users[i]);
       if (!roomData.users[i].name) nullUserCount++;
       newUsersList.push({
         ...roomData.users[i],

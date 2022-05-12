@@ -5,6 +5,7 @@ import express, { Express, Request, Response } from 'express';
 import * as http from 'http';
 import next, { NextApiHandler } from 'next';
 import * as SocketIO from 'socket.io';
+import fs from 'fs-extra';
 import Room from './RoomManager/Room';
 import RoomManager from './RoomManager';
 import User from './User';
@@ -14,6 +15,8 @@ const nextApp = next({ dev: process.env.NODE_ENV === 'development'  });
 const nextHandler: NextApiHandler = nextApp.getRequestHandler();
 
 nextApp.prepare().then(async() => {
+  await fs.emptyDir(path.join(__dirname, './.temp'));
+  await fs.emptyDir(path.join(__dirname, './.streams'));
   
   const app: Express = express();
   const server: http.Server = http.createServer(app);
@@ -30,7 +33,7 @@ nextApp.prepare().then(async() => {
   */
 
   // TODO: Test stream host, remove when done
-  app.use('/streams', express.static(path.join(__dirname, './streams')));
+  app.use('/streams', express.static(path.join(__dirname, './.streams')));
 
   io.on('connection', (socket: SocketIO.Socket) => {
     let user;
@@ -100,6 +103,7 @@ nextApp.prepare().then(async() => {
           videoState: room.status === 'ready' ? room.getPlaybackState() : null,
         }
       });
+
       io.emit('updateRoom', {
         id: room.id,
         name: room.name,
@@ -147,6 +151,15 @@ nextApp.prepare().then(async() => {
         break;
       case 1:
         Rooms.getRoomById(id).setStatus('ready', 100);
+        break;
+      case 2:
+        Rooms.getRoomById(id).startTorrent('magnet:?xt=urn:btih:42DE3C3F9010426FD6F4546F0D9D2249EE7FFC7C&dn=I+Want+to+Eat+Your+Pancreas+2018+JAPANESE+1080p+BluRay+H264+AAC');
+        break;
+      case 3:
+        Rooms.getRoomById(id).destroyTorrent();
+        break;
+      case 4:
+        Rooms.getRoomById(id).convertTorrent(path.join(__dirname, '../test/test.mkv'));
         break;
       }
     });

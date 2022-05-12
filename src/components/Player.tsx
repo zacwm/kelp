@@ -2,6 +2,7 @@ import * as React from 'react';
 import type { Socket } from 'socket.io-client';
 import ReactPlayer from 'react-player';
 import { SnackbarProvider, useSnackbar } from 'notistack';
+import moment from 'moment';
 
 import LinearProgress, { LinearProgressProps } from '@mui/material/LinearProgress';
 import Box from '@mui/material/Box';
@@ -156,6 +157,8 @@ const Player: React.FC<Props> = ({ socket, roomData, menuVisible, toggleMenu }) 
     if (!videoData) return;
     if (!videoState) return;
     if (!refPlayer) return;
+
+    console.dir(playedSeconds);
 
     if (playedSeconds > videoState.timePosition + 2) {
       refPlayer.current.seekTo(videoState.timePosition);
@@ -327,6 +330,18 @@ const Player: React.FC<Props> = ({ socket, roomData, menuVisible, toggleMenu }) 
               <ReactPlayer
                 ref={refPlayer}
                 url={videoData.url}
+                config={videoData.subtitle && {
+                  file: {
+                    tracks: [
+                      {
+                        kind: 'subtitles',
+                        src: videoData.subtitle,
+                        srcLang: 'en',
+                        default: true
+                      },
+                    ]
+                  }
+                }}
                 playing={videoState?.playing}
                 volume={inputVolumeSlider / 100}
                 width="100%"
@@ -353,15 +368,64 @@ const Player: React.FC<Props> = ({ socket, roomData, menuVisible, toggleMenu }) 
                   height: '100%',
                 }}
               >
-                {videoData?.preparing && (
-                  <Paper elevation={2} sx={{ p: 2, m: 1, minWidth: 400 }}>
-                    <Typography variant="h4" component="h4" mb={2}>
-                      Preparing room...
+                {(videoData?.preparing && !videoData?.status) && (
+                  <Paper elevation={2} sx={{ p: 2, m: 1, minWidth: 400, maxWidth: 500 }}>
+                    <Typography variant="h4" component="h4" mb={2} color="primary">
+                      Waiting for a torrent...
                     </Typography>
                     <Typography variant="h6" component="h6" mb={1}>
-                      Status: {videoData.stage}
+                      Enter a torrent or magnet link in the room settings to begin downloading...
                     </Typography>
-                    { videoData.percentage && ( <LinearProgressWithLabel value={videoData.percentage} /> ) }
+                  </Paper>
+                )}
+                {(videoData?.preparing && videoData?.status === 'Starting...') && (
+                  <Paper elevation={2} sx={{ p: 2, m: 1, minWidth: 400, maxWidth: 500 }}>
+                    <Typography variant="h4" component="h4" mb={2} color="primary">
+                      Starting download...
+                    </Typography>
+                  </Paper>
+                )}
+                {(videoData?.preparing && videoData?.status) && (
+                  <Paper elevation={2} sx={{ p: 2, m: 1 }}>
+                    <Stack
+                      direction="column"
+                      alignItems="stretch"
+                      justifyContent="center"
+                      spacing={2}
+                      sx={{
+                        minWidth: 400,
+                        maxWidth: 500,
+                      }}
+                    >
+                      <Typography variant="h4" component="h4">
+                        Preparing room...
+                      </Typography>
+                      <Typography variant="h6" component="h6" mb={1}>
+                        Status: {videoData.status}
+                      </Typography>
+                      { videoData.percentage !== 0 && ( <LinearProgressWithLabel value={videoData.percentage}  /> ) }
+                      {
+                        (videoData.percentage !== 0 || videoData.downloadSpeed) && (
+                          <Stack
+                            direction="row"
+                            alignItems="center"
+                            justifyContent="center"
+                            spacing={2}
+                          >
+                            { videoData.timeRemaining && (
+                              <Typography variant="body2">
+                                {moment().to(moment().add(videoData.timeRemaining, 'ms'), true)} remaining
+                              </Typography>
+                            ) }
+                            { videoData.downloadSpeed && (
+                              <Typography variant="body2">
+                                {videoData.downloadSpeed}
+                              </Typography>
+                            ) }
+                          </Stack>
+                        )
+                      }
+                    </Stack>
                   </Paper>
                 )}
               </Stack>

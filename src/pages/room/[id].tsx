@@ -26,7 +26,7 @@ const Room: NextPage = () => {
   const [roomNotFound, setRoomNotFound] = React.useState(false);
   const [openPRW, setOpenPRW] = React.useState(false);
 
-  const [menuVisible, setMenuVisible] = React.useState(true);
+  const [menuVisible, setMenuVisible] = React.useState(false);
 
   React.useEffect((): any => {
     const newSocket = io(`https://${window.location.hostname}`);
@@ -59,13 +59,13 @@ const Room: NextPage = () => {
       router.push(`/room/${id}`, undefined, { shallow: true });
     }
     socket.emit('joinRoom', { id, password }, (res) => {
-      console.dir(res);
       setLoadingRoomData(false);
       if (res.roomNotFound) return setRoomNotFound(true);
       if (res.passwordRequest) return setOpenPRW(true);
       if (res.error) return;
       setUserId(res.user);
       setRoomData(res.room);
+      setMenuVisible(true);
     });
   }, [socket, id]);
 
@@ -74,13 +74,13 @@ const Room: NextPage = () => {
     if (!id) return;
     setLoadingRoomData(true);
     socket.emit('joinRoom', { id, password }, (res) => {
-      console.dir(res);
       setLoadingRoomData(false);
       if (res.roomNotFound) return setRoomNotFound(true);
       if (res.error) return callback(res);
       setOpenPRW(false);
       setUserId(res.user);
       setRoomData(res.room);
+      setMenuVisible(true);
     });
   };
 

@@ -1,5 +1,7 @@
 /node_modules
 /.next 
-*/streams/*
+*/.streams
+*/.temp
+*/test
 
 .env
