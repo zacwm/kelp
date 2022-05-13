@@ -20,7 +20,7 @@
   - No database, no logins, all temporary! (BYO authentication)
   - Supports MKV, MP4 and AVI (finds first matching file in torrent)
   - Simultaneous room support (room limit configurable)
-  - Playback syncing with others in the room
+  - Playback syncing with other users in the room
   - Extracts subtitles if found
 
 ## Setup
@@ -31,6 +31,6 @@
   5. Run with `$ npm start`, and enjoy!
 
 ## Important
-  **Before using, you must know that, I [(Zachary)](https://github.com/zacimac) and all contribuitors are not responsible for any torrents you decide download using 'kelp' (legal, viruses, etc). Use at your own risk.** *Maybe use some sort of VPN on whatever its hosted on? (any VPN sponsors? :eyes:)*
+  **Before using, you must know that, I [(Zachary)](https://github.com/zacimac) and all contribuitors are not responsible for any torrents you decide download using ['kelp'](https://github.com/zacimac/kelp) (legal, viruses, etc). Use at your own risk.** *Maybe use some sort of VPN on whatever its hosted on? (any VPN sponsors? :eyes:)*
 
-  [❤️ **Also maybe considor sponsoring me so I can work on this more often**](https://github.com/sponsors/zacimac)
+  [❤️ **Also maybe considor sponsoring me so I can work on projects like this more often?**](https://github.com/sponsors/zacimac)
