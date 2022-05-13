@@ -1,4 +1,5 @@
 import * as React from 'react';
+import Head from 'next/head';
 import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import io from 'socket.io-client';
@@ -102,6 +103,9 @@ const Room: NextPage = () => {
   
   return (
     <React.Fragment>
+      <Head>
+        <title>kelp - room</title>
+      </Head>
       <Backdrop
         sx={{ color: '#fff', zIndex: (theme) => theme.zIndex.drawer + 2 }}
         open={roomNotFound}

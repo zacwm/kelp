@@ -1,4 +1,5 @@
 import * as React from 'react';
+import Head from 'next/head';
 import type { NextPage } from 'next';
 import io from 'socket.io-client';
 
@@ -75,6 +76,9 @@ const Home: NextPage = () => {
 
   return (
     <Container maxWidth="sm">
+      <Head>
+        <title>kelp - menu</title>
+      </Head>
       <Box
         sx={{
           my: 4,
