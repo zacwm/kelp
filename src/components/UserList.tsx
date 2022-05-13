@@ -44,7 +44,7 @@ const UserList: React.FC<Props> = ({ socket, roomData, userId }) => {
     >
       {
         (roomData?.users || []).map((user, index) => (
-          <Paper key={index} elevation={5} sx={{ p: 1 }}>
+          <Paper key={index} elevation={5} sx={{ p: 1, overflow: 'clip' }}>
             <Stack
               direction="row"
               alignItems="center"
@@ -52,7 +52,7 @@ const UserList: React.FC<Props> = ({ socket, roomData, userId }) => {
               spacing={1}
             >
               <AccountCircleIcon />
-              {isEditingName ? (
+              {isEditingName && user.id === userId ? (
                 <Input
                   defaultValue={inputName}
                   value={inputName}
@@ -60,7 +60,7 @@ const UserList: React.FC<Props> = ({ socket, roomData, userId }) => {
                   fullWidth
                 />
               ): (
-                <Typography sx={!(user.id === userId) ? { flex: 1 } : {}}>{user.name}</Typography>
+                <Typography sx={!(user.id === userId) && { flex: 1 }}>{user.name}</Typography>
               )}
               {user.id === userId && (
                 <Stack

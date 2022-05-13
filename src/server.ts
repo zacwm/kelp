@@ -110,10 +110,10 @@ nextApp.prepare().then(async() => {
     });
 
     socket.on('updateUserName', (data: any) => {
-      if (data.roomId === currentRoom) return;
-      if (data.name.length === 0) data.name = `User ${Rooms.getRoomById(data.roomId).getUsers().length + 1}`;
-      user.updateName(data.name);
-      Rooms.getRoomById(data.roomId).updateuser(user);
+      if (currentRoom !== data.roomId) return;
+      const room: Room = Rooms.getRoomById(data.roomId);
+      if (!room || !user) return;
+      Rooms.getRoomById(data.roomId).updateUserName(socket.id, data.name.substring(0, 15));
     });
 
     socket.on('roomStartTorrent', (data: any, callback: any) => {

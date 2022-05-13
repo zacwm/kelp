@@ -41,6 +41,7 @@ const SideMenu: React.FC<Props> = ({ socket, roomData, userId, videoState, video
       url: inputTorrentUrl,
     }, (res) => {
       if (res.error) alert(res.error);
+      setTorrentPrompt(false);
     });
   };
 
@@ -146,7 +147,7 @@ const SideMenu: React.FC<Props> = ({ socket, roomData, userId, videoState, video
                 >
                   { [0, 1].includes(videoData?.statusCode) && (
                     <Button variant="contained" onClick={() => setTorrentPrompt(true)}>
-                      Download torent
+                      Download torrent
                     </Button>
                   ) }
                   { ![0, 1].includes(videoData?.statusCode) && (

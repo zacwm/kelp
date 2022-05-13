@@ -15,7 +15,7 @@ interface RoomInterface {
   addUser(user: User): void;
   getUsers(): User[];
   removeUser(userId: string): void;
-  updateuser(user: User): void;
+  updateUserName(id: any, newName: string): void;
   getVideoData(forceVideoData?: boolean): any
   getPlaybackState(): any;
   setTimePosition(time: number): void;
@@ -109,11 +109,10 @@ class Room implements RoomInterface {
     this.users = this.users.filter(user => user.id !== userId);
   }
 
-  updateuser(user: User): void {
-    const userId = user.id;
-    const userIndex = this.users.findIndex(u => u.id === userId);
-    if (userIndex !== -1) {
-      this.users[userIndex] = user;
+  updateUserName(id: any, newName: string): void {
+    const userPos = this.users.findIndex(user => user.id === id);
+    if (userPos !== -1) {
+      this.users[userPos].setName(newName || `User ${this.users.length + 1}`);
     }
 
     this.SocketServer.emit('updateRoom', {
@@ -243,6 +242,7 @@ class Room implements RoomInterface {
         /* // TODO: This issue marked as a bug from over 2 years ago... https://github.com/webtorrent/webtorrent/issues/1931
         if (this.wtClient) this.wtClient.destory();
         */
+        this.wtClient = null;
         if (this.torrentCheckInterval) clearInterval(this.torrentCheckInterval);
         this.videoTitle = torrent.name;
         this.convertTorrent(videoFile.path);
@@ -319,6 +319,8 @@ class Room implements RoomInterface {
             this.setStatus(0, 'Ready');
           }
         });
+      } else {
+        return this.setStatus(-1, 'Unsupported file type...');
       }
     });
   }
