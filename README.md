@@ -1,9 +1,9 @@
 # kelp
   A slimy torrent downloader, temporary hosting & playback syncing server.
 
-<center>
+<p align="center">
   <img src="./kelp.png" height="250" />
-</center>
+</p>
 
 ## [What is kelp?](#what-is-kelp) | [Features](#features) | [Setup](#setup) | [Important](#important)
 
