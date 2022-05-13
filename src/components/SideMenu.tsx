@@ -13,6 +13,10 @@ import AccordionSummary from '@mui/material/AccordionSummary';
 import AccordionDetails from '@mui/material/AccordionDetails';
 import TextField from '@mui/material/TextField';
 import Link from '@mui/material/Link';
+import MenuItem from '@mui/material/MenuItem';
+import InputLabel from '@mui/material/InputLabel';
+import FormControl from '@mui/material/FormControl';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
 
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 
@@ -42,11 +46,16 @@ const SideMenu: React.FC<Props> = ({ socket, roomData, userId, videoState, video
 
   // TODO: Testing stuff below
   const [inputTimePosition, setInputTimePosition] = React.useState('');
+  const [inputSelect, setInputSelect] = React.useState('');
 
   const buttonSubmitTimeChange = () => {
     socket.emit('videoChangePlaybackTime', {
       id: roomData.id,
     }, parseInt(inputTimePosition));
+  };
+
+  const handleChange = (event: SelectChangeEvent) => {
+    setInputSelect(event.target.value as string);
   };
 
   React.useEffect(() => {
@@ -188,21 +197,32 @@ const SideMenu: React.FC<Props> = ({ socket, roomData, userId, videoState, video
                       setInputTimePosition(e.target.value);
                     }}
                     fullWidth
+                    disabled={videoState?.playing}
                   />
-                  <Button variant="contained" onClick={buttonSubmitTimeChange}>
+                  <Button variant="contained" onClick={buttonSubmitTimeChange} disabled={videoState?.playing}>
                     Set seconds
                   </Button>
-                  <Button variant="contained" onClick={() => socket.emit('playerTest', roomData.id, 2)}>
-                    [2] Download torrent
-                  </Button>
-                  <Button variant="contained" onClick={() => socket.emit('playerTest', roomData.id, 3)}>
-                    [3] Stop torrent
-                  </Button>
-                  <Button variant="contained" onClick={() => socket.emit('playerTest', roomData.id, 4)}>
-                    [4] Convert test mkv
-                  </Button>
-                  <Button variant="contained" onClick={() => socket.emit('playerTest', roomData.id, 5)}>
-                    [5] Convert test mp4
+                  <FormControl fullWidth>
+                    <InputLabel id="test-action-select">Action type</InputLabel>
+                    <Select
+                      labelId="test-action-select"
+                      id="test-action-select"
+                      value={inputSelect}
+                      label="Action type"
+                      onChange={handleChange}
+                      fullWidth
+                    >
+                      <MenuItem value={1}>[1] Download torrent</MenuItem>
+                      <MenuItem value={2}>[2] Reset room</MenuItem>
+                      <MenuItem value={3}>[3] Convert test mkv</MenuItem>
+                      <MenuItem value={4}>[4] Convert test1 mp4</MenuItem>
+                      <MenuItem value={5}>[5] Convert test2 mp4</MenuItem>
+                      <MenuItem value={6}>[6] Convert test3 mp4</MenuItem>
+                      <MenuItem value={7}>[7] Convert test3 mp4</MenuItem>
+                    </Select>
+                  </FormControl>
+                  <Button variant="contained" onClick={() => socket.emit('playerTest', roomData.id, parseInt(inputSelect))}>
+                    Run action
                   </Button>
                 </Stack>
               </AccordionDetails>

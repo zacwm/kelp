@@ -47,7 +47,7 @@ class Room implements RoomInterface {
   // Video playback data...
   playbackPlaying: boolean;
   private playbackTimePosition: number;
-  private playbackTimePositionTimeout: any;
+  private playbackTimePositionInterval: any;
   // Torrent
   private wtClient: any; // TODO: should be webtorrent client type, but cant find it rn...
   private torrent: any;
@@ -70,7 +70,7 @@ class Room implements RoomInterface {
     this.videoURL = 'https://kelp.sneeze.xyz/streams/test/output.m3u8';
     this.playbackPlaying = false;
     this.playbackTimePosition = 0;
-    this.playbackTimePositionTimeout = null;
+    this.playbackTimePositionInterval = null;
 
     fs.emptyDir(path.join(__dirname, `../.temp/${this.id}`));
   }
@@ -144,20 +144,19 @@ class Room implements RoomInterface {
       newState: this.getPlaybackState(),
     });
 
-    // Changes to syncing timeout...
-    if (this.playbackPlaying) {
-      // Create the syncing interval
-      this.playbackTimePositionTimeout = setInterval(() => {
+    // Create the syncing interval
+    this.playbackTimePositionInterval = setInterval(() => {
+      if (!this.playbackPlaying || this.statusCode !== 0) {
+        this.playbackPlaying = false;
+        clearInterval(this.playbackTimePositionInterval);
+      } else {
         this.playbackTimePosition += .2;
-        this.SocketServer.emit('videoUpdateState', {
-          roomId: this.id,
-          newState: this.getPlaybackState(),
-        });
-      }, 200);
-    } else {
-      // If paused, it can be stopped...
-      clearInterval(this.playbackTimePositionTimeout);
-    }
+      }
+      this.SocketServer.emit('videoUpdateState', {
+        roomId: this.id,
+        newState: this.getPlaybackState(),
+      });
+    }, 200);
   }
 
   setTimePosition(time: number): void {
@@ -169,7 +168,7 @@ class Room implements RoomInterface {
   }
 
   runEndEvent(): void {
-    clearInterval(this.playbackTimePositionTimeout);
+    clearInterval(this.playbackTimePositionInterval);
     this.playbackTimePosition = 0;
     this.playbackPlaying = false;
     this.SocketServer.emit('videoUpdateState', {
@@ -224,27 +223,41 @@ class Room implements RoomInterface {
     this.setStatus(4, 'Staring conversion...');
     if (this.ffmpegProcess) return;
     fs.pathExists(videoPath, async (err, exists) => {
-      if (err) return console.log(err);
+      if (err) {
+        return this.setStatus(-1, 'Video file check failed...');
+      }
       if (!exists) return this.setStatus(-1, 'Video file not found...');
 
+      // TODO: Move ffmpeg processes to a separate file with promises...
       if (type === '.mkv') {
         // File exists, start converting...
         this.setStatus(5, 'Converting - 0/3 files done');
         
-        this.ffmpegProcess = childProcess.exec(`ffmpeg -i "${videoPath}" -codec copy "${path.join(__dirname, `../.temp/${this.id}/convert.mp4`)}"`, (err, mp4Stdout, mp4Stderr) => {
-          if (err) return console.log(err);
+        this.ffmpegProcess = childProcess.exec(`ffmpeg -i "${videoPath}" -codec copy "${path.join(__dirname, `../.temp/${this.id}/convert.mp4`)}"`, (mp4Err, mp4Stdout, mp4Stderr) => {
+          if (mp4Err) {
+            this.ffmpegProcess = null;
+            return this.setStatus(-1, 'File conversion failed on conversion 1/3...');
+          }
           if (mp4Stdout || mp4Stderr) {
             this.setStatus(5, 'Converting - 1/3 files done');
             
             // Now convert to HLS
-            this.ffmpegProcess = childProcess.exec(`ffmpeg -i "${path.join(__dirname, `../.temp/${this.id}/convert.mp4`)}" -codec: copy -start_number 0 -hls_time 10 -hls_list_size 0 -f hls "${path.join(__dirname, `../.streams/${this.id}/index.m3u8`)}"`, (err, videoStdout, videoStderr) => {
-              if (err) return console.log(err);
+            this.ffmpegProcess = childProcess.exec(`ffmpeg -i "${path.join(__dirname, `../.temp/${this.id}/convert.mp4`)}" -codec: copy -start_number 0 -hls_time 10 -hls_list_size 0 -f hls "${path.join(__dirname, `../.streams/${this.id}/index.m3u8`)}"`, (videoErr, videoStdout, videoStderr) => {
+              if (videoErr) {
+                console.dir(videoErr);
+                this.ffmpegProcess = null;
+                return this.setStatus(-1, 'File conversion failed on conversion 2/3...');
+              }
               if (videoStdout || videoStderr) {
+                fs.unlinkSync(path.join(__dirname, `../.temp/${this.id}/convert.mp4`));
                 this.videoURL = `/streams/${this.id}/index.m3u8`;
                 this.setStatus(5, 'Converting - 2/3 files done');
       
-                this.ffmpegProcess = childProcess.exec(`ffmpeg -i "${videoPath}" -map 0:s:0 "${path.join(__dirname, `../.streams/${this.id}/subtitle.vtt`)}"`, (err, subtitleStdout, subtitleStderr) => {
-                  if (err) return console.log(err);
+                this.ffmpegProcess = childProcess.exec(`ffmpeg -i "${videoPath}" -map 0:s:0 "${path.join(__dirname, `../.streams/${this.id}/subtitle.vtt`)}"`, (subtitleErr, subtitleStdout, subtitleStderr) => {
+                  if (subtitleErr) {
+                    this.ffmpegProcess = null;
+                    return this.setStatus(0, 'Ready');
+                  }
           
                   if (subtitleStdout || subtitleStderr) {
                     this.videoSubtitle = `/streams/${this.id}/subtitle.vtt`;
@@ -257,9 +270,12 @@ class Room implements RoomInterface {
           }
         });
       } else if (type === '.mp4') {
-        this.setStatus(5, 'Converting - 1/2 files done');
+        this.setStatus(5, 'Converting - 0/1 files done');
         this.ffmpegProcess = childProcess.exec(`ffmpeg -i "${videoPath}" -codec: copy -start_number 0 -hls_time 10 -hls_list_size 0 -f hls "${path.join(__dirname, `../.streams/${this.id}/index.m3u8`)}"`, (err, videoStdout, videoStderr) => {
-          if (err) return console.log(err);
+          if (err) {
+            this.ffmpegProcess = null;
+            return this.setStatus(-1, 'File conversion failed on conversion 1/3...');
+          }
           if (videoStdout || videoStderr) {
             this.videoURL = `/streams/${this.id}/index.m3u8`;
             this.ffmpegProcess = null;
