@@ -13,31 +13,6 @@ type Props = {
 }
 
 const UserList: React.FC<Props> = ({ roomData, userId }) => {
-  const [formattedUsers, setFormattedUsers] = React.useState([]);
-
-  React.useEffect(() => {
-    if (!roomData) return;
-    if (!roomData.users) return;
-    const newUsersList = [];
-    // Format users, and if no name, add a count to make it unique.
-    let nullUserCount = 0;
-    for (let i = 0; i < roomData.users.length; i++) {
-      if (!roomData.users[i].name) nullUserCount++;
-      newUsersList.push({
-        ...roomData.users[i],
-        name: roomData.users[i].name || `User ${nullUserCount}`,
-        isSelf: roomData.users[i].id === userId,
-      });
-    }
-    // Sort isSelf to top
-    newUsersList.sort((a, b) => {
-      if (a.isSelf && !b.isSelf) return -1;
-      if (!a.isSelf && b.isSelf) return 1;
-      return 0;
-    });
-    setFormattedUsers(newUsersList);
-  }, [roomData, userId]);
-  
   return (
     <Stack
       direction="column"
@@ -46,7 +21,7 @@ const UserList: React.FC<Props> = ({ roomData, userId }) => {
       spacing={1}
     >
       {
-        formattedUsers.map((user, index) => (
+        (roomData?.users || []).map((user, index) => (
           <Paper key={index} elevation={5} sx={{ p: 1 }}>
             <Stack
               direction="row"
@@ -55,8 +30,8 @@ const UserList: React.FC<Props> = ({ roomData, userId }) => {
               spacing={1}
             >
               <AccountCircleIcon />
-              <Typography sx={!user.isSelf ? { flex: 1 } : {}}>{user.name}</Typography>
-              {user.isSelf && (
+              <Typography sx={!(user.id === userId) ? { flex: 1 } : {}}>{user.name}</Typography>
+              {user.id === userId && (
                 <Stack
                   direction="row"
                   alignItems="center"

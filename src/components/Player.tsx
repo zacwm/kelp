@@ -123,14 +123,21 @@ const Player: React.FC<Props> = ({ socket, roomData, menuVisible, videoState, se
       refPlayer.current.seekTo(data.newTimePosition);
     };
 
+    const socketNotify = (data: any) => {
+      if (data.roomId !== roomData.id) return;
+      enqueueSnackbar(data.message, { variant: data.variant, autoHideDuration: data.autoHideDuration });
+    };
+
     socket.on('videoUpdateData', videoUpdateData);
     socket.on('videoUpdateState', videoUpdateState);
     socket.on('videoUpdateTimePosition', videoUpdateTimePosition);
+    socket.on('notify', socketNotify);
 
     return () => {
       socket.off('videoUpdateData', videoUpdateData);
       socket.off('videoUpdateState', videoUpdateState);
       socket.off('videoUpdateTimePosition', videoUpdateTimePosition);
+      socket.off('notify', socketNotify);
     };
   }, [roomData, socket]);
 

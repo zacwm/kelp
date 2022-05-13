@@ -86,7 +86,7 @@ nextApp.prepare().then(async() => {
       if (room.hasPassword() && (!roomData.password || roomData.password === '')) return callback({ error: 'Room requires a password', passwordRequest: true });
       if (room.hasPassword() && roomData.password !== room.getPassword()) return callback({ error: 'Room password is incorrect', passwordRequest: true });
       currentRoom = room.id;
-      user = new User(socket.id);
+      user = new User(socket.id, `User ${room.getUsers().length + 1}`);
       room.addUser(user);
       callback({
         user: user.id,
@@ -131,7 +131,7 @@ nextApp.prepare().then(async() => {
     socket.on('videoChangePlaybackPlaying', (roomData: any, playing: boolean) => {
       if (currentRoom !== roomData.id) return;
 
-      Rooms.getRoomById(currentRoom).setPlaying(playing);
+      Rooms.getRoomById(currentRoom).setPlaying(playing, user.name);
     });
 
     socket.on('videoChangePlaybackTime', (roomData: any, time: number) => {
@@ -163,19 +163,19 @@ nextApp.prepare().then(async() => {
         Rooms.getRoomById(id).resetRoom();
         break;
       case 3:
-        Rooms.getRoomById(id).convertTorrent(path.join(__dirname, './test/test.mkv'), '.mkv');
+        Rooms.getRoomById(id).convertTorrent(path.join(__dirname, './test/test.mkv'));
         break;
       case 4:
-        Rooms.getRoomById(id).convertTorrent(path.join(__dirname, './test/test1.mp4'), '.mp4');
+        Rooms.getRoomById(id).convertTorrent(path.join(__dirname, './test/test1.mp4'));
         break;
       case 5:
-        Rooms.getRoomById(id).convertTorrent(path.join(__dirname, './test/test2.mp4'), '.mp4');
+        Rooms.getRoomById(id).convertTorrent(path.join(__dirname, './test/test2.mp4'));
         break;
       case 6:
-        Rooms.getRoomById(id).convertTorrent(path.join(__dirname, './test/test3.mp4'), '.mp4');
+        Rooms.getRoomById(id).convertTorrent(path.join(__dirname, './test/test3.mp4'));
         break;
       case 7:
-        Rooms.getRoomById(id).convertTorrent(path.join(__dirname, './test/test4.mp4'), '.mp4');
+        Rooms.getRoomById(id).convertTorrent(path.join(__dirname, './test/test4.mp4'));
         break;
       }
     });

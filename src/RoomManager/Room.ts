@@ -22,6 +22,7 @@ interface RoomInterface {
   resetRoom(): void
   // Torrent controls
   startTorrent(url: string, callback: any): void;
+  convertTorrent(videoPath: string): void;
   // Internal
   setStatus(statusCode: number, message: string, percentage: number, timeRemaining: number, speed: string): void;
 }
@@ -137,26 +138,35 @@ class Room implements RoomInterface {
     };
   }
 
-  setPlaying(playing: boolean): void {
+  setPlaying(playing: boolean, username?: string): void {
     this.playbackPlaying = playing;
-    this.SocketServer.emit('videoUpdateState', {
-      roomId: this.id,
-      newState: this.getPlaybackState(),
-    });
+    clearInterval(this.playbackTimePositionInterval);
 
     // Create the syncing interval
-    this.playbackTimePositionInterval = setInterval(() => {
+    if (playing) this.playbackTimePositionInterval = setInterval(() => {
       if (!this.playbackPlaying || this.statusCode !== 0) {
+        // Ensure that the playback is paused, if the statusCode is not 0
         this.playbackPlaying = false;
         clearInterval(this.playbackTimePositionInterval);
       } else {
-        this.playbackTimePosition += .2;
+        this.playbackTimePosition += 1;
       }
       this.SocketServer.emit('videoUpdateState', {
         roomId: this.id,
         newState: this.getPlaybackState(),
       });
-    }, 200);
+    }, 1000);
+
+    this.SocketServer.emit('videoUpdateState', {
+      roomId: this.id,
+      newState: this.getPlaybackState(),
+    });
+    if (username) this.SocketServer.emit('notify', {
+      roomId: this.id,
+      message: `Video ${playing ? 'resumed' : 'paused'} by ${username}`,
+      variant: 'success',
+      autoHideDuration: 1000,
+    });
   }
 
   setTimePosition(time: number): void {
@@ -213,12 +223,12 @@ class Room implements RoomInterface {
         */
         if (this.torrentCheckInterval) clearInterval(this.torrentCheckInterval);
         this.videoTitle = torrent.name;
-        this.convertTorrent(videoFile.path, path.extname(videoFile.path));
+        this.convertTorrent(videoFile.path);
       });
     });
   }
   
-  async convertTorrent(videoPath: string, type: string): Promise<void> {
+  async convertTorrent(videoPath: string): Promise<void> {
     await fs.emptyDir(path.join(__dirname, `../.streams/${this.id}`));
     this.setStatus(4, 'Staring conversion...');
     if (this.ffmpegProcess) return;
@@ -227,6 +237,7 @@ class Room implements RoomInterface {
         return this.setStatus(-1, 'Video file check failed...');
       }
       if (!exists) return this.setStatus(-1, 'Video file not found...');
+      const type = path.extname(videoPath);
 
       // TODO: Move ffmpeg processes to a separate file with promises...
       if (type === '.mkv') {
