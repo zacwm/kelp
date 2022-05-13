@@ -166,7 +166,7 @@ const SideMenu: React.FC<Props> = ({ socket, roomData, userId, videoState, video
                 <Typography variant="h6" component="h6" color="primary">Users</Typography>
               </AccordionSummary>
               <AccordionDetails>
-                <UserList roomData={roomData} userId={userId} />
+                <UserList socket={socket} roomData={roomData} userId={userId} />
               </AccordionDetails>
             </Accordion>
           </Box>

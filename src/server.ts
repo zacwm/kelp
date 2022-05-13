@@ -88,34 +88,32 @@ nextApp.prepare().then(async() => {
       currentRoom = room.id;
       user = new User(socket.id, `User ${room.getUsers().length + 1}`);
       room.addUser(user);
-      callback({
-        user: user.id,
-        room: {
-          id: room.id,
-          name: room.name,
-          users: room.getUsers().map(userItem => {
-            return {
-              id: userItem.id,
-              name: userItem.name || null,
-            };
-          }),
-          videoData: room.getVideoData(),
-          videoState: room.statusCode === 0 ? room.getPlaybackState() : null,
-        }
-      });
-
-      io.emit('updateRoom', {
+      const roomDataToSend: any = {
         id: room.id,
         name: room.name,
         users: room.getUsers().map(userItem => {
           return {
             id: userItem.id,
-            name: userItem.name || null,
+            name: userItem.name,
           };
         }),
         videoData: room.getVideoData(),
         videoState: room.statusCode === 0 ? room.getPlaybackState() : null,
+      };
+
+      callback({
+        user: user.id,
+        room: roomDataToSend
       });
+
+      io.emit('updateRoom', roomDataToSend);
+    });
+
+    socket.on('updateUserName', (data: any) => {
+      if (data.roomId === currentRoom) return;
+      if (data.name.length === 0) data.name = `User ${Rooms.getRoomById(data.roomId).getUsers().length + 1}`;
+      user.updateName(data.name);
+      Rooms.getRoomById(data.roomId).updateuser(user);
     });
 
     socket.on('roomStartTorrent', (data: any, callback: any) => {

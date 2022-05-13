@@ -15,6 +15,7 @@ interface RoomInterface {
   addUser(user: User): void;
   getUsers(): User[];
   removeUser(userId: string): void;
+  updateuser(user: User): void;
   getVideoData(forceVideoData?: boolean): any
   getPlaybackState(): any;
   setTimePosition(time: number): void;
@@ -106,6 +107,27 @@ class Room implements RoomInterface {
 
   removeUser(userId: string): void {
     this.users = this.users.filter(user => user.id !== userId);
+  }
+
+  updateuser(user: User): void {
+    const userId = user.id;
+    const userIndex = this.users.findIndex(u => u.id === userId);
+    if (userIndex !== -1) {
+      this.users[userIndex] = user;
+    }
+
+    this.SocketServer.emit('updateRoom', {
+      id: this.id,
+      name: this.name,
+      users: this.getUsers().map(userItem => {
+        return {
+          id: userItem.id,
+          name: userItem.name,
+        };
+      }),
+      videoData: this.getVideoData(),
+      videoState: this.statusCode === 0 ? this.getPlaybackState() : null,
+    });
   }
 
   getVideoData(forceVideoData?: boolean): any {

@@ -2,6 +2,7 @@ interface UserInterface {
   id: string;
   name: string;
   setName(name: string): void;
+  updateName(name: string): void;
 }
 
 class User implements UserInterface {
@@ -14,6 +15,10 @@ class User implements UserInterface {
   }
 
   setName(name: string): void {
+    this.name = name;
+  }
+
+  updateName(name: string): void {
     this.name = name;
   }
 }
