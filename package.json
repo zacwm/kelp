@@ -4,9 +4,7 @@
   "description": "A slimy torrent downloader and syncing client",
   "main": "./src/server.ts",
   "scripts": {
-    "start": "npx ts-node .",
-    "torrentTest": "npx ts-node ./src/TorrentTest.ts",
-    "watch": "npx nodemon --exec \"npm start\""
+    "start": "npx ts-node ."
   },
   "repository": {
     "type": "git",
