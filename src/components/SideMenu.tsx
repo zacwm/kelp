@@ -212,13 +212,9 @@ const SideMenu: React.FC<Props> = ({ socket, roomData, userId, videoState, video
                       onChange={handleChange}
                       fullWidth
                     >
-                      <MenuItem value={1}>[1] Download torrent</MenuItem>
-                      <MenuItem value={2}>[2] Reset room</MenuItem>
-                      <MenuItem value={3}>[3] Convert test mkv</MenuItem>
-                      <MenuItem value={4}>[4] Convert test1 mp4</MenuItem>
-                      <MenuItem value={5}>[5] Convert test2 mp4</MenuItem>
-                      <MenuItem value={6}>[6] Convert test3 mp4</MenuItem>
-                      <MenuItem value={7}>[7] Convert test3 mp4</MenuItem>
+                      <MenuItem value={1}>[1] Reset room</MenuItem>
+                      <MenuItem value={2}>[2] Convert test mkv</MenuItem>
+                      <MenuItem value={3}>[3] Convert test mp4</MenuItem>
                     </Select>
                   </FormControl>
                   <Button variant="contained" onClick={() => socket.emit('playerTest', roomData.id, parseInt(inputSelect))}>

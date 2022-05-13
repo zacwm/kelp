@@ -157,25 +157,13 @@ nextApp.prepare().then(async() => {
     socket.on('playerTest', (id: string, type: number) => {
       switch (type) {
       case 1:
-        Rooms.getRoomById(id).startTorrent('magnet:?xt=urn:btih:42DE3C3F9010426FD6F4546F0D9D2249EE7FFC7C&dn=I+Want+to+Eat+Your+Pancreas+2018+JAPANESE+1080p+BluRay+H264+AAC');
-        break;
-      case 2:
         Rooms.getRoomById(id).resetRoom();
         break;
-      case 3:
+      case 2:
         Rooms.getRoomById(id).convertTorrent(path.join(__dirname, './test/test.mkv'));
         break;
-      case 4:
-        Rooms.getRoomById(id).convertTorrent(path.join(__dirname, './test/test1.mp4'));
-        break;
-      case 5:
-        Rooms.getRoomById(id).convertTorrent(path.join(__dirname, './test/test2.mp4'));
-        break;
-      case 6:
-        Rooms.getRoomById(id).convertTorrent(path.join(__dirname, './test/test3.mp4'));
-        break;
-      case 7:
-        Rooms.getRoomById(id).convertTorrent(path.join(__dirname, './test/test4.mp4'));
+      case 3:
+        Rooms.getRoomById(id).convertTorrent(path.join(__dirname, './test/test.mp4'));
         break;
       }
     });
