@@ -9,7 +9,7 @@ import fs from 'fs-extra';
 import SocketServer from './socket';
 
 const port: number = +process.env.PORT || 3000;
-const nextApp = next({ dev: process.env.NODE_ENV === 'development'  });
+const nextApp = next({ dev: process.env.NODE_ENV !== 'production', hostname: 'localhost', port });
 const nextHandler: NextApiHandler = nextApp.getRequestHandler();
 
 nextApp.prepare().then(async() => {

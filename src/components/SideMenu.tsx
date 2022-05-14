@@ -29,6 +29,8 @@ type Props = {
 }
 
 const SideMenu: React.FC<Props> = ({ socket, roomData, userId, videoState, videoData }) => {
+  const isDev = process.env.NODE_ENV === 'development';
+
   const [torrentPrompt, setTorrentPrompt] = React.useState(false);
   const [inputTorrentUrl, setInputTorrentUrl] = React.useState('');
 
@@ -155,6 +157,9 @@ const SideMenu: React.FC<Props> = ({ socket, roomData, userId, videoState, video
                       Stop Download
                     </Button>
                   ) }
+                  <Button variant="contained" color="error">
+                    Close room
+                  </Button>
                 </Stack>
               </AccordionDetails>
             </Accordion>
@@ -176,83 +181,88 @@ const SideMenu: React.FC<Props> = ({ socket, roomData, userId, videoState, video
             alignItems="stretch"
             justifyContent="center"
           >
-            <Accordion disableGutters>
-              <AccordionSummary
-                expandIcon={<ExpandMoreIcon />}
-                aria-controls="panel1a-content"
-                id="panel1a-header"
-              >
-                <Typography variant="subtitle2" component="p">Testing buttons</Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Stack
-                  direction="column"
-                  alignItems="center"
-                  justifyContent="space-between"
-                  spacing={2}
-                >
-                  <TextField
-                    label="seconds"
-                    value={inputTimePosition}
-                    onChange={(e) => {
-                      setInputTimePosition(e.target.value);
-                    }}
-                    fullWidth
-                    disabled={videoState?.playing}
-                  />
-                  <Button variant="contained" onClick={buttonSubmitTimeChange} disabled={videoState?.playing}>
-                    Set seconds
-                  </Button>
-                  <FormControl fullWidth>
-                    <InputLabel id="test-action-select">Action type</InputLabel>
-                    <Select
-                      labelId="test-action-select"
-                      id="test-action-select"
-                      value={inputSelect}
-                      label="Action type"
-                      onChange={handleChange}
-                      fullWidth
+            {isDev && (
+              <React.Fragment>
+
+                <Accordion disableGutters>
+                  <AccordionSummary
+                    expandIcon={<ExpandMoreIcon />}
+                    aria-controls="panel1a-content"
+                    id="panel1a-header"
+                  >
+                    <Typography variant="subtitle2" component="p">Testing buttons</Typography>
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    <Stack
+                      direction="column"
+                      alignItems="center"
+                      justifyContent="space-between"
+                      spacing={2}
                     >
-                      <MenuItem value={1}>[1] Reset room</MenuItem>
-                      <MenuItem value={2}>[2] Convert test mkv</MenuItem>
-                      <MenuItem value={3}>[3] Convert test mp4</MenuItem>
-                    </Select>
-                  </FormControl>
-                  <Button variant="contained" onClick={() => socket.emit('playerTest', roomData.id, parseInt(inputSelect))}>
-                    Run action
-                  </Button>
-                </Stack>
-              </AccordionDetails>
-            </Accordion>
-            <Accordion disableGutters>
-              <AccordionSummary
-                expandIcon={<ExpandMoreIcon />}
-                aria-controls="panel1a-content"
-                id="panel1a-header"
-              >
-                <Typography variant="subtitle2" component="p">Extra info</Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Stack
-                  direction="column"
-                  alignItems="center"
-                  justifyContent="space-between"
-                  spacing={2}
-                >
-                  {
-                    videoData?.extra ? Object.keys(videoData?.extra || {}).map((key) => (
-                      <Typography variant="body2" component="span" key={`extra_${key}`}>
-                        {key}: {videoData?.extra[key]}
-                      </Typography>
-                    )) : (
-                      <Typography variant="body1" component="span" color="primary">
-                        No information available
-                      </Typography>
-                    )
-                  }
-                </Stack>
-              </AccordionDetails>
-            </Accordion>
+                      <TextField
+                        label="seconds"
+                        value={inputTimePosition}
+                        onChange={(e) => {
+                          setInputTimePosition(e.target.value);
+                        }}
+                        fullWidth
+                        disabled={videoState?.playing}
+                      />
+                      <Button variant="contained" onClick={buttonSubmitTimeChange} disabled={videoState?.playing}>
+                        Set seconds
+                      </Button>
+                      <FormControl fullWidth>
+                        <InputLabel id="test-action-select">Action type</InputLabel>
+                        <Select
+                          labelId="test-action-select"
+                          id="test-action-select"
+                          value={inputSelect}
+                          label="Action type"
+                          onChange={handleChange}
+                          fullWidth
+                        >
+                          <MenuItem value={1}>[1] Reset room</MenuItem>
+                          <MenuItem value={2}>[2] Convert test mkv</MenuItem>
+                          <MenuItem value={3}>[3] Convert test mp4</MenuItem>
+                        </Select>
+                      </FormControl>
+                      <Button variant="contained" onClick={() => socket.emit('playerTest', roomData.id, parseInt(inputSelect))}>
+                        Run action
+                      </Button>
+                    </Stack>
+                  </AccordionDetails>
+                </Accordion>
+                <Accordion disableGutters>
+                  <AccordionSummary
+                    expandIcon={<ExpandMoreIcon />}
+                    aria-controls="panel1a-content"
+                    id="panel1a-header"
+                  >
+                    <Typography variant="subtitle2" component="p">Extra info</Typography>
+                  </AccordionSummary>
+                  <AccordionDetails>
+                    <Stack
+                      direction="column"
+                      alignItems="center"
+                      justifyContent="space-between"
+                      spacing={2}
+                    >
+                      {
+                        videoData?.extra ? Object.keys(videoData?.extra || {}).map((key) => (
+                          <Typography variant="body2" component="span" key={`extra_${key}`}>
+                            {key}: {videoData?.extra[key]}
+                          </Typography>
+                        )) : (
+                          <Typography variant="body1" component="span" color="primary">
+                            No information available
+                          </Typography>
+                        )
+                      }
+                    </Stack>
+                  </AccordionDetails>
+                </Accordion>
+              </React.Fragment>
+            )}
             <Stack
               direction="row"
               alignItems="center"
