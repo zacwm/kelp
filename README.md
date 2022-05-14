@@ -34,3 +34,8 @@
   **Before using, you must know that, I [(Zachary)](https://github.com/zacimac) and all contribuitors are not responsible for any torrents downloaded on YOUR instance of ['kelp'](https://github.com/zacimac/kelp) (such as legal, viruses, etc). Use at your own risk.** *Maybe use some sort of VPN on whatever its hosted on? (any VPN sponsors? :eyes:)*
 
   [❤️ **Also maybe considor sponsoring me so I can work on projects like this more often?**](https://github.com/sponsors/zacimac)
+
+## Development
+To get started with development of kelp, follow the setup as normal and instead of last step, use `$ npm run dev` instead.
+
+If intending to edit conversion/playback/player etc, it may be useful to create a `src/test` folder and a `video.mp4` or `video.mkv` files can be placed in the test folder to use in the ['Testing buttons' menu](https://i.zachary.lol/firefox_UPLs2I1QPQ.png).
