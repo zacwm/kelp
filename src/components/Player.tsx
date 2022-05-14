@@ -182,10 +182,10 @@ const Player: React.FC<Props> = ({ socket, roomData, menuVisible, videoState, se
     if (!videoState) return;
     if (!refPlayer) return;
 
-    if (playedSeconds > videoState.timePosition + 2) {
+    if (Math.floor(playedSeconds) > videoState.timePosition + 2) {
       refPlayer.current.seekTo(videoState.timePosition);
       enqueueSnackbar('Your player was over 2 seconds ahead. Resyncing...', { variant: 'warning' });
-    } else if (playedSeconds < videoState.timePosition - 2) {
+    } else if (Math.floor(playedSeconds) < videoState.timePosition - 2) {
       refPlayer.current.seekTo(videoState.timePosition);
       enqueueSnackbar('Your player was over 2 seconds behind. Resyncing...', { variant: 'warning' });
     }
@@ -287,6 +287,30 @@ const Player: React.FC<Props> = ({ socket, roomData, menuVisible, videoState, se
                       }
                     </Stack>
                   </Box>
+                  <Fade in={!videoState?.playing}>
+                    <Stack
+                      direction="row"
+                      alignItems="center"
+                      justifyContent="center"
+                      sx={{
+                        position: 'absolute',
+                        zIndex: 1,
+                        top: 0,
+                        height: '100%',
+                        width: '100%',
+                      }}
+                    >
+                      <PlayArrowIcon
+                        color="primary"
+                        sx={{
+                          fontSize: 120,
+                          textShadow: '0px 0px 10px rgba(0,0,0,0.1)',
+                          cursor: 'pointer',
+                        }}
+                        onClick={buttonPlayback}
+                      />
+                    </Stack>
+                  </Fade>
                   <Box sx={{
                     position: 'absolute',
                     zIndex: 1,
