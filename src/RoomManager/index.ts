@@ -41,6 +41,12 @@ class RoomManager implements RoomManagerInterface {
   getRoomCount(): number {
     return this.rooms.length;
   }
+  
+  closeRoom(room: Room): void {
+    room.resetRoom(true);
+    this.SocketServer.emit('roomClosed', room.id);
+    this.rooms = this.rooms.filter(r => r.id !== room.id);
+  }
 }
 
 export default RoomManager;

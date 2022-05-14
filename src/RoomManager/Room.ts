@@ -4,7 +4,7 @@ import { v4 as uuid } from 'uuid';
 import User from '../User';
 import * as SocketIO from 'socket.io';
 import WebTorrent from 'webtorrent';
-import childProcess from 'child_process';
+import FFmpeg from '../ffmpeg';
 
 interface RoomInterface {
   setName(name: string): void;
@@ -20,7 +20,7 @@ interface RoomInterface {
   getPlaybackState(): any;
   setTimePosition(time: number): void;
   runEndEvent(): void;
-  resetRoom(): void
+  resetRoom(noStatus?: boolean): void;
   // Torrent controls
   startTorrent(url: string, callback: any): void;
   convertTorrent(videoPath: string): void;
@@ -54,7 +54,7 @@ class Room implements RoomInterface {
   private wtClient: any; // TODO: should be webtorrent client type, but cant find it rn...
   private torrent: any;
   private torrentCheckInterval: any;
-  private ffmpegProcess: any;
+  private ffmpeg: FFmpeg;
 
   constructor(socketServer: SocketIO.Server, name: string, password?: string) {
     this.SocketServer = socketServer;
@@ -73,6 +73,7 @@ class Room implements RoomInterface {
     this.playbackPlaying = false;
     this.playbackTimePosition = 0;
     this.playbackTimePositionInterval = null;
+    this.ffmpeg = new FFmpeg();
 
     fs.emptyDir(path.join(__dirname, `../.temp/${this.id}`));
   }
@@ -212,7 +213,7 @@ class Room implements RoomInterface {
   async startTorrent(url: string, callback?: any): Promise<void> {
     await fs.emptyDir(path.join(__dirname, `../.temp/${this.id}`));
     this.setStatus(2, 'Staring download...');
-    if (this.ffmpegProcess) return callback({ error: 'Already processing video...' });
+    if (this.ffmpeg.process) return callback({ error: 'Already processing video...' });
     if (this.wtClient) return callback({ error: 'Already downloading torrent...' });
     if (!this.wtClient) this.wtClient = new WebTorrent();
     this.wtClient.add(url, { path: path.join(__dirname, `../.temp/${this.id}`) }, (torrent: any) => {
@@ -253,87 +254,64 @@ class Room implements RoomInterface {
   async convertTorrent(videoPath: string): Promise<void> {
     await fs.emptyDir(path.join(__dirname, `../.streams/${this.id}`));
     this.setStatus(4, 'Staring conversion...');
-    if (this.ffmpegProcess) return;
+    if (this.ffmpeg.process) return;
     fs.pathExists(videoPath, async (err, exists) => {
-      if (err) {
-        return this.setStatus(-1, 'Video file check failed...');
-      }
+      if (err) return this.setStatus(-1, 'Video file check failed...');
       if (!exists) return this.setStatus(-1, 'Video file not found...');
       const type = path.extname(videoPath);
 
-      // TODO: Move ffmpeg processes to a separate file with promises...
       if (type === '.mkv') {
-        // File exists, start converting...
         this.setStatus(5, 'Converting - 0/3 files done');
-        
-        this.ffmpegProcess = childProcess.exec(`ffmpeg -i "${videoPath}" -codec copy "${path.join(__dirname, `../.temp/${this.id}/convert.mp4`)}"`, (mp4Err, mp4Stdout, mp4Stderr) => {
-          if (mp4Err) {
-            this.ffmpegProcess = null;
-            return this.setStatus(-1, 'File conversion failed on conversion 1/3...');
-          }
-          if (mp4Stdout || mp4Stderr) {
+        this.ffmpeg.convertVideoToMP4(videoPath, this.id)
+          .then(({ mp4Path }) => {
             this.setStatus(5, 'Converting - 1/3 files done');
-            
-            // Now convert to HLS
-            this.ffmpegProcess = childProcess.exec(`ffmpeg -i "${path.join(__dirname, `../.temp/${this.id}/convert.mp4`)}" -codec: copy -start_number 0 -hls_time 10 -hls_list_size 0 -f hls "${path.join(__dirname, `../.streams/${this.id}/index.m3u8`)}"`, (videoErr, videoStdout, videoStderr) => {
-              if (videoErr) {
-                console.dir(videoErr);
-                this.ffmpegProcess = null;
-                return this.setStatus(-1, 'File conversion failed on conversion 2/3...');
-              }
-              if (videoStdout || videoStderr) {
-                fs.unlinkSync(path.join(__dirname, `../.temp/${this.id}/convert.mp4`));
-                this.videoURL = `/streams/${this.id}/index.m3u8`;
-                this.setStatus(5, 'Converting - 2/3 files done');
-      
-                this.ffmpegProcess = childProcess.exec(`ffmpeg -i "${videoPath}" -map 0:s:0 "${path.join(__dirname, `../.streams/${this.id}/subtitle.vtt`)}"`, (subtitleErr, subtitleStdout, subtitleStderr) => {
-                  if (subtitleErr) {
-                    this.ffmpegProcess = null;
-                    return this.setStatus(0, 'Ready');
-                  }
-          
-                  if (subtitleStdout || subtitleStderr) {
-                    this.videoSubtitle = `/streams/${this.id}/subtitle.vtt`;
-                    this.ffmpegProcess = null;
-                    this.setStatus(0, 'Ready');
-                  }
-                });
-              }
-            });
-          }
-        });
+            return this.ffmpeg.convertVideoToHLS(mp4Path, this.id);
+          })
+          .then(() => {
+            this.setStatus(5, 'Converting - 2/3 files done');
+            this.ffmpeg.extractSubtitles(videoPath, this.id)
+              .then(() => {
+                this.videoSubtitle = `/streams/${this.id}/subtitle.vtt`;
+                this.setStatus(0, 'Ready');
+              })
+              .catch(() => {
+                return this.setStatus(0, 'Ready');
+              });
+          })
+          .catch((err) => {
+            console.error(err);
+            return this.setStatus(-1, 'File conversion failed...');
+          });
       } else if (type === '.mp4') {
         this.setStatus(5, 'Converting - 0/1 files done');
-        this.ffmpegProcess = childProcess.exec(`ffmpeg -i "${videoPath}" -codec: copy -start_number 0 -hls_time 10 -hls_list_size 0 -f hls "${path.join(__dirname, `../.streams/${this.id}/index.m3u8`)}"`, (err, videoStdout, videoStderr) => {
-          if (err) {
-            this.ffmpegProcess = null;
-            return this.setStatus(-1, 'File conversion failed on conversion 1/3...');
-          }
-          if (videoStdout || videoStderr) {
+        this.ffmpeg.convertVideoToHLS(videoPath, this.id)
+          .then(() => {
             this.videoURL = `/streams/${this.id}/index.m3u8`;
-            this.ffmpegProcess = null;
-            this.videoExtra = {
-              ...this.videoExtra,
-              hlsFileCount: fs.readdirSync(path.join(__dirname, `../.streams/${this.id}`)).length,
-            };
+            this.videoExtra = { ...this.videoExtra, hlsFileCount: fs.readdirSync(path.join(__dirname, `../.streams/${this.id}`)).length };
             this.setStatus(0, 'Ready');
-          }
-        });
+          })
+          .catch((err) => {
+            console.error(err);
+            return this.setStatus(-1, 'File conversion failed...');
+          });
       } else {
         return this.setStatus(-1, 'Unsupported file type...');
       }
     });
   }
 
-  resetRoom(): void {
-    this.setStatus(10, 'Resetting room...');
+  resetRoom(noStatus?: boolean): void {
+    if (noStatus) this.setStatus(10, 'Resetting room...');
     if (this.wtClient) {
-      this.wtClient.destroy();
+      try {
+        this.wtClient.destroy();
+      } catch (wtClientDestroy) {
+        console.error(wtClientDestroy);
+      }
       this.wtClient = null;
     }
-    if (this.ffmpegProcess) {
-      this.ffmpegProcess.kill();
-      this.ffmpegProcess = null;
+    if (this.ffmpeg.process) {
+      this.ffmpeg.stop();
     }
   }
 
