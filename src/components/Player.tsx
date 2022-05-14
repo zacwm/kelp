@@ -364,16 +364,18 @@ const Player: React.FC<Props> = ({ socket, roomData, menuVisible, videoState, se
               <ReactPlayer
                 ref={refPlayer}
                 url={videoData.url}
-                config={videoData.subtitle && {
+                config={{
                   file: {
+                    forceHLS: true,
                     tracks: [
                       {
+                        label: 'subtitles',
                         kind: 'subtitles',
                         src: videoData.subtitle,
                         srcLang: 'en',
-                        default: true
+                        default: true,
                       },
-                    ]
+                    ],
                   }
                 }}
                 playing={videoState?.playing}
