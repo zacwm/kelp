@@ -29,7 +29,7 @@ const Home: NextPage = () => {
   const [inputRoomPassword, setInputRoomPassword] = React.useState('');
 
   React.useEffect((): any => {
-    const newSocket = io(`https://${window.location.hostname}`);
+    const newSocket = io();
     setSocket(newSocket);
     return () => newSocket.close();
   }, []);

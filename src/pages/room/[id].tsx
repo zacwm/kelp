@@ -33,7 +33,7 @@ const Room: NextPage = () => {
   const [menuVisible, setMenuVisible] = React.useState(false);
 
   React.useEffect((): any => {
-    const newSocket = io(`https://${window.location.hostname}`);
+    const newSocket = io();
     setSocket(newSocket);
     return () => newSocket.close();
   }, []);
