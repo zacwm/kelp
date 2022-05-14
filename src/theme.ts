@@ -12,10 +12,10 @@ const darkTheme = createTheme({
     },
 
     primary: {
-      main: '#19857b',
+      main: '#00a152',
     },
     error: {
-      main: '#ff0000',
+      main: '#f44336',
     }
   },
 });
