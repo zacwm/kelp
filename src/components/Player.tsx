@@ -301,7 +301,6 @@ const Player: React.FC<Props> = ({ socket, roomData, menuVisible, videoState, se
                       }}
                     >
                       <PlayArrowIcon
-                        color="primary"
                         sx={{
                           fontSize: 120,
                           textShadow: '0px 0px 10px rgba(0,0,0,0.1)',
