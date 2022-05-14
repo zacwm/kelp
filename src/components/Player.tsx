@@ -366,7 +366,6 @@ const Player: React.FC<Props> = ({ socket, roomData, menuVisible, videoState, se
                 url={videoData.url}
                 config={{
                   file: {
-                    forceHLS: true,
                     tracks: [
                       {
                         label: 'subtitles',
