@@ -140,6 +140,12 @@ class SocketServer {
         case 3:
           this.Rooms.getRoomById(id).convertTorrent(path.join(__dirname, './test/test.mp4'));
           break;
+        case 4:
+          this.Rooms.getRoomById(id).convertTorrent(path.join(__dirname, './test/test.avi'));
+          break;
+        case 5:
+          this.Rooms.getRoomById(id).convertTorrent(path.join(__dirname, './test/test.mov'));
+          break;
         }
       });
     });

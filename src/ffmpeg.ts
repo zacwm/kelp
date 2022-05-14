@@ -18,9 +18,9 @@ class FFmpeg implements FFmpegInterface {
 
   convertVideoToMP4(filePath: string, roomId: string): Promise<any> {
     return new Promise((resolve: any, reject: any) => {
-      exec(`ffmpeg -i "${filePath}" -codec copy "${path.join(__dirname, `./.temp/${roomId}/convert.mp4`)}"`, (err, stdout, stderr) => {
+      exec(`ffmpeg -i "${filePath}" -codec copy -movflags +faststart "${path.join(__dirname, `.temp/${roomId}/convert.mp4`)}"`, (err, stdout, stderr) => {
         if (err) return reject(err);
-        resolve({ stdout, stderr, mp4Path: path.join(__dirname, `./.temp/${roomId}/convert.mp4`) });
+        resolve({ stdout, stderr, mp4Path: path.join(__dirname, `.temp/${roomId}/convert.mp4`) });
       });
     });
   }
@@ -36,7 +36,7 @@ class FFmpeg implements FFmpegInterface {
 
   extractSubtitles(filePath: string, roomId: string): Promise<any> {
     return new Promise((resolve: any, reject: any) => {
-      exec(`ffmpeg -i "${filePath}" -map 0:s:0 "${path.join(__dirname, `./.streams/${roomId}/subtitles.vtt`)}"`, (err, stdout, stderr) => {
+      exec(`ffmpeg -i "${filePath}" -map 0:s:0 "${path.join(__dirname, `.streams/${roomId}/subtitles.vtt`)}"`, (err, stdout, stderr) => {
         if (err) return reject(err);
         resolve({ stdout, stderr });
       });

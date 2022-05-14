@@ -265,30 +265,59 @@ class Room implements RoomInterface {
         this.ffmpeg.convertVideoToMP4(videoPath, this.id)
           .then(({ mp4Path }) => {
             this.setStatus(5, 'Converting - 1/3 files done');
-            return this.ffmpeg.convertVideoToHLS(mp4Path, this.id);
-          })
-          .then(() => {
-            this.videoExtra = { ...this.videoExtra, hlsFileCount: fs.readdirSync(path.join(__dirname, `../.streams/${this.id}`)).length };
-            this.setStatus(5, 'Converting - 2/3 files done');
-            this.ffmpeg.extractSubtitles(videoPath, this.id)
+            this.ffmpeg.convertVideoToHLS(mp4Path, this.id)
               .then(() => {
-                this.videoSubtitle = `/streams/${this.id}/subtitles.vtt`;
-                this.setStatus(0, 'Ready');
+                this.videoURL = `/streams/${this.id}/index.m3u8`;
+                this.videoExtra = { ...this.videoExtra, hlsFileCount: fs.readdirSync(path.join(__dirname, `../.streams/${this.id}`)).length };
+                this.setStatus(5, 'Converting - 2/3 files done');
+                this.ffmpeg.extractSubtitles(videoPath, this.id)
+                  .then(() => {
+                    this.videoSubtitle = `/streams/${this.id}/subtitles.vtt`;
+                    this.playbackTimePosition = 0;
+                    this.setStatus(0, 'Ready');
+                  })
+                  .catch((err) => {
+                    console.dir(err);
+                    this.playbackTimePosition = 0;
+                    return this.setStatus(0, 'Ready');
+                  });
               })
-              .catch(() => {
-                return this.setStatus(0, 'Ready');
+              .catch((err) => {
+                console.error(err);
+                return this.setStatus(-1, 'File conversion failed...');
               });
           })
           .catch((err) => {
             console.error(err);
             return this.setStatus(-1, 'File conversion failed...');
           });
-      } else if (type === '.mp4') {
+      } else if (['.avi', '.wmv'].includes(type)) {
+        this.setStatus(5, 'Converting - 0/2 files done');
+        this.ffmpeg.convertVideoToMP4(videoPath, this.id)
+          .then(({ mp4Path }) => {
+            this.setStatus(5, 'Converting - 1/2 files done');
+            this.ffmpeg.convertVideoToHLS(mp4Path, this.id)
+              .then(() => {
+                this.videoURL = `/streams/${this.id}/index.m3u8`;
+                this.videoExtra = { ...this.videoExtra, hlsFileCount: fs.readdirSync(path.join(__dirname, `../.streams/${this.id}`)).length };
+                this.setStatus(0, 'Ready');
+              })
+              .catch((err) => {
+                console.error(err);
+                return this.setStatus(-1, 'File conversion failed...');
+              });
+          })
+          .catch((err) => {
+            console.error(err);
+            return this.setStatus(-1, 'File conversion failed...');
+          });
+      } else if (['.mp4', '.mov'].includes(type)) {
         this.setStatus(5, 'Converting - 0/1 files done');
         this.ffmpeg.convertVideoToHLS(videoPath, this.id)
           .then(() => {
             this.videoURL = `/streams/${this.id}/index.m3u8`;
             this.videoExtra = { ...this.videoExtra, hlsFileCount: fs.readdirSync(path.join(__dirname, `../.streams/${this.id}`)).length };
+            this.playbackTimePosition = 0;
             this.setStatus(0, 'Ready');
           })
           .catch((err) => {
