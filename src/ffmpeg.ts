@@ -36,7 +36,7 @@ class FFmpeg implements FFmpegInterface {
 
   extractSubtitles(filePath: string, roomId: string): Promise<any> {
     return new Promise((resolve: any, reject: any) => {
-      exec(`ffmpeg -i "${filePath}" -map 0:s:0 "${path.join(__dirname, `./.temp/${roomId}/subtitles.vtt`)}"`, (err, stdout, stderr) => {
+      exec(`ffmpeg -i "${filePath}" -map 0:s:0 "${path.join(__dirname, `./.streams/${roomId}/subtitles.vtt`)}"`, (err, stdout, stderr) => {
         if (err) return reject(err);
         resolve({ stdout, stderr });
       });

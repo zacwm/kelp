@@ -268,10 +268,11 @@ class Room implements RoomInterface {
             return this.ffmpeg.convertVideoToHLS(mp4Path, this.id);
           })
           .then(() => {
+            this.videoExtra = { ...this.videoExtra, hlsFileCount: fs.readdirSync(path.join(__dirname, `../.streams/${this.id}`)).length };
             this.setStatus(5, 'Converting - 2/3 files done');
             this.ffmpeg.extractSubtitles(videoPath, this.id)
               .then(() => {
-                this.videoSubtitle = `/streams/${this.id}/subtitle.vtt`;
+                this.videoSubtitle = `/streams/${this.id}/subtitles.vtt`;
                 this.setStatus(0, 'Ready');
               })
               .catch(() => {
