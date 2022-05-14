@@ -31,6 +31,6 @@
   5. Run with `$ npm start`, and enjoy!
 
 ## Important
-  **Before using, you must know that, I [(Zachary)](https://github.com/zacimac) and all contribuitors are not responsible for any torrents you decide download using ['kelp'](https://github.com/zacimac/kelp) (legal, viruses, etc). Use at your own risk.** *Maybe use some sort of VPN on whatever its hosted on? (any VPN sponsors? :eyes:)*
+  **Before using, you must know that, I [(Zachary)](https://github.com/zacimac) and all contribuitors are not responsible for any torrents downloaded on YOUR instance of ['kelp'](https://github.com/zacimac/kelp) (such as legal, viruses, etc). Use at your own risk.** *Maybe use some sort of VPN on whatever its hosted on? (any VPN sponsors? :eyes:)*
 
   [❤️ **Also maybe considor sponsoring me so I can work on projects like this more often?**](https://github.com/sponsors/zacimac)
