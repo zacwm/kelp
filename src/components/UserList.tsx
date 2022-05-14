@@ -60,7 +60,7 @@ const UserList: React.FC<Props> = ({ socket, roomData, userId }) => {
                   fullWidth
                 />
               ): (
-                <Typography sx={!(user.id === userId) && { flex: 1 }}>{user.name}</Typography>
+                <Typography sx={!(user.id === userId) ? { flex: 1 } : {}}>{user.name}</Typography>
               )}
               {user.id === userId && (
                 <Stack
