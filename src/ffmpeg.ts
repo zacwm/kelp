@@ -18,8 +18,9 @@ class FFmpeg implements FFmpegInterface {
 
   convertVideoToMP4(filePath: string, roomId: string): Promise<any> {
     return new Promise((resolve: any, reject: any) => {
-      exec(`ffmpeg -i "${filePath}" -codec copy -movflags +faststart "${path.join(__dirname, `.temp/${roomId}/convert.mp4`)}"`, (err, stdout, stderr) => {
+      this.process = exec(`ffmpeg -i "${filePath}" -codec copy -movflags +faststart "${path.join(__dirname, `.temp/${roomId}/convert.mp4`)}"`, (err, stdout, stderr) => {
         if (err) return reject(err);
+        this.process = null;
         resolve({ stdout, stderr, mp4Path: path.join(__dirname, `.temp/${roomId}/convert.mp4`) });
       });
     });
@@ -27,8 +28,9 @@ class FFmpeg implements FFmpegInterface {
 
   convertVideoToHLS(filePath: string, roomId: string): Promise<any> {
     return new Promise((resolve: any, reject: any) => {
-      exec(`ffmpeg -i "${filePath}" -codec: copy -start_number 0 -hls_time 10 -hls_list_size 0 -f hls "${path.join(__dirname, `./.streams/${roomId}/index.m3u8`)}"`, (err, stdout, stderr) => {
+      this.process = exec(`ffmpeg -i "${filePath}" -codec: copy -start_number 0 -hls_time 10 -hls_list_size 0 -f hls "${path.join(__dirname, `./.streams/${roomId}/index.m3u8`)}"`, (err, stdout, stderr) => {
         if (err) return reject(err);
+        this.process = null;
         resolve({ stdout, stderr });
       });
     });
@@ -36,8 +38,9 @@ class FFmpeg implements FFmpegInterface {
 
   extractSubtitles(filePath: string, roomId: string): Promise<any> {
     return new Promise((resolve: any, reject: any) => {
-      exec(`ffmpeg -i "${filePath}" -map 0:s:0 "${path.join(__dirname, `.streams/${roomId}/subtitles.vtt`)}"`, (err, stdout, stderr) => {
+      this.process = exec(`ffmpeg -i "${filePath}" -map 0:s:0 "${path.join(__dirname, `.streams/${roomId}/subtitles.vtt`)}"`, (err, stdout, stderr) => {
         if (err) return reject(err);
+        this.process = null;
         resolve({ stdout, stderr });
       });
     });
