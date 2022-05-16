@@ -102,6 +102,15 @@ class SocketServer {
   
         room.startTorrent(data.url, callback);
       });
+
+      socket.on('videoSelectFile', (data: any) => {
+        if (currentRoom !== data.roomId) return;
+        const room: Room = this.Rooms.getRoomById(data.roomId);
+        if (!room) return;
+        const videoFile = (room.files || []).find(file => file.id === data.fileId);
+        if (!videoFile) return;
+        room.convertFile(videoFile.path);
+      });
   
       socket.on('videoChangePlaybackPlaying', (roomData: any, playing: boolean) => {
         if (currentRoom !== roomData.id) return;
@@ -135,16 +144,16 @@ class SocketServer {
           this.Rooms.getRoomById(id).resetRoom();
           break;
         case 2:
-          this.Rooms.getRoomById(id).convertTorrent(path.join(__dirname, './test/test.mkv'));
+          this.Rooms.getRoomById(id).convertFile(path.join(__dirname, './test/test.mkv'));
           break;
         case 3:
-          this.Rooms.getRoomById(id).convertTorrent(path.join(__dirname, './test/test.mp4'));
+          this.Rooms.getRoomById(id).convertFile(path.join(__dirname, './test/test.mp4'));
           break;
         case 4:
-          this.Rooms.getRoomById(id).convertTorrent(path.join(__dirname, './test/test.avi'));
+          this.Rooms.getRoomById(id).convertFile(path.join(__dirname, './test/test.avi'));
           break;
         case 5:
-          this.Rooms.getRoomById(id).convertTorrent(path.join(__dirname, './test/test.mov'));
+          this.Rooms.getRoomById(id).convertFile(path.join(__dirname, './test/test.mov'));
           break;
         }
       });

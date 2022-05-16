@@ -1,6 +1,7 @@
 import * as React from 'react';
 import type { Socket } from 'socket.io-client';
 import UserList from './UserList';
+import FileSelectList from './FileSelectList';
 
 import Backdrop from '@mui/material/Backdrop';
 import Box from '@mui/material/Box';
@@ -138,7 +139,7 @@ const SideMenu: React.FC<Props> = ({ socket, roomData, userId, videoState, video
                 aria-controls="panel1a-content"
                 id="panel1a-header"
               >
-                <Typography variant="h6" component="h6" color="primary">Room settings</Typography>
+                <Typography variant="h6" component="h6" color="primary">Room</Typography>
               </AccordionSummary>
               <AccordionDetails>
                 <Stack
@@ -153,7 +154,7 @@ const SideMenu: React.FC<Props> = ({ socket, roomData, userId, videoState, video
                     </Button>
                   ) }
                   { ![0, 1].includes(videoData?.statusCode) && (
-                    <Button variant="contained">
+                    <Button variant="contained" color="error">
                       Stop Download
                     </Button>
                   ) }
@@ -175,6 +176,20 @@ const SideMenu: React.FC<Props> = ({ socket, roomData, userId, videoState, video
                 <UserList socket={socket} roomData={roomData} userId={userId} />
               </AccordionDetails>
             </Accordion>
+            { (videoData?.files || []).length > 1 && (
+              <Accordion disableGutters>
+                <AccordionSummary
+                  expandIcon={<ExpandMoreIcon />}
+                  aria-controls="panel1a-content"
+                  id="panel1a-header"
+                >
+                  <Typography variant="h6" component="h6" color="primary">File select</Typography>
+                </AccordionSummary>
+                <AccordionDetails>
+                  <FileSelectList socket={socket} roomData={roomData} videoData={videoData} />
+                </AccordionDetails>
+              </Accordion>
+            ) }
           </Box>
           <Stack
             direction="column"

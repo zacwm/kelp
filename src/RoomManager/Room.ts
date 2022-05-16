@@ -23,7 +23,7 @@ interface RoomInterface {
   resetRoom(noStatus?: boolean): void;
   // Torrent controls
   startTorrent(url: string, callback: any): void;
-  convertTorrent(videoPath: string): void;
+  convertFile(videoPath: string): void;
   // Internal
   setStatus(statusCode: number, message: string, percentage: number, timeRemaining: number, speed: string): void;
 }
@@ -46,6 +46,7 @@ class Room implements RoomInterface {
   private videoURL: string;
   private videoSubtitle: string;
   private videoExtra: any;
+  files: Array<any>;
   // Video playback data...
   playbackPlaying: boolean;
   private playbackTimePosition: number;
@@ -138,6 +139,7 @@ class Room implements RoomInterface {
         url: this.videoURL,
         title: this.videoTitle,
         subtitle: this.videoSubtitle,
+        files: (this.files || []).map(file => { return { id: file.id, name: file.name }; }),
         extra: this.videoExtra,
       };
     } else {
@@ -218,8 +220,12 @@ class Room implements RoomInterface {
     if (!this.wtClient) this.wtClient = new WebTorrent();
     this.wtClient.add(url, { path: path.join(__dirname, `../.temp/${this.id}`) }, (torrent: any) => {
       this.torrent = torrent;
-      const videoFile = torrent.files.find(file => ['.mkv', '.mp4'].includes(path.extname(file.path)));
-      if (!videoFile) {
+      this.files = torrent.files.filter(file => {
+        return ['.mkv', '.mp4', '.avi', '.mov', '.wmv'].includes(path.extname(file.path));
+      }).map((file, index) => {
+        return { id: uuid(), name: file.name, path: file.path, selected: index === 0 };
+      });
+      if (this.files.length <= 0) {
         torrent.destroy();
         return this.setStatus(-1, 'No video file found in torrent...');
       }
@@ -246,13 +252,13 @@ class Room implements RoomInterface {
         this.wtClient = null;
         if (this.torrentCheckInterval) clearInterval(this.torrentCheckInterval);
         this.videoTitle = torrent.name;
-        this.convertTorrent(videoFile.path);
+        this.convertFile(this.files[0].path);
       });
     });
   }
   
-  async convertTorrent(videoPath: string): Promise<void> {
-    if (this.ffmpeg.process) return;
+  async convertFile(videoPath: string): Promise<void> {
+    if (this.ffmpeg.process) return this.ffmpeg.stop();
     await fs.emptyDir(path.join(__dirname, `../.streams/${this.id}`));
     this.setStatus(4, 'Staring conversion...');
     this.playbackTimePosition = 0;

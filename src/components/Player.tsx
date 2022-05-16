@@ -415,6 +415,7 @@ const Player: React.FC<Props> = ({ socket, roomData, menuVisible, videoState, se
             <Box
               sx={{
                 backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),url(/novideo.gif)',
+                backgroundSize: 'cover',
                 height: '100vh',
                 width: '100%',
               }}
@@ -467,10 +468,7 @@ const Player: React.FC<Props> = ({ socket, roomData, menuVisible, videoState, se
                       }}
                     >
                       <Typography variant="h4" component="h4">
-                        Preparing room...
-                      </Typography>
-                      <Typography variant="h6" component="h6" mb={1}>
-                        Status: {videoData.status}
+                        {videoData.status}
                       </Typography>
                       { videoData.percentage !== 0 && ( <LinearProgressWithLabel value={videoData.percentage}  /> ) }
                       {
