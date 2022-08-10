@@ -14,7 +14,7 @@ import Player from '../../components/Player';
 import SideMenu from '../../components/SideMenu';
 import TorrentSelect from '../../components/TorrentSelect';
 
-import { Typography, Grid } from '@mui/material';
+import { Grid } from '@mui/material';
 
 import { Box, Button, Text, Paper, Stack, Group, Progress } from '@mantine/core';
 

@@ -17,7 +17,7 @@ import PauseIcon from '@mui/icons-material/Pause';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
 
-import { Box, Paper, ActionIcon, Slider } from '@mantine/core';
+import { Box, ActionIcon, Slider } from '@mantine/core';
 
 import { IconArrowLeft, IconArrowRight, IconPlayerPlay } from '@tabler/icons';
 
@@ -32,7 +32,7 @@ type Props = {
 const Player: React.FC<Props> = ({ socket, menuVisible, videoState, setVideoState, toggleMenu }) => {
   const [cookies, setCookie] = useCookies(['kelp-volume']);
   const { room } = useRoom();
-  const { video, setVideo } = useVideo();
+  const { video } = useVideo();
 
   const { enqueueSnackbar } = useSnackbar();
 
@@ -167,7 +167,7 @@ const Player: React.FC<Props> = ({ socket, menuVisible, videoState, setVideoStat
     hls.audioTrack = hls.audioTracks[1];
   };
 
-  const playerOnProgress = ({ playedSeconds, played }: any) => {
+  const playerOnProgress = ({ playedSeconds }: any) => {
     if (!video) return;
     if (!videoState) return;
     if (!refPlayer) return;

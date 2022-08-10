@@ -36,7 +36,7 @@ const EpisodeItem: React.FC<Props> = ({ episodeData, onSelect }) => {
         </Button>
       </Group>
     </Box>
-  )
-}
+  );
+};
 
 export default EpisodeItem;
