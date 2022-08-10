@@ -46,94 +46,94 @@ const CreateRooms: React.FC<Props> = ({ socket }) => {
     });
   };
   
-    return(
-        <Box
-          sx={{
-            mx: 2,
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'center',
-            alignItems: 'center',
-            width: '100%',
-            height: '100%',
-          }}
-        >
-          <Grid container spacing={2}>
-            <Grid item xs={12}>
-              <Paper shadow="xs" p="md" withBorder sx={{
-                padding: 2,
-              }}>
-                <Stack alignItems="center" spacing={2}>
-                  <Text size={25} mb={4}>
+  return(
+    <Box
+      sx={{
+        mx: 2,
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: '100%',
+        height: '100%',
+      }}
+    >
+      <Grid container spacing={2}>
+        <Grid item xs={12}>
+          <Paper shadow="xs" p="md" withBorder sx={{
+            padding: 2,
+          }}>
+            <Stack alignItems="center" spacing={2}>
+              <Text size={25} mb={4}>
                     Create a room
-                  </Text>
-                  <TextInput
-                    placeholder="Room name"
-                    size="lg"
-                    disabled={createRoomPending}
-                    ref={refInputRoomName}
-                    sx={{ width: '100%' }}
-                  />
-                  <PasswordInput
-                    placeholder="Room password (optional)"
-                    size="lg"
-                    disabled={createRoomPending}
-                    ref={refInputRoomPassword}
-                    sx={{ width: '100%', mb: 2 }}
-                  />
-                  <Button
-                    onClick={buttonCreateRoom}
-                    disabled={createRoomPending}
-                  >Create Room</Button>
-                </Stack>
-                <Collapse
-                  in={createRoomErrorMessage} 
-                  sx={{
-                    width: '100%',
-                  }}
-                >
-                  <Alert
-                    icon={<IconAlertCircle size={16} />}
-                    title="Oh, uhh..."
-                    withCloseButton
-                    variant="outline"
-                    color="red"
-                    onClose={() => setCreateRoomErrorMessage(null)}
-                    sx={{ marginTop: 15 }}
-                  >
-                    {createRoomErrorMessage}
-                  </Alert>
-                </Collapse>
-              </Paper>
-            </Grid>
-            <Grid item xs={12}>
-              <Paper shadow="xs" p="md" withBorder sx={{
-                padding: 2,
-              }}>
-                <Stack
-                  direction="row"
-                  justifyContent="center"
-                  alignItems="center"
-                  spacing={2}
-                >
-                  <Typography variant="caption" component="span">
+              </Text>
+              <TextInput
+                placeholder="Room name"
+                size="lg"
+                disabled={createRoomPending}
+                ref={refInputRoomName}
+                sx={{ width: '100%' }}
+              />
+              <PasswordInput
+                placeholder="Room password (optional)"
+                size="lg"
+                disabled={createRoomPending}
+                ref={refInputRoomPassword}
+                sx={{ width: '100%', mb: 2 }}
+              />
+              <Button
+                onClick={buttonCreateRoom}
+                disabled={createRoomPending}
+              >Create Room</Button>
+            </Stack>
+            <Collapse
+              in={createRoomErrorMessage} 
+              sx={{
+                width: '100%',
+              }}
+            >
+              <Alert
+                icon={<IconAlertCircle size={16} />}
+                title="Oh, uhh..."
+                withCloseButton
+                variant="outline"
+                color="red"
+                onClose={() => setCreateRoomErrorMessage(null)}
+                sx={{ marginTop: 15 }}
+              >
+                {createRoomErrorMessage}
+              </Alert>
+            </Collapse>
+          </Paper>
+        </Grid>
+        <Grid item xs={12}>
+          <Paper shadow="xs" p="md" withBorder sx={{
+            padding: 2,
+          }}>
+            <Stack
+              direction="row"
+              justifyContent="center"
+              alignItems="center"
+              spacing={2}
+            >
+              <Typography variant="caption" component="span">
                     Version: 1.1.2
-                  </Typography>
-                  <Link
-                    component="a"
-                    target="_blank"
-                    href="https://github.com/zacimac/kelp"
-                    rel="noopener"
-                    variant="caption"
-                  >
+              </Typography>
+              <Link
+                component="a"
+                target="_blank"
+                href="https://github.com/zacimac/kelp"
+                rel="noopener"
+                variant="caption"
+              >
                     GitHub
-                  </Link>
-                </Stack>
-              </Paper>
-            </Grid>
-          </Grid>
-        </Box>
-    );
+              </Link>
+            </Stack>
+          </Paper>
+        </Grid>
+      </Grid>
+    </Box>
+  );
 };
 
 export default CreateRooms;

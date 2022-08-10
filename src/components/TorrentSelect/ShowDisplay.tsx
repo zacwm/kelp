@@ -37,7 +37,7 @@ const TitleDisplay: React.FC<Props> = ({ title, onTitleSelect, close, socket }) 
       } else {
         seasonObj[ep.season] = [ep];
       }
-      seasonObj[ep.season].sort((a, b) => { return a.episode - b.episode });
+      seasonObj[ep.season].sort((a, b) => { return a.episode - b.episode; });
     });
 
     setSeasonEpisodesData(seasonObj);
@@ -116,7 +116,7 @@ const TitleDisplay: React.FC<Props> = ({ title, onTitleSelect, close, socket }) 
               >
                 <Accordion chevronPosition="left" sx={{ maxHeight: 500 }}>
                   {
-                    Object.keys(seasonEpisodesData).sort((a, b) => { return parseInt(a) - parseInt(b) }).map((season, sIndex) => (
+                    Object.keys(seasonEpisodesData).sort((a, b) => { return parseInt(a) - parseInt(b); }).map((season, sIndex) => (
                       <Accordion.Item value={`season${season}`} key={sIndex}>
                         <Accordion.Control>Season {season}</Accordion.Control>
                         <Accordion.Panel>

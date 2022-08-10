@@ -1,6 +1,5 @@
 import * as React from 'react';
 import Head from 'next/head';
-import { useRouter } from 'next/router';
 import type { NextPage } from 'next';
 import io from 'socket.io-client';
 
