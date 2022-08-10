@@ -11,10 +11,8 @@ import {Text} from '@mantine/core';
 import ActiveRooms from '../components/ActiveRooms';
 import CreateRooms from '../components/CreateRoom';
 
-
 const Home: NextPage = () => {
-  
-const [socket, setSocket] = React.useState(null);
+  const [socket, setSocket] = React.useState(null);
 
   React.useEffect((): any => {
     const newSocket = io();
