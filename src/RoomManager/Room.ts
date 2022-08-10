@@ -1,6 +1,5 @@
 import fs from 'fs-extra';
 import path from 'path';
-import { v4 as uuid } from 'uuid';
 import User from '../User';
 import * as SocketIO from 'socket.io';
 import WebTorrent from 'webtorrent';
@@ -223,7 +222,7 @@ class Room implements RoomInterface {
       this.files = torrent.files.filter(file => {
         return ['.mkv', '.mp4', '.avi', '.mov', '.wmv'].includes(path.extname(file.path));
       }).map((file, index) => {
-        return { id: uuid(), name: file.name, path: file.path, selected: index === 0 };
+        return { id: makeid(16), name: file.name, path: file.path, selected: index === 0 };
       });
       if (this.files.length <= 0) {
         torrent.destroy();
