@@ -13,7 +13,6 @@ type Props = {
   socket: any;
 }
 
-
 const ActiveRooms: React.FC<Props> = ({ socket }) => {
   const router = useRouter();
   const [roomClosedMessage, setRoomClosedMessage] = React.useState(false);
@@ -41,7 +40,6 @@ const ActiveRooms: React.FC<Props> = ({ socket }) => {
     };
   }, [socket]);
 
-  
     return(
         <Box
           sx={{
@@ -115,7 +113,6 @@ const ActiveRooms: React.FC<Props> = ({ socket }) => {
             </Grid>
           </Grid>
         </Box>
-
     );
 };
 
