@@ -4,7 +4,6 @@ import type { Socket } from 'socket.io-client';
 import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Slider from '@mui/material/Slider';
-import Tooltip from '@mui/material/Tooltip';
 import Typography from '@mui/material/Typography';
 
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
@@ -39,7 +38,6 @@ const PlayerControls: React.FC<Props> = ({
   menuVisible,
   toggleMenu,
   setMouseOverControls,
-  videoTimePosition,
   videoPlayedSeconds,
   videoDuration,
   inputVolumeSlider,

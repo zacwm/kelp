@@ -24,7 +24,7 @@ const CustomTorrentPrompt: React.FC<Props> = ({ setTorrent }) => {
         <Button onClick={() => setTorrent(inputTorrentUrl)}>Start Download</Button>
       </Stack>
     </Box>
-  )
-}
+  );
+};
 
 export default CustomTorrentPrompt;
