@@ -1,9 +1,10 @@
 import React from 'react';
 import Head from 'next/head';
 import { AppProps } from 'next/app';
-import { ThemeProvider } from '@mui/material/styles';
-import CssBaseline from '@mui/material/CssBaseline';
-import theme from '../theme';
+
+import '../styles.css';
+
+import { MantineProvider } from '@mantine/core';
 
 export default function App(props: AppProps ) {
   const { Component, pageProps } = props;
@@ -12,10 +13,15 @@ export default function App(props: AppProps ) {
       <Head>
         <meta name="viewport" content="initial-scale=1, width=device-width" />
       </Head>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
+      <MantineProvider theme={{
+        colorScheme: 'dark',
+        colors: {
+          brand: ['#00a152', '#00a152', '#00a152', '#00a152', '#00a152', '#00a152', '#00a152', '#00a152', '#00a152','#00a152'],
+        },
+        primaryColor: 'brand',
+      }} withGlobalStyles withNormalizeCSS>
         <Component {...pageProps} />
-      </ThemeProvider>
+      </MantineProvider>
     </React.Fragment>
   );
 }

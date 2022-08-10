@@ -59,13 +59,13 @@ class Room implements RoomInterface {
 
   constructor(socketServer: SocketIO.Server, name: string, password?: string) {
     this.SocketServer = socketServer;
-    this.id = uuid();
+    this.id = makeid(6);
     this.name = name;
     this.password = password || '';
-    this.authToken = uuid(); // TODO: Replace with a heavier token...
+    this.authToken = makeid(32);
     this.users = [];
     this.statusCode = 1;
-    this.status = 'Waiting';
+    this.status = 'Looking for a movie...';
     this.statusPercentage = 0;
     this.statusTimeRemaining = 0;
     this.statusSpeed = '';
@@ -214,7 +214,7 @@ class Room implements RoomInterface {
   // Torrent controls
   async startTorrent(url: string, callback?: any): Promise<void> {
     if (this.ffmpeg.process) return callback({ error: 'Already processing video...' });
-    if (this.wtClient) return callback({ error: 'Already downloading torrent...' });
+    if (this.wtClient) return callback({ error: 'Already downloading...' });
     this.setStatus(2, 'Staring download...');
     await fs.emptyDir(path.join(__dirname, `../.temp/${this.id}`));
     if (!this.wtClient) this.wtClient = new WebTorrent();
@@ -242,7 +242,7 @@ class Room implements RoomInterface {
         };
 
         console.log(`Room: ${this.id} | Files: ${torrent.files.length} | ${(torrent.progress * 100).toFixed(2)}% @ ${formatBytes(torrent.downloadSpeed)}/sec`);
-        this.setStatus(3, 'Downloading torrent...', torrent.progress * 100, torrent.timeRemaining, `${formatBytes(torrent.downloadSpeed)}/s`);
+        this.setStatus(3, 'Downloading...', torrent.progress * 100, torrent.timeRemaining, `${formatBytes(torrent.downloadSpeed)}/s`);
       }, 500);
 
       torrent.on('done', () => {
@@ -281,11 +281,11 @@ class Room implements RoomInterface {
                 this.ffmpeg.extractSubtitles(videoPath, this.id)
                   .then(() => {
                     this.videoSubtitle = `/streams/${this.id}/subtitles.vtt`;
-                    this.setStatus(0, 'Ready');
+                    this.setStatus(0, `Watching '${this.videoTitle}'`);
                   })
                   .catch((err) => {
                     console.dir(err);
-                    return this.setStatus(0, 'Ready');
+                    return this.setStatus(0, `Watching '${this.videoTitle}'`);
                   });
               })
               .catch((err) => {
@@ -306,7 +306,7 @@ class Room implements RoomInterface {
               .then(() => {
                 this.videoURL = `/streams/${this.id}/index.m3u8`;
                 this.videoExtra = { ...this.videoExtra, hlsFileCount: fs.readdirSync(path.join(__dirname, `../.streams/${this.id}`)).length };
-                this.setStatus(0, 'Ready');
+                this.setStatus(0, `Watching '${this.videoTitle}'`);
               })
               .catch((err) => {
                 console.error(err);
@@ -323,7 +323,7 @@ class Room implements RoomInterface {
           .then(() => {
             this.videoURL = `/streams/${this.id}/index.m3u8`;
             this.videoExtra = { ...this.videoExtra, hlsFileCount: fs.readdirSync(path.join(__dirname, `../.streams/${this.id}`)).length };
-            this.setStatus(0, 'Ready');
+            this.setStatus(0, `Watching '${this.videoTitle}'`);
           })
           .catch((err) => {
             console.error(err);
@@ -335,8 +335,10 @@ class Room implements RoomInterface {
     });
   }
 
-  resetRoom(noStatus?: boolean): void {
-    if (noStatus) this.setStatus(10, 'Resetting room...');
+  async resetRoom(noStatus?: boolean): Promise<void> {
+    if (noStatus === true) noStatus = noStatus || false;
+    
+    if (noStatus !== true) this.setStatus(10, 'Resetting room...');
     if (this.wtClient) {
       try {
         this.wtClient.destroy();
@@ -348,6 +350,11 @@ class Room implements RoomInterface {
     if (this.ffmpeg.process) {
       this.ffmpeg.stop();
     }
+
+    await fs.emptyDir(path.join(__dirname, `../.temp/${this.id}`));
+    await fs.emptyDir(path.join(__dirname, `../.streams/${this.id}`));
+
+    this.setStatus(1, 'Looking for a movie...');
   }
 
   // Internal class functions
@@ -381,4 +388,14 @@ function formatBytes(bytes, decimals = 2) {
   const i = Math.floor(Math.log(bytes) / Math.log(k));
 
   return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+}
+
+function makeid(length) {
+  let result           = '';
+  const characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  const charactersLength = characters.length;
+  for ( let i = 0; i < length; i++ ) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+  return result;
 }

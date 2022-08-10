@@ -1,13 +1,12 @@
 import * as React from 'react';
 
 import Backdrop from '@mui/material/Backdrop';
-import Paper from '@mui/material/Paper';
-import Typography from '@mui/material/Typography';
 import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
 import Stack from '@mui/material/Stack';
 import Alert from '@mui/material/Alert';
 import Collapse from '@mui/material/Collapse';
+
+import { Text, Paper, Button, PasswordInput } from '@mantine/core';
 
 type Props = {
   open: boolean;
@@ -48,26 +47,19 @@ const PasswordRequestWindow: React.FC<Props> = ({ open, isLoading, passwordSubmi
       }}
       open={open}
     >
-      <Paper elevation={4} sx={{
-        padding: 2,
-      }}>
+      <Paper shadow="xs" p="md" sx={{ width: '400px' }}>
+        <Text size={23} sx={{ marginBottom: '10px' }}>This room requires a password...</Text>
         <Stack alignItems="center" spacing={2}>
-          <Typography variant="h5" component="h5" color="primary">
-            This room requires a password...
-          </Typography>
-          <TextField
-            id="input_createRoom_roomPassword"
+          <PasswordInput
             label="Room password"
-            variant="outlined"
-            fullWidth
             value={inputRoomPassword}
-            onChange={(e) => setInputRoomPassword(e.target.value)}
-            type="password"
-            autoComplete="off"
+            onChange={(e) => setInputRoomPassword(e.currentTarget.value)}
             disabled={isLoading}
+            sx={{ width: '100%' }}
           />
           <Button
-            variant="contained"
+            size="md"
+            variant="filled"
             onClick={handlePasswordSubmit}
             disabled={isLoading}
           >

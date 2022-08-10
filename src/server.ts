@@ -23,10 +23,13 @@ nextApp.prepare().then(async() => {
   app.use(express.static(path.join(__dirname, './public')));
   io.attach(server);
 
+  // Start socket server
   new SocketServer(io);
 
+  // Set `./streams` as a static folder
   app.use('/streams', express.static(path.join(__dirname, './.streams')));
 
+  // Direct any other path to next.js
   app.all('*', (req: any, res: any) => nextHandler(req, res));
 
   server.listen(port, () => {

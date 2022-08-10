@@ -1,5 +1,6 @@
 import * as React from 'react';
 import Head from 'next/head';
+import { useRouter } from 'next/router';
 import type { NextPage } from 'next';
 import io from 'socket.io-client';
 
@@ -8,31 +9,38 @@ import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import Link from '@mui/material/Link';
 import Box from '@mui/material/Box';
-import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
-import TextField from '@mui/material/TextField';
-import Button from '@mui/material/Button';
-import Alert from '@mui/material/Alert';
 import Collapse from '@mui/material/Collapse';
 
-import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
-import LockOpenOutlinedIcon from '@mui/icons-material/LockOpenOutlined';
+import { Alert, Button, Divider, Text, TextInput, PasswordInput, Paper } from '@mantine/core';
+import { IconLockOpen, IconLock, IconAlertCircle  } from '@tabler/icons';
 
 
 const Home: NextPage = () => {
+  const router = useRouter();
+  const { roomclosed } = router.query;
+
   const [socket, setSocket] = React.useState(null);
   const [activeRooms, setActiveRooms] = React.useState([]);
   const [createRoomPending, setCreateRoomPending] = React.useState(false);
   const [createRoomErrorMessage, setCreateRoomErrorMessage] = React.useState(null);
+  const [roomClosedMessage, setRoomClosedMessage] = React.useState(false);
 
-  const [inputRoomName, setInputRoomName] = React.useState('');
-  const [inputRoomPassword, setInputRoomPassword] = React.useState('');
+  const refInputRoomName = React.useRef<HTMLInputElement>(null);
+  const refInputRoomPassword = React.useRef<HTMLInputElement>(null);
 
   React.useEffect((): any => {
     const newSocket = io();
     setSocket(newSocket);
     return () => newSocket.close();
   }, []);
+
+  React.useEffect((): void => {
+    if (roomclosed) {
+      router.push('/', undefined, { shallow: true });
+      setRoomClosedMessage(true);
+    }
+  }, [roomclosed]);
 
   React.useEffect((): any => {
     if (!socket) return;
@@ -41,10 +49,10 @@ const Home: NextPage = () => {
       setActiveRooms(rooms);
     };
 
-    socket.on('allRooms', Event_allRooms);
+    socket.on('getRoomsList', Event_allRooms);
 
     return () => {
-      socket.off('allRooms', Event_allRooms);
+      socket.off('getRoomsList', Event_allRooms);
     };
   }, [socket]);
 
@@ -61,13 +69,13 @@ const Home: NextPage = () => {
       await timeout(300);
     }
     socket.emit('createRoom', {
-      name: inputRoomName,
-      password: inputRoomPassword,
+      name: refInputRoomName.current?.value,
+      password: refInputRoomPassword.current?.value,
     }, (res) => {
       setCreateRoomPending(false);
       if (res.error) return setCreateRoomErrorMessage(res.error);
       if (res.roomId) {
-        window.location.href = inputRoomPassword ? `/room/${res.roomId}?password=${inputRoomPassword}` : `/room/${res.roomId}`;
+        window.location.href = refInputRoomPassword.current?.value ? `/room/${res.roomId}?password=${refInputRoomPassword.current?.value}` : `/room/${res.roomId}`;
       } else {
         setCreateRoomErrorMessage('Unknown error');
       }
@@ -75,154 +83,187 @@ const Home: NextPage = () => {
   };
 
   return (
-    <Container maxWidth="sm">
+    <Container maxWidth="lg">
       <Head>
         <title>kelp - menu</title>
       </Head>
+      <Text size={60} sx={(theme) => ({
+        position: 'absolute',
+        top: '8%',
+        left: 0,
+        right: 0,
+        textAlign: 'center',
+        color: theme.colors.brand[7],
+      })}>
+        kelp
+      </Text>
       <Box
         sx={{
-          my: 4,
-          mx: 'auto',
           display: 'flex',
-          flexDirection: 'column',
+          flexDirection: 'row',
           justifyContent: 'center',
           alignItems: 'center',
+          height: '100vh',
         }}
       >
-        <Typography variant="h2" component="h1" color="primary" mb={5}>
-          kelp
-        </Typography>
-        <Grid container spacing={2}>
-          <Grid item xs={12} mb={4}>
-            <Paper elevation={2} sx={{
-              padding: 2,
-            }}>
-              <Typography variant="h5" component="h5" mb={1}>
-                Create a room
-              </Typography>
-              <Stack alignItems="center" spacing={2}>
-                <TextField
-                  id="input_createRoom_roomName"
-                  label="Room name"
-                  variant="outlined"
-                  fullWidth
-                  value={inputRoomName}
-                  onChange={(e) => setInputRoomName(e.target.value)}
-                  disabled={createRoomPending}
-                  autoComplete="off"
-                />
-                <TextField
-                  id="input_createRoom_roomPassword"
-                  label="Room password (optional)"
-                  variant="outlined"
-                  fullWidth
-                  value={inputRoomPassword}
-                  onChange={(e) => setInputRoomPassword(e.target.value)}
-                  type="password"
-                  disabled={createRoomPending}
-                  autoComplete="off"
-                />
-                <Button
-                  variant="contained"
-                  onClick={buttonCreateRoom}
-                  disabled={createRoomPending}
-                >Create Room</Button>
-              </Stack>
-              <Collapse
-                in={createRoomErrorMessage} 
-                sx={{
-                  width: '100%',
-                }}
-              >
-                <Alert
-                  severity="error"
-                  variant="filled"
+        <Box
+          sx={{
+            mx: 2,
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            width: '100%',
+            height: '100%',
+          }}
+        >
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <Paper shadow="xs" p="md" withBorder sx={{
+                padding: 2,
+              }}>
+                <Stack alignItems="center" spacing={2}>
+                  <Text size={25} mb={4}>
+                    Create a room
+                  </Text>
+                  <TextInput
+                    placeholder="Room name"
+                    size="lg"
+                    disabled={createRoomPending}
+                    ref={refInputRoomName}
+                    sx={{ width: '100%' }}
+                  />
+                  <PasswordInput
+                    placeholder="Room password (optional)"
+                    size="lg"
+                    disabled={createRoomPending}
+                    ref={refInputRoomPassword}
+                    sx={{ width: '100%', mb: 2 }}
+                  />
+                  <Button
+                    onClick={buttonCreateRoom}
+                    disabled={createRoomPending}
+                  >Create Room</Button>
+                </Stack>
+                <Collapse
+                  in={createRoomErrorMessage} 
                   sx={{
-                    mt: 2,
                     width: '100%',
                   }}
                 >
-                  {createRoomErrorMessage}
-                </Alert>
-              </Collapse>
-            </Paper>
-          </Grid>
-          <Grid item xs={12}>
-            <Paper elevation={2} sx={{
-              padding: 2,
-            }}>
-              <Typography variant="h5" component="h5" mb={1}>
-                Active rooms
-              </Typography>
-              <Stack alignItems="stretch" spacing={2}>
-                {activeRooms.length === 0 && <Typography variant="body1">No rooms found...</Typography>}
-                {
-                  activeRooms.map(room => (
-                    <Paper key={room.id} elevation={10} sx={{
-                      px: 2,
-                      py: 1,
-                    }}>
-                      <Stack
-                        direction="row"
-                        justifyContent="flex-start"
-                        alignItems="center" 
-                        spacing={2}
-                      >
-                        {room.hasPassword ? (
-                          <LockOutlinedIcon sx={{ fontSize: 40 }} />
-                        ) : (
-                          <LockOpenOutlinedIcon sx={{ fontSize: 40 }} />
-                        )}
-                        <Stack
-                          direction="column"
-                          justifyContent="center"
-                          alignItems="flex-start" 
-                          spacing={0}
-                          sx={{ flex: 1 }}
-                        >
-                          <Typography variant="h6" component="h6">
-                            {room.name}
-                          </Typography>
-                          <Typography variant="body2" component="p">
-                            Status: {room.status}
-                          </Typography>
-                        </Stack>
-                        <Button variant="contained" onClick={() => {
-                          window.location.href = `/room/${room.id}`;
-                        }}>Join Room</Button>
-                      </Stack>
-                    </Paper>
-                  ))
-                }
-              </Stack>
-            </Paper>
-          </Grid>
-          <Grid item xs={12}>
-            <Paper elevation={2} sx={{
-              padding: 2,
-            }}>
-              <Stack
-                direction="row"
-                justifyContent="center"
-                alignItems="center"
-                spacing={2}
-              >
-                <Typography variant="caption" component="span">
-                  Version: 1.0.0
-                </Typography>
-                <Link
-                  component="a"
-                  target="_blank"
-                  href="https://github.com/zacimac/kelp"
-                  rel="noopener"
-                  variant="caption"
+                  <Alert
+                    icon={<IconAlertCircle size={16} />}
+                    title="Oh, uhh..."
+                    withCloseButton
+                    variant="outline"
+                    color="red"
+                    onClose={() => setCreateRoomErrorMessage(null)}
+                    sx={{ marginTop: 15 }}
+                  >
+                    {createRoomErrorMessage}
+                  </Alert>
+                </Collapse>
+              </Paper>
+            </Grid>
+            <Grid item xs={12}>
+              <Paper shadow="xs" p="md" withBorder sx={{
+                padding: 2,
+              }}>
+                <Stack
+                  direction="row"
+                  justifyContent="center"
+                  alignItems="center"
+                  spacing={2}
                 >
-                  GitHub
-                </Link>
-              </Stack>
-            </Paper>
+                  <Typography variant="caption" component="span">
+                    Version: 1.1.2
+                  </Typography>
+                  <Link
+                    component="a"
+                    target="_blank"
+                    href="https://github.com/zacimac/kelp"
+                    rel="noopener"
+                    variant="caption"
+                  >
+                    GitHub
+                  </Link>
+                </Stack>
+              </Paper>
+            </Grid>
           </Grid>
-        </Grid>
+        </Box>
+        <Box
+          sx={{
+            mx: 2,
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            width: '100%',
+            height: '100%',
+          }}
+        >
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              {roomClosedMessage && (
+                <Alert
+                  icon={<IconAlertCircle size={16} />}
+                  title="So about the room you were in..."
+                  withCloseButton
+                  variant="outline"
+                  onClose={() => setRoomClosedMessage(false)}
+                  sx={{ marginBottom: 15 }}
+                >
+                  It was closed by the host. Maybe it&apos;s time to create your own!
+                </Alert>
+              )}
+              <Paper shadow="xs" p="md" withBorder sx={{
+                padding: 2,
+              }}>
+                <Text size={25} mb={4} align="center">
+                  Active rooms
+                </Text>
+                <Stack alignItems="stretch" spacing={2}>
+                  {activeRooms.length === 0 && <Text>No rooms found...</Text>}
+                  {
+                    activeRooms.map(room => (
+                      <React.Fragment key={room.id}>
+                        <Stack
+                          direction="row"
+                          justifyContent="flex-start"
+                          alignItems="center" 
+                          spacing={2}
+                        >
+                          {room.hasPassword ? (
+                            <IconLock size={40} />
+                          ) : (
+                            <IconLockOpen size={40} />
+                          )}
+                          <Stack
+                            direction="column"
+                            justifyContent="center"
+                            alignItems="flex-start" 
+                            spacing={0}
+                            sx={{ flex: 1 }}
+                          >
+                            <Text size="xl" weight={700}>
+                              {room.name}
+                            </Text>
+                            <Text size="sm" italic>
+                              {room.status}
+                            </Text>
+                          </Stack>
+                          <Button onClick={() => router.push(`/room/${room.id}`)}>Join Room</Button>
+                        </Stack>
+                        {activeRooms.length - 1 !== activeRooms.indexOf(room) && <Divider />}
+                      </React.Fragment>
+                    ))
+                  }
+                </Stack>
+              </Paper>
+            </Grid>
+          </Grid>
+        </Box>
       </Box>
     </Container>
   );

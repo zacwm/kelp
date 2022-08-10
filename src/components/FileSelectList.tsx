@@ -1,5 +1,8 @@
 import * as React from 'react';
 
+import { useRoom } from '../contexts/room.context';
+import { useVideo } from '../contexts/video.context';
+
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
@@ -9,19 +12,19 @@ import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 
 type Props = {
   socket: any;
-  roomData: any;
-  videoData: any;
 }
 
-const FileSelectList: React.FC<Props> = ({ socket, roomData, videoData }) => {
+const FileSelectList: React.FC<Props> = ({ socket }) => {
+  const { room } = useRoom();
+  const { video } = useVideo();
 
   const onFileSelect = (videoFileId: string) => {
     if (!videoFileId) return;
     if (!socket) return;
-    if (!roomData) return;
+    if (!room) return;
 
     socket.emit('videoSelectFile', {
-      roomId: roomData.id,
+      roomId: room.id,
       fileId: videoFileId,
     });
   };
@@ -34,7 +37,7 @@ const FileSelectList: React.FC<Props> = ({ socket, roomData, videoData }) => {
       spacing={1}
     >
       {
-        (videoData?.files || []).map((videoFile, index) => (
+        (video?.files || []).map((videoFile, index) => (
           <Paper key={index} elevation={5} sx={{ p: 1 }}>
             <Stack
               direction="row"

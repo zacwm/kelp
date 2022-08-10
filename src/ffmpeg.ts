@@ -1,5 +1,5 @@
 import path from 'path';
-import { exec } from 'child_process';
+import { exec, spawn } from 'child_process';
 
 interface FFmpegInterface {
   convertVideoToMP4(filePath: string, roomId: string): Promise<string>;
@@ -18,7 +18,28 @@ class FFmpeg implements FFmpegInterface {
 
   convertVideoToMP4(filePath: string, roomId: string): Promise<any> {
     return new Promise((resolve: any, reject: any) => {
-      this.process = exec(`ffmpeg -i "${filePath}" -codec copy -movflags +faststart "${path.join(__dirname, `.temp/${roomId}/convert.mp4`)}"`, (err, stdout, stderr) => {
+      /* Commented out *for now* due to having some parameter issues
+      this.process = spawn('ffmpeg', ['-i', filePath, '-codec', 'copy', '-map', '0:v:0', '-map', '0:a:0', '-movflags', '+faststart', path.join(__dirname, `.temp/${roomId}/convert.mp4`), '-progress', '-', '-nostats', '-loglevel', 'error'])
+
+      this.process.stdout.on('data', (data) => {
+        const statusItems = data.toString().split('\n');
+        const isFinished = statusItems.find(item => item === 'progress=end') !== undefined;
+
+        // TODO: Respond with progress updates via socket.
+        // TODO: Still need to try get a percentage of progress if possible, but at least it can indicate that it's doing something.
+        console.dir(statusItems);
+
+        if (isFinished) return resolve({ mp4Path: path.join(__dirname, `.temp/${roomId}/convert.mp4`) });
+        this.process = null;
+      });
+
+      this.process.stderr.on('data', (data) => {
+        reject(data.toString());
+        this.process = null;
+      });
+      */
+      
+      this.process = exec(`ffmpeg -i "${filePath}" -codec copy -movflags +faststart "${path.join(__dirname, `.temp/${roomId}/convert.mp4`)}" -progress - -nostats -loglevel error`, (err, stdout, stderr) => {
         if (err) return reject(err);
         this.process = null;
         resolve({ stdout, stderr, mp4Path: path.join(__dirname, `.temp/${roomId}/convert.mp4`) });

@@ -6,6 +6,7 @@ interface RoomManagerInterface {
   createRoom(name: string): Room;
   getRoomById(id: string): Room;
   getRoomCount(): number;
+  closeRoom(room: Room): void;
 }
 
 class RoomManager implements RoomManagerInterface {

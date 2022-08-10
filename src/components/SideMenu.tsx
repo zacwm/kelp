@@ -1,195 +1,131 @@
 import * as React from 'react';
 import type { Socket } from 'socket.io-client';
+
+import { useRoom } from '../contexts/room.context';
+import { useVideo } from '../contexts/video.context';
+
 import UserList from './UserList';
 import FileSelectList from './FileSelectList';
 
-import Backdrop from '@mui/material/Backdrop';
 import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import Paper from '@mui/material/Paper';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import Accordion from '@mui/material/Accordion';
-import AccordionSummary from '@mui/material/AccordionSummary';
-import AccordionDetails from '@mui/material/AccordionDetails';
-import TextField from '@mui/material/TextField';
 import Link from '@mui/material/Link';
-import MenuItem from '@mui/material/MenuItem';
-import InputLabel from '@mui/material/InputLabel';
-import FormControl from '@mui/material/FormControl';
-import Select, { SelectChangeEvent } from '@mui/material/Select';
 
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import { Accordion, Button, Paper, Select, NumberInput } from '@mantine/core';
 
 type Props = {
   socket: Socket;
-  roomData: any;
   userId: string;
   videoState: any;
-  videoData: any;
 }
 
-const SideMenu: React.FC<Props> = ({ socket, roomData, userId, videoState, videoData }) => {
+const SideMenu: React.FC<Props> = ({ socket, userId, videoState }) => {
+  const { room } = useRoom();
+  const { video } = useVideo();
+
   const isDev = process.env.NODE_ENV === 'development';
 
-  const [torrentPrompt, setTorrentPrompt] = React.useState(false);
-  const [inputTorrentUrl, setInputTorrentUrl] = React.useState('');
+  const selectActionTypeOptions = [
+    { value: '1', label: '[1] Reset room' },
+    { value: '2', label: '[2] Convert test mkv' },
+    { value: '3', label: '[3] Convert test mp4' },
+    { value: '4', label: '[4] Convert test avi' },
+    { value: '5', label: '[5] Convert test mov' },
+  ];
 
-  const onTorrentStart = () => {
-    if (!socket) return;
-    if (!roomData) return;
-    if (!inputTorrentUrl) return;
-    socket.emit('roomStartTorrent', {
-      id: roomData.id,
-      url: inputTorrentUrl,
-    }, (res) => {
-      if (res.error) alert(res.error);
-      setTorrentPrompt(false);
-    });
-  };
+  const refTestingSeconds = React.useRef<HTMLInputElement>(null);
 
   // TODO: Testing stuff below
-  const [inputTimePosition, setInputTimePosition] = React.useState('');
-  const [inputSelect, setInputSelect] = React.useState('');
+  const [inputTimePosition, setInputTimePosition] = React.useState<number | undefined>(undefined);
+  const [inputSelect, setInputSelect] = React.useState<number>(0);
 
   const buttonSubmitTimeChange = () => {
     socket.emit('videoChangePlaybackTime', {
-      id: roomData.id,
-    }, parseInt(inputTimePosition));
+      id: room.id,
+    }, inputTimePosition);
   };
 
-  const handleChange = (event: SelectChangeEvent) => {
-    setInputSelect(event.target.value as string);
+  const handleChange = (value: string) => {
+    setInputSelect(parseInt(value));
   };
 
   React.useEffect(() => {
     if (!videoState?.timePosition) return;
-    setInputTimePosition(Math.floor(videoState.timePosition || 0).toString());
+    setInputTimePosition(Math.floor(videoState.timePosition || 0));
   }, [videoState]);
   
   return (
     <React.Fragment>
-      <Backdrop
-        open={[0, 1].includes(videoData?.statusCode) && torrentPrompt}
-        sx={{
-          zIndex: 9999,
-        }}
-      >
-        <Paper
-          elevation={24}
-          sx={{
-            p: 4
-          }}
-        >
-          <Stack
-            direction="column"
-            alignItems="center"
-            justifyContent="flex-start"
-            spacing={2}
-          >
-            <Typography variant="h5" component="h5">
-              Start a torrent download...
-            </Typography>
-            <TextField
-              id="torrent-input"
-              label="Torrent or magnet link"
-              variant="outlined"
-              fullWidth
-              value={inputTorrentUrl}
-              onChange={(e) => setInputTorrentUrl(e.target.value)}
-            />
-            <Typography variant="body1" component="p" color="red">
-              If the room already has a torrent playing, using this will delete the current torrent and start a new one.
-            </Typography>
-            <Stack
-              direction="row"
-              alignItems="center"
-              justifyContent="center"
-              spacing={1}
-            >
-              <Button variant="contained" onClick={() => setTorrentPrompt(false)}>
-                Close
-              </Button>
-              <Button variant="contained" onClick={onTorrentStart}>
-                Start Download
-              </Button>
-            </Stack>
-          </Stack>
-        </Paper>
-      </Backdrop>
-
-      <Paper
-        elevation={2}
-        square
-      >
+      <Paper shadow="md" radius="md">
         <Stack
           direction="column"
           alignItems="stretch"
           justifyContent="space-between"
-          sx={{
+          sx={() => ({
             height: '100vh',
+            width: '100%',
             maxHeight: '100vh',
             overflowY: 'auto',
-          }}
+            boxSizing: 'border-box',
+          })}
         >
           <Box>
-            <Accordion disableGutters>
-              <AccordionSummary
-                expandIcon={<ExpandMoreIcon />}
-                aria-controls="panel1a-content"
-                id="panel1a-header"
-              >
-                <Typography variant="h6" component="h6" color="primary">Room</Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <Stack
-                  direction="column"
-                  alignItems="center"
-                  justifyContent="space-between"
-                  spacing={2}
-                >
-                  { [0, 1].includes(videoData?.statusCode) && (
-                    <Button variant="contained" onClick={() => setTorrentPrompt(true)}>
-                      Download torrent
+            <Accordion variant="filled" radius="xs">
+              <Accordion.Item value="room">
+                <Accordion.Control>Room</Accordion.Control>
+                <Accordion.Panel>
+                  <Stack
+                    direction="row"
+                    alignItems="center"
+                    justifyContent="center"
+                    spacing={2}
+                  >
+                    { video?.statusCode === 0 && (
+                      <Button
+                        onClick={() => {
+                          socket.emit('resetRoom', room.id);
+                        }}
+                      >
+                        Select Torrent
+                      </Button>
+                    ) }
+                    { ![0, 1].includes(video?.statusCode) && (
+                      <Button
+                        color="red"
+                        onClick={() => {
+                          socket.emit('resetRoom', room.id);
+                        }}
+                      >
+                        Stop Download
+                      </Button>
+                    ) }
+                    <Button
+                      color="gray"
+                      onClick={() => {
+                        socket.emit('closeRoom', room.id);
+                      }}
+                    >
+                      Close room
                     </Button>
-                  ) }
-                  { ![0, 1].includes(videoData?.statusCode) && (
-                    <Button variant="contained" color="error">
-                      Stop Download
-                    </Button>
-                  ) }
-                  <Button variant="contained" color="error">
-                    Close room
-                  </Button>
-                </Stack>
-              </AccordionDetails>
+                  </Stack>
+                </Accordion.Panel>
+              </Accordion.Item>
+              <Accordion.Item value="users">
+                <Accordion.Control>Users</Accordion.Control>
+                <Accordion.Panel>
+                  <UserList socket={socket} userId={userId} />
+                </Accordion.Panel>
+              </Accordion.Item>
+              { (video?.files || []).length > 1 && (
+                <Accordion.Item value="files">
+                  <Accordion.Control>Files</Accordion.Control>
+                  <Accordion.Panel>
+                    <FileSelectList socket={socket} />
+                  </Accordion.Panel>
+                </Accordion.Item>
+              ) }
             </Accordion>
-            <Accordion defaultExpanded disableGutters>
-              <AccordionSummary
-                expandIcon={<ExpandMoreIcon />}
-                aria-controls="panel2a-content"
-                id="panel2a-header"
-              >
-                <Typography variant="h6" component="h6" color="primary">Users</Typography>
-              </AccordionSummary>
-              <AccordionDetails>
-                <UserList socket={socket} roomData={roomData} userId={userId} />
-              </AccordionDetails>
-            </Accordion>
-            { (videoData?.files || []).length > 1 && (
-              <Accordion disableGutters>
-                <AccordionSummary
-                  expandIcon={<ExpandMoreIcon />}
-                  aria-controls="panel1a-content"
-                  id="panel1a-header"
-                >
-                  <Typography variant="h6" component="h6" color="primary">File select</Typography>
-                </AccordionSummary>
-                <AccordionDetails>
-                  <FileSelectList socket={socket} roomData={roomData} videoData={videoData} />
-                </AccordionDetails>
-              </Accordion>
-            ) }
           </Box>
           <Stack
             direction="column"
@@ -197,67 +133,39 @@ const SideMenu: React.FC<Props> = ({ socket, roomData, userId, videoState, video
             justifyContent="center"
           >
             {isDev && (
-              <React.Fragment>
-
-                <Accordion disableGutters>
-                  <AccordionSummary
-                    expandIcon={<ExpandMoreIcon />}
-                    aria-controls="panel1a-content"
-                    id="panel1a-header"
-                  >
-                    <Typography variant="subtitle2" component="p">Testing buttons</Typography>
-                  </AccordionSummary>
-                  <AccordionDetails>
+              <Accordion variant="filled" radius="xs">
+                <Accordion.Item value="testingbuttons">
+                  <Accordion.Control>Testing Buttons</Accordion.Control>
+                  <Accordion.Panel>
                     <Stack
                       direction="column"
                       alignItems="center"
                       justifyContent="space-between"
                       spacing={2}
                     >
-                      <TextField
-                        label="seconds"
+                      <NumberInput
                         value={inputTimePosition}
-                        onChange={(e) => {
-                          setInputTimePosition(e.target.value);
-                        }}
-                        fullWidth
+                        onChange={(val) => setInputTimePosition(val)}
+                        ref={refTestingSeconds}
                         disabled={videoState?.playing}
                       />
-                      <Button variant="contained" onClick={buttonSubmitTimeChange} disabled={videoState?.playing}>
+                      <Button onClick={buttonSubmitTimeChange} disabled={videoState?.playing}>
                         Set seconds
                       </Button>
-                      <FormControl fullWidth>
-                        <InputLabel id="test-action-select">Action type</InputLabel>
-                        <Select
-                          labelId="test-action-select"
-                          id="test-action-select"
-                          value={inputSelect}
-                          label="Action type"
-                          onChange={handleChange}
-                          fullWidth
-                        >
-                          <MenuItem value={1}>[1] Reset room</MenuItem>
-                          <MenuItem value={2}>[2] Convert test mkv</MenuItem>
-                          <MenuItem value={3}>[3] Convert test mp4</MenuItem>
-                          <MenuItem value={4}>[4] Convert test avi</MenuItem>
-                          <MenuItem value={5}>[5] Convert test mov</MenuItem>
-                        </Select>
-                      </FormControl>
-                      <Button variant="contained" onClick={() => socket.emit('playerTest', roomData.id, parseInt(inputSelect))}>
+                      <Select
+                        value={inputSelect.toString()}
+                        onChange={handleChange}
+                        data={selectActionTypeOptions}
+                      />
+                      <Button onClick={() => socket.emit('playerTest', room.id, inputSelect) }>
                         Run action
                       </Button>
                     </Stack>
-                  </AccordionDetails>
-                </Accordion>
-                <Accordion disableGutters>
-                  <AccordionSummary
-                    expandIcon={<ExpandMoreIcon />}
-                    aria-controls="panel1a-content"
-                    id="panel1a-header"
-                  >
-                    <Typography variant="subtitle2" component="p">Extra info</Typography>
-                  </AccordionSummary>
-                  <AccordionDetails>
+                  </Accordion.Panel>
+                </Accordion.Item>
+                <Accordion.Item value="debuginfo">
+                  <Accordion.Control>Debug Info</Accordion.Control>
+                  <Accordion.Panel>
                     <Stack
                       direction="column"
                       alignItems="center"
@@ -265,9 +173,9 @@ const SideMenu: React.FC<Props> = ({ socket, roomData, userId, videoState, video
                       spacing={2}
                     >
                       {
-                        videoData?.extra ? Object.keys(videoData?.extra || {}).map((key) => (
+                        video?.extra ? Object.keys(video?.extra || {}).map((key) => (
                           <Typography variant="body2" component="span" key={`extra_${key}`}>
-                            {key}: {videoData?.extra[key]}
+                            {key}: {video?.extra[key]}
                           </Typography>
                         )) : (
                           <Typography variant="body1" component="span" color="primary">
@@ -276,9 +184,9 @@ const SideMenu: React.FC<Props> = ({ socket, roomData, userId, videoState, video
                         )
                       }
                     </Stack>
-                  </AccordionDetails>
-                </Accordion>
-              </React.Fragment>
+                  </Accordion.Panel>
+                </Accordion.Item>
+              </Accordion>
             )}
             <Stack
               direction="row"
@@ -290,15 +198,8 @@ const SideMenu: React.FC<Props> = ({ socket, roomData, userId, videoState, video
                 borderTop: '1px solid #555',
               }}
             >
-              <Link
-                component="a"
-                href="/"
-                variant="caption"
-              >
-                kelp
-              </Link>
               <Typography variant="caption" component="span">
-                Version 1.0.0
+                Version 1.1.2
               </Typography>
               <Link
                 component="a"

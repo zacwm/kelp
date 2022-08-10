@@ -2,59 +2,45 @@ import * as React from 'react';
 import type { Socket } from 'socket.io-client';
 import ReactPlayer from 'react-player';
 import { SnackbarProvider, useSnackbar } from 'notistack';
-import moment from 'moment';
+import { useCookies } from 'react-cookie';
 
-import LinearProgress, { LinearProgressProps } from '@mui/material/LinearProgress';
-import Box from '@mui/material/Box';
+import { useRoom } from '../contexts/room.context';
+import { useVideo } from '../contexts/video.context';
+
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import Paper from '@mui/material/Paper';
 import Fade from '@mui/material/Fade';
-import Slider from '@mui/material/Slider';
-import Tooltip from '@mui/material/Tooltip';
 
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import VolumeDown from '@mui/icons-material/VolumeDown';
 import VolumeUp from '@mui/icons-material/VolumeUp';
 import PauseIcon from '@mui/icons-material/Pause';
 import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 import FullscreenIcon from '@mui/icons-material/Fullscreen';
 
-function LinearProgressWithLabel(props: LinearProgressProps & { value: number }) {
-  return (
-    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-      <Box sx={{ width: '100%', mr: 1 }}>
-        <LinearProgress variant="determinate" {...props} />
-      </Box>
-      <Box sx={{ minWidth: 35 }}>
-        <Typography variant="body2" color="text.secondary">{`${Math.round(
-          props.value,
-        )}%`}</Typography>
-      </Box>
-    </Box>
-  );
-}
+import { Box, Paper, ActionIcon, Slider } from '@mantine/core';
+
+import { IconArrowLeft, IconArrowRight, IconPlayerPlay } from '@tabler/icons';
 
 type Props = {
   socket: Socket;
-  roomData: any;
   menuVisible: boolean;
   videoState: any;
   setVideoState: any;
-  videoData: any;
-  setVideoData: any;
   toggleMenu: (forceValue?: boolean) => void;
 }
 
-const Player: React.FC<Props> = ({ socket, roomData, menuVisible, videoState, setVideoState, videoData, setVideoData, toggleMenu }) => {
+const Player: React.FC<Props> = ({ socket, menuVisible, videoState, setVideoState, toggleMenu }) => {
+  const [cookies, setCookie] = useCookies(['kelp-volume']);
+  const { room } = useRoom();
+  const { video, setVideo } = useVideo();
+
   const { enqueueSnackbar } = useSnackbar();
 
   const refVideoStateCheckTimeout = React.useRef(null);
 
-  const [videoTimePosition, setVideoTimePosition] = React.useState(0);
   const [videoPlayedSeconds, setVideoPlayedSeconds] = React.useState(0);
   const [videoDuration, setVideoDuration] = React.useState(0);
+  const [sliderEndPosition, setSliderEndPosition] = React.useState(0);
 
   const [mouseOverVideo, setMouseOverVideo] = React.useState(false);
   const [mouseRecentMove, setMouseRecentMove] = React.useState(false);
@@ -66,6 +52,7 @@ const Player: React.FC<Props> = ({ socket, roomData, menuVisible, videoState, se
 
   const refPlayer = React.useRef<ReactPlayer>(null);
 
+  // Hover controls manager
   let mouseStopTimeout = null;
   React.useEffect(() => {
     const onMouseMove = () => {
@@ -76,6 +63,14 @@ const Player: React.FC<Props> = ({ socket, roomData, menuVisible, videoState, se
       }, 3000);
     };
 
+    try {
+      const savedVol = !isNaN(cookies['kelp-volume']) ? parseInt(cookies['kelp-volume']) : 50;
+      setInputVolumeSlider(savedVol);
+    } catch (exception) {
+      console.warn('Cookie had a valid key property, but failed on parsing.');
+      console.warn(exception);
+    }
+
     window.addEventListener('mousemove', onMouseMove, false);
 
     return () => {
@@ -84,63 +79,39 @@ const Player: React.FC<Props> = ({ socket, roomData, menuVisible, videoState, se
   }, []);
 
   React.useEffect(() => {
-    if (!roomData) return;
+    if (!room) return;
     if (mouseOverControls) return setShowVideoOverlay(true);
     setShowVideoOverlay(mouseOverVideo && mouseRecentMove);
   }, [mouseOverVideo, mouseRecentMove, mouseOverControls]);
 
-  React.useEffect(() => {
-    if (!roomData) return;
-    setVideoData(roomData.videoData);
-    setVideoState({
-      ...roomData.videoState,
-      updated: Date.now(),
-    });
-  }, [roomData]);
-
   // Socket events
   React.useEffect(() => {
-    if (!roomData) return;
+    if (!room) return;
     if (!socket) return;
 
-    const videoUpdateData = (data: any) => {
-      if (data.roomId !== roomData.id) return;
-      setVideoData(data.newData);
-    };
-
-    const videoUpdateState = (data: any) => {
-      if (data.roomId !== roomData.id) return;
-      setVideoState({
-        ...data.newState,
-        updated: Date.now(),
-      });
-    };
-
     const videoUpdateTimePosition = (data: any) => {
-      if (data.roomId !== roomData.id) return;
-      if (!refPlayer) return;
+      if (data.roomId !== room.id) return;
+      if (!refPlayer?.current) return;
 
       refPlayer.current.seekTo(data.newTimePosition);
     };
 
     const socketNotify = (data: any) => {
-      if (data.roomId !== roomData.id) return;
+      if (data.roomId !== room.id) return;
       enqueueSnackbar(data.message, { variant: data.variant, autoHideDuration: data.autoHideDuration });
     };
 
-    socket.on('videoUpdateData', videoUpdateData);
-    socket.on('videoUpdateState', videoUpdateState);
     socket.on('videoUpdateTimePosition', videoUpdateTimePosition);
     socket.on('notify', socketNotify);
 
     return () => {
-      socket.off('videoUpdateData', videoUpdateData);
-      socket.off('videoUpdateState', videoUpdateState);
       socket.off('videoUpdateTimePosition', videoUpdateTimePosition);
       socket.off('notify', socketNotify);
     };
-  }, [roomData, socket]);
+  }, [room, socket]);
 
+
+  // Fullscreen manager
   React.useEffect(() => {
     if (fullscreenMode && !document.fullscreenElement) {
       document.documentElement.requestFullscreen();
@@ -173,12 +144,31 @@ const Player: React.FC<Props> = ({ socket, roomData, menuVisible, videoState, se
         });
       }
     }, 2000);
-
-
   }, [videoState]);
 
+  React.useEffect(() => {
+    socket.emit('videoChangePlaybackTime', {
+      id: room.id,
+    }, sliderEndPosition);
+  }, [sliderEndPosition]);
+
+  React.useEffect(() => {
+    setCookie('kelp-volume', inputVolumeSlider, { path: '/' });
+  }, [inputVolumeSlider, video]);
+
+  const playerOnReady = () => {
+    if (!video) return;
+    if (!videoState) return;
+    if (!refPlayer) return;
+
+    const hls = refPlayer.current.getInternalPlayer('hls');
+    console.log(hls.audioTracks);
+    console.log(hls.audioTrack);
+    hls.audioTrack = hls.audioTracks[1];
+  };
+
   const playerOnProgress = ({ playedSeconds, played }: any) => {
-    if (!videoData) return;
+    if (!video) return;
     if (!videoState) return;
     if (!refPlayer) return;
 
@@ -191,15 +181,14 @@ const Player: React.FC<Props> = ({ socket, roomData, menuVisible, videoState, se
     }
 
     setVideoPlayedSeconds(playedSeconds);
-    setVideoTimePosition(played);
   };
 
   const playerEnded = () => {
-    if (!videoData) return;
+    if (!video) return;
     if (!videoState) return;
 
     socket.emit('videoEndedEvent', {
-      id: roomData.id,
+      id: room.id,
     });
   };
 
@@ -212,16 +201,10 @@ const Player: React.FC<Props> = ({ socket, roomData, menuVisible, videoState, se
     setVideoDuration(duration);
   };
 
-  // User Events
-  const volumeSliderChange = (event: Event, newValue: number | number[]) => {
-    if (!videoData) return;
-    setInputVolumeSlider(newValue as number);
-  };
-
   // - Play/pause
   const buttonPlayback = () => {
     socket.emit('videoChangePlaybackPlaying', {
-      id: roomData.id,
+      id: room.id,
     }, !videoState.playing);
   };
   
@@ -239,265 +222,160 @@ const Player: React.FC<Props> = ({ socket, roomData, menuVisible, videoState, se
             height: '100vh',
           }}
         >
-          {videoData?.statusCode === 0 && videoData?.url ? (
-            <Box
-              onMouseOver={() => setMouseOverVideo(true) }
-              onMouseOut={() => setMouseOverVideo(false) }
-              sx={{
-                height: '100%',
-                width: '100%',
-                cursor: showVideoOverlay ? 'default' : 'none',
-              }}
-            >
-              <Fade in={showVideoOverlay ? true : false}>
-                <Box>
-                  <Box sx={{
-                    position: 'absolute',
-                    zIndex: 1,
-                    top: 0,
-                    left: 0,
-                    width: '100%',
-                    background: 'linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.0) 100%)',
-                    padding: 2,
-                  }}
-                  onMouseEnter={() => setMouseOverControls(true) }
-                  onMouseLeave={() => setMouseOverControls(false) }
+          <Box
+            onMouseOver={() => setMouseOverVideo(true) }
+            onMouseOut={() => setMouseOverVideo(false) }
+            sx={{
+              height: '100%',
+              width: '100%',
+              cursor: showVideoOverlay ? 'default' : 'none',
+            }}
+          >
+            <Fade in={showVideoOverlay ? true : false}>
+              <Box>
+                <Box sx={{
+                  position: 'absolute',
+                  zIndex: 100,
+                  top: 0,
+                  left: 0,
+                  width: '100%',
+                  background: 'linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.0) 100%)',
+                  padding: '16px',
+                }}
+                onMouseEnter={() => setMouseOverControls(true) }
+                onMouseLeave={() => setMouseOverControls(false) }
+                >
+                  <Stack
+                    direction="row"
+                    alignItems="center"
+                    justifyContent="space-between"
+                    spacing={2}
                   >
-                    <Stack
-                      direction="row"
-                      alignItems="center"
-                      justifyContent="space-between"
-                      spacing={2}
-                    >
-                      <Typography color={!videoData.title ? 'primary' : 'default'}>
-                        {videoData.title || 'kelp'}
-                      </Typography>
-                      {
-                        menuVisible ? (
-                          <ArrowForwardIosIcon 
-                            onClick={() => { toggleMenu(); }}
-                            sx={{ cursor: 'pointer' }}
+                    <Typography color={!video.title ? 'primary' : 'default'}>
+                      {video.title || 'kelp'}
+                    </Typography>
+                    <ActionIcon size="lg" onClick={() => toggleMenu()} sx={{ zIndex: 1000 }}>
+                      {menuVisible ? <IconArrowRight /> : <IconArrowLeft /> }
+                    </ActionIcon>
+                  </Stack>
+                </Box>
+                <Fade in={!videoState?.playing}>
+                  <Stack
+                    direction="row"
+                    alignItems="center"
+                    justifyContent="center"
+                    sx={{
+                      position: 'absolute',
+                      zIndex: 1,
+                      top: 0,
+                      height: '100%',
+                      width: '100%',
+                    }}
+                  >
+                    <ActionIcon size={120} onClick={buttonPlayback}>
+                      <IconPlayerPlay size={100} />
+                    </ActionIcon>
+                  </Stack>
+                </Fade>
+                <Box sx={{
+                  position: 'absolute',
+                  zIndex: 100,
+                  bottom: 0,
+                  left: 0,
+                  width: '100%',
+                  background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.0) 100%)',
+                  padding: '16px',
+                }}
+                onMouseEnter={() => setMouseOverControls(true) }
+                onMouseLeave={() => setMouseOverControls(false) }
+                >
+                  <Stack
+                    direction="row"
+                    alignItems="center"
+                    justifyContent="space-between"
+                    spacing={2}
+                  >
+                    {
+                      videoState && (
+                        videoState.playing ? (
+                          <PauseIcon
+                            onClick={buttonPlayback}
+                            sx={{
+                              cursor: 'pointer',
+                            }}
                           />
                         ) : (
-                          <ArrowBackIosIcon 
-                            onClick={() => { toggleMenu(); }}
-                            sx={{ cursor: 'pointer' }}
+                          <PlayArrowIcon
+                            onClick={buttonPlayback}
+                            sx={{
+                              cursor: 'pointer',
+                            }}
                           />
                         )
-                      }
-                    </Stack>
-                  </Box>
-                  <Fade in={!videoState?.playing}>
-                    <Stack
-                      direction="row"
-                      alignItems="center"
-                      justifyContent="center"
-                      sx={{
-                        position: 'absolute',
-                        zIndex: 1,
-                        top: 0,
-                        height: '100%',
-                        width: '100%',
-                      }}
-                    >
-                      <PlayArrowIcon
-                        sx={{
-                          fontSize: 120,
-                          textShadow: '0px 0px 10px rgba(0,0,0,0.1)',
-                          cursor: 'pointer',
-                        }}
-                        onClick={buttonPlayback}
+                      )
+                    }
+                    <Stack spacing={2} direction="row" sx={{ mb: 1, flex: 1 }} alignItems="center">
+                      <Slider
+                        aria-label="time-indicator"
+                        value={videoPlayedSeconds}
+                        min={0}
+                        max={videoDuration || 0}
+                        step={1}
+                        sx={{ width: '100%' }}
+                        label={formatSeconds(videoPlayedSeconds || 0)}
+                        onChange={setVideoPlayedSeconds}
+                        onChangeEnd={setSliderEndPosition}
                       />
                     </Stack>
-                  </Fade>
-                  <Box sx={{
-                    position: 'absolute',
-                    zIndex: 1,
-                    bottom: 0,
-                    left: 0,
-                    width: '100%',
-                    background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.0) 100%)',
-                    padding: 2,
-                  }}
-                  onMouseEnter={() => setMouseOverControls(true) }
-                  onMouseLeave={() => setMouseOverControls(false) }
-                  >
-                    <Stack
-                      direction="row"
-                      alignItems="center"
-                      justifyContent="space-between"
-                      spacing={2}
-                    >
-                      {
-                        videoState && (
-                          videoState.playing ? (
-                            <PauseIcon
-                              onClick={buttonPlayback}
-                              sx={{
-                                cursor: 'pointer',
-                              }}
-                            />
-                          ) : (
-                            <PlayArrowIcon
-                              onClick={buttonPlayback}
-                              sx={{
-                                cursor: 'pointer',
-                              }}
-                            />
-                          )
-                        )
-                      }
-                      <Typography>
-                        {videoPlayedSeconds !== 0 && formatSeconds(videoPlayedSeconds)}
-                      </Typography>
-                      <Tooltip title="To adjust time, use the side menu." placement="top" followCursor>
-                        <Stack spacing={2} direction="row" sx={{ mb: 1, flex: 1 }} alignItems="center">
-                          <Slider
-                            aria-label="time-indicator"
-                            value={videoTimePosition}
-                            defaultValue={0}
-                            min={0}
-                            max={0.999999}
-                            step={0.0001}
-                            disabled
-                          />
-                        </Stack>
-                      </Tooltip>
-                      <Typography>
-                        {formatSeconds(videoDuration || 0)}
-                      </Typography>
-                      <Stack spacing={2} direction="row" sx={{ mb: 1, minWidth: 200 }} alignItems="center">
-                        <VolumeDown />
-                        <Slider
-                          aria-label="Volume"
-                          value={inputVolumeSlider}
-                          onChange={volumeSliderChange}
-                          valueLabelDisplay="auto"
-                        />
-                        <VolumeUp />
-                      </Stack>
-                      <FullscreenIcon 
-                        onClick={() => setFullscreenMode(!fullscreenMode)}
-                        sx={{ cursor: 'pointer' }}
+                    <Typography>
+                      {formatSeconds(videoDuration || 0)}
+                    </Typography>
+                    <Stack spacing={2} direction="row" sx={{ mb: 1, minWidth: 200 }} alignItems="center">
+                      <VolumeDown />
+                      <Slider
+                        aria-label="Volume"
+                        value={inputVolumeSlider}
+                        onChange={setInputVolumeSlider}
+                        sx={{ width: '100%' }}
                       />
+                      <VolumeUp />
                     </Stack>
-                  </Box>
+                    <FullscreenIcon 
+                      onClick={() => setFullscreenMode(!fullscreenMode)}
+                      sx={{ cursor: 'pointer' }}
+                    />
+                  </Stack>
                 </Box>
-              </Fade>
-              <ReactPlayer
-                ref={refPlayer}
-                url={videoData.url}
-                config={{
-                  file: {
-                    tracks: [
-                      {
-                        label: 'subtitles',
-                        kind: 'subtitles',
-                        src: videoData.subtitle,
-                        srcLang: 'en',
-                        default: true,
-                      },
-                    ],
-                  }
-                }}
-                playing={videoState?.playing}
-                volume={inputVolumeSlider / 100}
-                width="100%"
-                height="100%"
-
-                onProgress={playerOnProgress}
-                onEnded={playerEnded}
-                onError={playerOnError}
-                onDuration={playerOnDuration}
-              />
-            </Box>
-          ) : (
-            <Box
-              sx={{
-                backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),url(/novideo.gif)',
-                backgroundSize: 'cover',
-                height: '100vh',
-                width: '100%',
+              </Box>
+            </Fade>
+            <ReactPlayer
+              ref={refPlayer}
+              url={video.url}
+              config={{
+                file: {
+                  tracks: [
+                    {
+                      label: 'subtitles',
+                      kind: 'subtitles',
+                      src: video.subtitle,
+                      srcLang: 'en',
+                      default: true,
+                    },
+                  ],
+                }
               }}
-            >
-              <Stack
-                direction="column"
-                justifyContent="center"
-                alignItems="center"
-                sx={{
-                  height: '100%',
-                }}
-              >
-                {videoData?.statusCode === -1 && (
-                  <Paper elevation={2} sx={{ p: 2, m: 1, minWidth: 400, maxWidth: 500 }}>
-                    <Typography variant="h4" component="h4" color="error">
-                      There was an error...
-                    </Typography>
-                    <Typography variant="h6" component="h6">
-                      {videoData.status}
-                    </Typography>
-                  </Paper>
-                )}
-                {videoData?.statusCode === 1 && (
-                  <Paper elevation={2} sx={{ p: 2, m: 1, minWidth: 400, maxWidth: 500 }}>
-                    <Typography variant="h4" component="h4" mb={2} color="primary">
-                      Waiting for a torrent...
-                    </Typography>
-                    <Typography variant="h6" component="h6" mb={1}>
-                      Enter a torrent or magnet link in the room settings to begin downloading...
-                    </Typography>
-                  </Paper>
-                )}
-                {videoData?.statusCode === 2 && (
-                  <Paper elevation={2} sx={{ p: 2, m: 1, minWidth: 400, maxWidth: 500 }}>
-                    <Typography variant="h4" component="h4">
-                      Starting download...
-                    </Typography>
-                  </Paper>
-                )}
-                {videoData?.statusCode >= 3 && (
-                  <Paper elevation={2} sx={{ p: 2, m: 1 }}>
-                    <Stack
-                      direction="column"
-                      alignItems="stretch"
-                      justifyContent="center"
-                      spacing={2}
-                      sx={{
-                        minWidth: 400,
-                        maxWidth: 500,
-                      }}
-                    >
-                      <Typography variant="h4" component="h4">
-                        {videoData.status}
-                      </Typography>
-                      { videoData.percentage !== 0 && ( <LinearProgressWithLabel value={videoData.percentage}  /> ) }
-                      {
-                        (videoData.percentage !== 0 || videoData.downloadSpeed) && (
-                          <Stack
-                            direction="row"
-                            alignItems="center"
-                            justifyContent="center"
-                            spacing={2}
-                          >
-                            { videoData.timeRemaining && (
-                              <Typography variant="body2">
-                                {moment().to(moment().add(videoData.timeRemaining, 'ms'), true)} remaining
-                              </Typography>
-                            ) }
-                            { videoData.downloadSpeed && (
-                              <Typography variant="body2">
-                                {videoData.downloadSpeed}
-                              </Typography>
-                            ) }
-                          </Stack>
-                        )
-                      }
-                    </Stack>
-                  </Paper>
-                )}
-              </Stack>
-            </Box>
-          )}
+              playing={videoState?.playing}
+              volume={inputVolumeSlider / 100}
+              width="100%"
+              height="100%"
+
+              onReady={playerOnReady}
+              onProgress={playerOnProgress}
+              onEnded={playerEnded}
+              onError={playerOnError}
+              onDuration={playerOnDuration}
+            />
+          </Box>
         </Stack>
       </Box>
     </Box>

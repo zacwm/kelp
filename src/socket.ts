@@ -3,6 +3,7 @@ import path from 'path';
 import Room from './RoomManager/Room';
 import RoomManager from './RoomManager';
 import User from './User';
+import axios from 'axios';
 
 class SocketServer {
   private io: SocketIO.Server;
@@ -16,12 +17,14 @@ class SocketServer {
       let user;
       let currentRoom;
   
-      this.io.emit('allRooms', this.Rooms.getRoomList());
+      this.io.emit('getRoomsList', this.Rooms.getRoomList());
   
       socket.on('disconnect', () => {
         if (!currentRoom) return;
+
         const room: Room = this.Rooms.getRoomById(currentRoom);
         room.removeUser(user.id);
+
         this.io.emit('updateRoom', {
           id: room.id,
           name: room.name,
@@ -54,14 +57,16 @@ class SocketServer {
         const room: Room = this.Rooms.createRoom(roomData.name, roomData.password);
         callback({ roomId: room.id });
   
-        this.io.emit('allRooms', this.Rooms.getRoomList());
+        this.io.emit('getRoomsList', this.Rooms.getRoomList());
       });
   
       socket.on('joinRoom', (roomData: any, callback: any) => {
+        // TODO: Use socket rooms to prevent requiring the client to filter out if it's the room they're in.
         const room: Room = this.Rooms.getRoomById(roomData.id);
         if (!room) return callback({ error: 'Room does not exist', roomNotFound: true });
         if (room.hasPassword() && (!roomData.password || roomData.password === '')) return callback({ error: 'Room requires a password', passwordRequest: true });
         if (room.hasPassword() && roomData.password !== room.getPassword()) return callback({ error: 'Room password is incorrect', passwordRequest: true });
+        socket.join(room.id);
         currentRoom = room.id;
         user = new User(socket.id, `User ${room.getUsers().length + 1}`);
         room.addUser(user);
@@ -83,7 +88,39 @@ class SocketServer {
           room: roomDataToSend
         });
   
-        this.io.emit('updateRoom', roomDataToSend);
+        this.io.to(room.id).emit('updateRoom', roomDataToSend);
+      });
+
+      socket.on('resetRoom', (roomId: string) => {
+        const room: Room = this.Rooms.getRoomById(roomId);
+        room.resetRoom();
+      });
+
+      socket.on('closeRoom', (roomId: string) => {
+        const room: Room = this.Rooms.getRoomById(roomId);
+        this.Rooms.closeRoom(room);
+      });
+
+      // Popcorn Time API integration
+      socket.on('getTitles', async (opts, callback) => {
+        try {
+          const { data } = await axios.get(`https://movies-api.ga/${opts.category}/${opts.page || 1}${opts.keywords && `?keywords=${opts.keywords.replace(' ', '%20')}`}`);
+          if ((data || []).length === 0) return callback({ error: 'No titles found' });
+          callback({ titles: data || [] });
+        } catch (err) {
+          console.warn(err);
+          callback({ error: 'Internal Server Error' });
+        }
+      });
+
+      socket.on('getShowData', async (showId, callback) => {
+        try {
+          const { data } = await axios.get(`https://movies-api.ga/show/${showId}`);
+          callback({ show: data });
+        } catch (err) {
+          console.warn(err);
+          callback({ error: 'Internal Server Error' });
+        }
       });
   
       socket.on('updateUserName', (data: any) => {
@@ -107,8 +144,12 @@ class SocketServer {
         if (currentRoom !== data.roomId) return;
         const room: Room = this.Rooms.getRoomById(data.roomId);
         if (!room) return;
+
+        // Find and return the file specified.
         const videoFile = (room.files || []).find(file => file.id === data.fileId);
         if (!videoFile) return;
+        
+        // Begin the file ffmpeg conversion and play the file (if file exists);
         room.convertFile(videoFile.path);
       });
   
