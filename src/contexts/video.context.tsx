@@ -1,4 +1,4 @@
-import React, { createContext, useState, useReducer, useContext } from 'react';
+import React, { createContext, useReducer, useContext } from 'react';
 
 // Context value types.
 interface VideoContextInterface {
@@ -9,11 +9,11 @@ interface VideoContextInterface {
 // Original context state values.
 const VideoState: VideoContextInterface = {
   video: undefined,
-  setVideo: (data: any) => {},
+  setVideo: () => undefined,
 };
 
 const Reducer = (state, action) => {
-  if (action.type === "reset") {
+  if (action.type === 'reset') {
     return VideoState;
   }
 
@@ -24,7 +24,7 @@ const Reducer = (state, action) => {
 
 const VideoContext: any = createContext<VideoContextInterface | null>(VideoState);
 
-export const VideoProvider: any = (props) => {
+export const VideoProvider: any = (props: any) => {
   const [state, dispatch] = useReducer(Reducer, VideoState);
 
   // Context state functions
