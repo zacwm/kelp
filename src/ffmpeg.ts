@@ -1,5 +1,5 @@
 import path from 'path';
-import { exec, spawn } from 'child_process';
+import { exec } from 'child_process';
 
 interface FFmpegInterface {
   convertVideoToMP4(filePath: string, roomId: string): Promise<string>;
