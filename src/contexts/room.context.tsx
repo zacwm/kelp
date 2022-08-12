@@ -1,4 +1,4 @@
-import React, { createContext, useState, useReducer, useContext } from 'react';
+import React, { createContext, useReducer, useContext } from 'react';
 
 // Context value types.
 interface RoomContextInterface {
@@ -9,11 +9,11 @@ interface RoomContextInterface {
 // Original context state values.
 const RoomState: RoomContextInterface = {
   room: undefined,
-  setRoom: (data: any) => {},
+  setRoom: () => undefined,
 };
 
 const Reducer = (state, action) => {
-  if (action.type === "reset") {
+  if (action.type === 'reset') {
     return RoomState;
   }
 
@@ -24,7 +24,7 @@ const Reducer = (state, action) => {
 
 const RoomContext: any = createContext<RoomContextInterface | null>(RoomState);
 
-export const RoomProvider: any = (props) => {
+export const RoomProvider: any = (props: any) => {
   const [state, dispatch] = useReducer(Reducer, RoomState);
 
   // Context state functions

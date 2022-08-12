@@ -2,7 +2,7 @@
   A slimy torrent downloader, temporary hosting & playback syncing server.
 
 <p align="center">
-  <img src="./kelp.png" height="250" />
+  <img src="./kelp.png" height="auto" width="100%" />
 </p>
 
 ## [What is kelp?](#what-is-kelp) | [Features](#features) | [Setup](#setup) | [Important](#important)
