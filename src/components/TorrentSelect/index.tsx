@@ -10,6 +10,7 @@ import ShowDisplay from './ShowDisplay';
 import CustomTorrentPrompt from './CustomTorrentPrompt';
 
 import { Box, Button, Paper, Text, Stack, Group, NumberInput, Loader, TextInput, ScrollArea } from '@mantine/core';
+import InfinateScroll from './InfinateScroll';
 
 type Props = {
   socket: Socket;
@@ -176,29 +177,14 @@ const TorrentSelect: React.FC<Props> = ({ socket }) => {
                 />
               </Group>
             </Group>
-            <ScrollArea
-              sx={{
-                position: 'relative',
-                height: '100%',
-                width: '100%',
-                overflowY: 'auto',
-                padding: '0 16px',
-              }}
-            >
-              <Group position="center" align="stretch">
-                {(!loadingTitles ? titles || [] : []).map((title, index) => (
-                  <TitleItem
-                    key={index}
-                    title={title}
-                    onSelect={() => setSelectedTitle(title)}
-                    delayIndex={index * 150}
-                  />
-                ))}
-                {(!loadingTitles && titles.length === 0) && (
-                  <Text size={32} sx={{ marginTop: 40 }}>Couldn&apos;t find anything, sorry!</Text>
-                )}
-              </Group>
-            </ScrollArea>
+            <InfinateScroll
+              socket={socket}
+              setSelectedTitle={setSelectedTitle}
+              titleCategory={titleCategory}
+              setLoadingTitles={setLoadingTitles}
+              setTitles={setTitles}
+              inputKeywords={inputKeywords}
+            />
           </React.Fragment>
         ) }
       </Stack>
