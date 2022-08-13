@@ -9,7 +9,7 @@ import ShowDisplay from './ShowDisplay';
 import CustomTorrentPrompt from './CustomTorrentPrompt';
 import VirtualList from './VirtualList';
 
-import { Box, Button, Paper, Text, Stack, Group, Loader, TextInput } from '@mantine/core';
+import { Box, Button, Paper, Stack, Group, Loader, TextInput } from '@mantine/core';
 
 type Props = {
   socket: Socket;
