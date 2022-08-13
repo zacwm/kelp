@@ -6,6 +6,27 @@ import { Accordion, Box, Stack, Group, Text, Button, ActionIcon, Badge, ScrollAr
 
 import { IconArrowLeft, IconExternalLink } from '@tabler/icons';
 
+const FanartBanner: React.FC<any> = ({ imgSrc }) => {
+  const srcSplit = imgSrc.split('/');
+  const getImagesId = srcSplit[srcSplit.length - 1];
+  const sourceUrl = `https://image.tmdb.org/t/p/w1920_and_h1080_multi_faces/${getImagesId}`;
+
+  return (
+    <Box
+      sx={{
+        position: 'absolute',
+        width: '100%',
+        height: 400,
+        top: 0,
+        left: 0,
+        backgroundImage: `linear-gradient(rgba(26, 27, 30, 0.7), rgba(26, 27, 30, 1)), url(${sourceUrl});`,
+        backgroundPosition: 'center',
+        backgroundSize: 'cover',
+      }}
+    />
+  );
+};
+
 type Props = {
   title: any,
   onTitleSelect: (url: string) => void,
@@ -49,6 +70,7 @@ const TitleDisplay: React.FC<Props> = ({ title, onTitleSelect, close, socket }) 
       width: '100%',
       position: 'relative',
     }}>
+      <FanartBanner imgSrc={title?.images?.fanart} />
       <Stack sx={{
         height: '100%',
         width: '100%',
