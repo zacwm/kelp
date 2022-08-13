@@ -4,13 +4,12 @@ import { useDebouncedValue } from '@mantine/hooks';
 
 import { useRoom } from '../../contexts/room.context';
 
-import TitleItem from './TitleItem';
 import MovieDisplay from './MovieDisplay';
 import ShowDisplay from './ShowDisplay';
 import CustomTorrentPrompt from './CustomTorrentPrompt';
+import VirtualList from "./VirtualList";
 
 import { Box, Button, Paper, Text, Stack, Group, NumberInput, Loader, TextInput, ScrollArea } from '@mantine/core';
-import InfinateScroll from './InfinateScroll';
 
 type Props = {
   socket: Socket;
@@ -21,47 +20,53 @@ const TorrentSelect: React.FC<Props> = ({ socket }) => {
 
   const [titleCategory, setTitleCategory] = React.useState('movies');
 
-  // TODO: Move to infinite scroll
-  const [inputPageNumber, setInputPageNumber] = React.useState(1);
-  const [debouncedPageNumber] = useDebouncedValue(inputPageNumber, 1000);
-
   const [inputKeywords, setInputKeywords] = React.useState('');
   const [debouncedKeywords] = useDebouncedValue(inputKeywords, 1000);
 
   const [openCustomTorrentPrompt, setOpenCustomTorrentPrompt] = React.useState<boolean>(false);
-
   const [loadingTitles, setLoadingTitles] = React.useState<boolean>(true);
-  // const [titles, setTitles] = React.useState(() => []);
-  const [titles, setTitles] = React.useState([]);
+  const [torrentList, setTorrentList] = React.useState<object[]>([]);
   const [selectedTitle, setSelectedTitle] = React.useState<any>(null);
   
-  const getTitles = async (page?: number) => {
-    setLoadingTitles(true);
-    socket.emit('getTitles', { page: page || 1, category: titleCategory, keywords: inputKeywords }, (response) => {
+  React.useEffect(() => {
+    loadTorrentList(1, false, true);
+  }, [titleCategory, debouncedKeywords]);
+
+  const loadTorrentList = async (
+    page: number,
+    concat: boolean,
+    forceLoad: boolean,
+    callback?: Function
+  ): Promise<void> => {
+    if (forceLoad) {
+      setLoadingTitles(true);
+    }
+
+    socket.emit("getTitles", {
+        page: page || 1,
+        category: titleCategory,
+        keywords: debouncedKeywords
+    }, (response: any) => {
       setLoadingTitles(false);
+
       if (response.error) {
-        setTitles([]);
+        setTorrentList([]);
         console.error(response.error);
         return;
+      };
+
+      if (typeof callback === "function") {
+        callback();
       }
 
-      setTitles(response.titles || []);
-    });
-  };
-
-  React.useEffect(() => {
-    getTitles();
-  }, [titleCategory]);
-
-  React.useEffect(() => {
-    setInputPageNumber(1);
-    getTitles();
-  }, [debouncedKeywords]);
-
-  React.useEffect(() => {
-    if (!debouncedPageNumber) return;
-    getTitles(debouncedPageNumber);
-  }, [debouncedPageNumber]);
+      if (concat) {
+        const newTorrentList = [...torrentList, ...response.titles];
+        setTorrentList(newTorrentList);
+      } else {
+        setTorrentList(response.titles || []); 
+      }
+    })
+  }
 
   const onTorrentStart = (torrentURL: string) => {
     if (!socket) return;
@@ -74,6 +79,12 @@ const TorrentSelect: React.FC<Props> = ({ socket }) => {
       if (res.error) alert(res.error);
       close();
     });
+  };
+
+  const onSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+
+    setInputKeywords(value);
   };
 
   return (
@@ -162,28 +173,18 @@ const TorrentSelect: React.FC<Props> = ({ socket }) => {
                 <Text>Search</Text>
                 <TextInput
                   value={inputKeywords}
-                  onChange={(event) => setInputKeywords(event.currentTarget.value)}
+                  onChange={onSearchChange}
                   disabled={loadingTitles}
                   sx={{ width: '200px' }}
                   variant="filled"
                 />
-                <Text>Page</Text>
-                <NumberInput
-                  value={inputPageNumber}
-                  onChange={setInputPageNumber}
-                  disabled={loadingTitles}
-                  sx={{ width: '100px' }}
-                  variant="filled"
-                />
               </Group>
             </Group>
-            <InfinateScroll
-              socket={socket}
+            <VirtualList 
+              itemData={torrentList}
+              isLoading={loadingTitles}
               setSelectedTitle={setSelectedTitle}
-              titleCategory={titleCategory}
-              setLoadingTitles={setLoadingTitles}
-              setTitles={setTitles}
-              inputKeywords={inputKeywords}
+              fetchTorrentList={loadTorrentList}
             />
           </React.Fragment>
         ) }
