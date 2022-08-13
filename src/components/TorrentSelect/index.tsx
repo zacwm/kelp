@@ -7,9 +7,9 @@ import { useRoom } from '../../contexts/room.context';
 import MovieDisplay from './MovieDisplay';
 import ShowDisplay from './ShowDisplay';
 import CustomTorrentPrompt from './CustomTorrentPrompt';
-import VirtualList from "./VirtualList";
+import VirtualList from './VirtualList';
 
-import { Box, Button, Paper, Text, Stack, Group, NumberInput, Loader, TextInput, ScrollArea } from '@mantine/core';
+import { Box, Button, Paper, Text, Stack, Group, Loader, TextInput } from '@mantine/core';
 
 type Props = {
   socket: Socket;
@@ -36,20 +36,20 @@ const TorrentSelect: React.FC<Props> = ({ socket }) => {
     page: number,
     concat: boolean,
     forceLoad: boolean,
-    callback?: Function
+    callback?: () => void,
   ): Promise<void> => {
     if (forceLoad) {
       setLoadingTitles(true);
     }
 
-    socket.emit("getTitles", {
-        page: page || 1,
-        category: titleCategory,
-        keywords: debouncedKeywords
+    socket.emit('getTitles', {
+      page: page || 1,
+      category: titleCategory,
+      keywords: debouncedKeywords
     }, (response: any) => {
       setLoadingTitles(false);
 
-      if (typeof callback === "function") {
+      if (typeof callback === 'function') {
         callback();
       }
 
@@ -57,7 +57,7 @@ const TorrentSelect: React.FC<Props> = ({ socket }) => {
         setTorrentList([]);
         console.error(response.error);
         return;
-      };
+      }
 
       if (concat) {
         const newTorrentList = [...torrentList, ...response.titles];
@@ -65,8 +65,8 @@ const TorrentSelect: React.FC<Props> = ({ socket }) => {
       } else {
         setTorrentList(response.titles || []); 
       }
-    })
-  }
+    });
+  };
 
   const onTorrentStart = (torrentURL: string) => {
     if (!socket) return;

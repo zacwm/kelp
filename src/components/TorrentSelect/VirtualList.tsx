@@ -1,133 +1,136 @@
-import React, { useState, useRef, useMemo } from "react";
-import { VirtuosoGrid, GridComponents, GridItemContent } from "react-virtuoso";
-import { Box, Loader, createStyles, LoadingOverlay } from "@mantine/core";
+import React, { useState, useRef, useMemo } from 'react';
+import { VirtuosoGrid, GridComponents, GridItemContent } from 'react-virtuoso';
+import { Box, Loader, createStyles, LoadingOverlay } from '@mantine/core';
 
-import MemoizedTorrent from "./TorrentCell";
+import MemoizedTorrent from './TorrentCell';
 
 interface Props {
     itemData: object[];
     isLoading: boolean;
     setSelectedTitle: React.Dispatch<React.SetStateAction<any>>;
-    fetchTorrentList: (page: number, concat: boolean, forceLoad: boolean, callback?: Function) => void;
+    fetchTorrentList: (page: number, concat: boolean, forceLoad: boolean, callback?: () => void) => void;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const useStyles = createStyles((theme) => ({
-    list: {
-        display: "flex",
-        flexWrap: "wrap",
-    },
-    itemContainer: {
-        width: "20%",
-        display: "flex",
-        flex: "none",
-        padding: "10px",
-        alignContent: "stretch",
-        boxSizing: "border-box",
-        // [`@media (max-width: ${theme.breakpoints.lg}px)`]: {
-        //     width: "33%"
-        // },
-        // [`@media (max-width: ${theme.breakpoints.sm}px)`]: {
-        //     width: "50%"
-        // }
-    },
+  list: {
+    display: 'flex',
+    flexWrap: 'wrap',
+  },
+  itemContainer: {
+    width: '20%',
+    display: 'flex',
+    flex: 'none',
+    padding: '10px',
+    alignContent: 'stretch',
+    boxSizing: 'border-box',
+    // [`@media (max-width: ${theme.breakpoints.lg}px)`]: {
+    //     width: "33%"
+    // },
+    // [`@media (max-width: ${theme.breakpoints.sm}px)`]: {
+    //     width: "50%"
+    // }
+  },
 }));
 
 const VirtualList = ({
-    itemData,
-    isLoading,
-    setSelectedTitle,
-    fetchTorrentList
+  itemData,
+  isLoading,
+  setSelectedTitle,
+  fetchTorrentList
 }: Props): React.ReactElement => {
-    const { classes } = useStyles();
+  const { classes } = useStyles();
 
-    const [shallowFetch, setShallowFetch] = useState(false);
+  const [shallowFetch, setShallowFetch] = useState(false);
 
-    const hasMoreData = () => {
-        return itemData.length >= 50;
+  const hasMoreData = () => {
+    return itemData.length >= 50;
+  };
+
+  const lastPage = useRef(1);
+  const hasMore = hasMoreData();
+
+  const onEndReached = () => {
+    if (shallowFetch || !hasMore) {
+      return;
     }
 
-    const lastPage = useRef(1);
-    const hasMore = hasMoreData();
+    setShallowFetch(true);
+    lastPage.current += 1;
+    fetchTorrentList(lastPage.current, true, false, () => {
+      setShallowFetch(false);
+    });
+  };
 
-    const onEndReached = () => {
-        if (shallowFetch || !hasMore) {
-            return;
-        };
+  const itemContent: GridItemContent<number> = (index: number) => {
+    const torrent = itemData[index];
 
-        setShallowFetch(true);
-        lastPage.current += 1;
-        fetchTorrentList(lastPage.current, true, false, () => {
-            setShallowFetch(false);
-        });
-    }
+    if (torrent) {
+      return (
+        <MemoizedTorrent 
+          key={index}
+          title={torrent}
+          onSelect={() => setSelectedTitle(torrent)}
+          delayIndex={index}
+        />
+      );
+    } else {
+      return <div style={{ height: 1 }}/>;
+    }        
+  };
 
-    const itemContent: GridItemContent<number> = (index: number) => {
-        const torrent = itemData[index];
+  const Components: GridComponents = useMemo(() => {
+    const List = React.forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement>>(function List(props, ref) {
+      return(
+        <div {...props} ref={ref} className={classes.list}/>
+      );
+    });
 
-        if (torrent) {
-            return (
-                <MemoizedTorrent 
-                    key={index}
-                    title={torrent}
-                    onSelect={() => setSelectedTitle(torrent)}
-                    delayIndex={index}
-                />
-            )
-        } else {
-            return <div style={{ height: 1 }}/>
-        }        
-    }
+    const ItemContainer = (props: any) => {
+      return <div {...props} className={classes.itemContainer}/>;
+    };
 
-    const Components: GridComponents = useMemo(() => {
-        const List = React.forwardRef<HTMLDivElement, React.HTMLProps<HTMLDivElement>>((props, ref) => (
-            <div {...props} ref={ref} className={classes.list}/>
-        ))
+    return {
+      List: List,
+      Item: ItemContainer
+    };
+  }, [itemData, isLoading]);
 
-        const ItemContainer = (props: any) => {
-            return <div {...props} className={classes.itemContainer}/>
-        }
-
-        return {
-            List: List,
-            Item: ItemContainer
-        }
-    }, [itemData, isLoading])
-
-    if (isLoading) {
-        return (
-            <Box sx={{
-                height: "100%",
-                width: "100%",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center"
-            }}>
-                <Loader />
-            </Box>
-        )
-    }
-
+  if (isLoading) {
     return (
-        <div style={{
-            height: "100%",
-            width: "100%",
-            padding: 32
-        }}>
-            <LoadingOverlay visible={shallowFetch} />
-            <VirtuosoGrid
-                style={{ height: "100%" }}
-                totalCount={itemData.length}
-                overscan={150}
-                components={Components}
-                itemContent={itemContent}
-                endReached={onEndReached}
-            />
-        </div>
-    )
-}
+      <Box sx={{
+        height: '100%',
+        width: '100%',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center'
+      }}>
+        <Loader />
+      </Box>
+    );
+  }
+
+  return (
+    <div style={{
+      height: '100%',
+      width: '100%',
+      padding: 32
+    }}>
+      <LoadingOverlay visible={shallowFetch} />
+      <VirtuosoGrid
+        style={{ height: '100%' }}
+        totalCount={itemData.length}
+        overscan={150}
+        components={Components}
+        itemContent={itemContent}
+        endReached={onEndReached}
+      />
+    </div>
+  );
+};
 
 const MemoizedVirtualList = React.memo(VirtualList, (prevProps: Props, nextProps: Props) => {
-    return JSON.stringify(prevProps.itemData) === JSON.stringify(nextProps.itemData) && prevProps.isLoading === nextProps.isLoading;
+  return JSON.stringify(prevProps.itemData) === JSON.stringify(nextProps.itemData) && prevProps.isLoading === nextProps.isLoading;
 });
 
 export default MemoizedVirtualList;
