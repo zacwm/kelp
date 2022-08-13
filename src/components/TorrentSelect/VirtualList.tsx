@@ -114,11 +114,12 @@ const VirtualList = ({
     <div style={{
       height: '100%',
       width: '100%',
-      padding: 32
     }}>
       <LoadingOverlay visible={shallowFetch} />
       <VirtuosoGrid
-        style={{ height: '100%' }}
+        style={{
+          height: '100%',
+        }}
         totalCount={itemData.length}
         overscan={150}
         components={Components}

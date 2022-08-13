@@ -92,35 +92,19 @@ const TorrentSelect: React.FC<Props> = ({ socket }) => {
       shadow="md"
       radius="sm"
       sx={{
-        height: 'calc(100% - 60px)',
+        height: 'calc(100% - 100px)',
         width: 'calc(100% - 60px)',
+        maxWidth: 1400,
         boxSizing: 'border-box',
         background: 'rgba(26, 27, 30)',
         overflow: 'hidden',
       }}
     >
       <Stack sx={{ height: '100%' }} spacing={0}>
-        { !selectedTitle && (
-          <Group position="apart" align="center" sx={{ padding: '8px 16px' }}>
-            <Text
-              size={40}
-              color="green"
-              weight={600}
-            >
-              Select a torrent
-            </Text>
-            <Button
-              variant="filled"
-              color={openCustomTorrentPrompt && 'red'}
-              onClick={() => setOpenCustomTorrentPrompt(!openCustomTorrentPrompt)}
-            >
-              { !openCustomTorrentPrompt ? 'Enter Torrent/Magnet URI' : 'Close' }
-            </Button>
-          </Group>
-        )}
         { openCustomTorrentPrompt ? (
           <CustomTorrentPrompt
             setTorrent={(url) => onTorrentStart(url)}
+            close={() => setOpenCustomTorrentPrompt(false)}
           />
         ) : selectedTitle ? (
           titleCategory == 'movies' ? (
@@ -144,7 +128,7 @@ const TorrentSelect: React.FC<Props> = ({ socket }) => {
               sx={{
                 width: '100%',
                 borderBottom: 'solid 1px #2C2E33',
-                padding: '0px 12px'
+                padding: '12px 12px 0 12px'
               }}
             >
               <Group>
@@ -168,16 +152,23 @@ const TorrentSelect: React.FC<Props> = ({ socket }) => {
                   </Box>
                 ))}
               </Group>
+              <TextInput
+                value={inputKeywords}
+                onChange={onSearchChange}
+                disabled={loadingTitles}
+                placeholder="Search"
+                sx={{ width: '500px' }}
+                variant="filled"
+              />
               <Group>
                 { loadingTitles && <Loader size="sm" /> }
-                <Text>Search</Text>
-                <TextInput
-                  value={inputKeywords}
-                  onChange={onSearchChange}
-                  disabled={loadingTitles}
-                  sx={{ width: '200px' }}
+                <Button
                   variant="filled"
-                />
+                  color={openCustomTorrentPrompt && 'red'}
+                  onClick={() => setOpenCustomTorrentPrompt(!openCustomTorrentPrompt)}
+                >
+                  { !openCustomTorrentPrompt ? 'Enter Torrent/Magnet URI' : 'Close' }
+                </Button>
               </Group>
             </Group>
             <VirtualList 
