@@ -21,7 +21,7 @@ type Props = {
 }
 
 const SideMenu: React.FC<Props> = ({ socket, userId, videoState }) => {
-  const { room } = useRoom();
+  const { room, setClosingRoom } = useRoom();
   const { video } = useVideo();
 
   const isDev = process.env.NODE_ENV === 'development';
@@ -103,6 +103,7 @@ const SideMenu: React.FC<Props> = ({ socket, userId, videoState }) => {
                     <Button
                       color="gray"
                       onClick={() => {
+                        setClosingRoom();
                         socket.emit('closeRoom', room.id);
                       }}
                     >

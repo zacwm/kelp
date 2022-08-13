@@ -15,14 +15,14 @@ type Props = {
 
 const ActiveRooms: React.FC<Props> = ({ socket }) => {
   const router = useRouter();
-  const [roomClosedMessage, setRoomClosedMessage] = React.useState(false);
+  const [roomClosedMessage, setRoomClosedMessage] = React.useState(undefined);
   const [activeRooms, setActiveRooms] = React.useState([]);
   const { roomclosed } = router.query;
 
   React.useEffect((): void => {
     if (roomclosed) {
       router.push('/', undefined, { shallow: true });
-      setRoomClosedMessage(true);
+      setRoomClosedMessage(roomclosed);
     }
   }, [roomclosed]);
 
@@ -63,7 +63,8 @@ const ActiveRooms: React.FC<Props> = ({ socket }) => {
               onClose={() => setRoomClosedMessage(false)}
               sx={{ marginBottom: 15 }}
             >
-                  It was closed by the host. Maybe it&apos;s time to create your own!
+              { roomClosedMessage == 1 && 'It was closed by the host. Maybe it\'s time to create your own!' }
+              { roomClosedMessage == 2 && 'Room was closed successfully.' }
             </Alert>
           )}
           <Paper shadow="xs" p="md" withBorder sx={{

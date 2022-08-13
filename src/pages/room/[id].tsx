@@ -32,7 +32,7 @@ function LinearProgressWithLabel(props: any & { value: number }) {
 }
 
 const Room: React.FC = () => {
-  const { room, setRoom } = useRoom();
+  const { room, closingRoom, setRoom } = useRoom();
   const { video, setVideo } = useVideo();
 
   const router = useRouter();
@@ -88,6 +88,7 @@ const Room: React.FC = () => {
 
     const onRoomClosed = (roomId: string) => {
       if (room.id !== roomId) return;
+      if (closingRoom) return window.location.href = '/?roomclosed=2';
       window.location.href = '/?roomclosed=1';
     };
 
@@ -102,7 +103,7 @@ const Room: React.FC = () => {
       socket.off('updateRoom', onUpdateRoom);
       socket.off('roomClosed', onRoomClosed);
     };
-  }, [room, socket]);
+  }, [room, closingRoom, socket]);
 
   React.useEffect((): any => {
     if (!socket) return;

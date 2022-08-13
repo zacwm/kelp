@@ -4,12 +4,16 @@ import React, { createContext, useReducer, useContext } from 'react';
 interface RoomContextInterface {
   room: any;
   setRoom: (data: any) => void;
+  closingRoom: boolean,
+  setClosingRoom: () => void;
 }
 
 // Original context state values.
 const RoomState: RoomContextInterface = {
   room: undefined,
   setRoom: () => undefined,
+  closingRoom: false,
+  setClosingRoom: () => undefined,
 };
 
 const Reducer = (state, action) => {
@@ -30,6 +34,10 @@ export const RoomProvider: any = (props: any) => {
   // Context state functions
   state.setRoom = (data: any) => {
     dispatch({ type: 'room', value: data });
+  };
+
+  state.setClosingRoom = () => {
+    dispatch({ type: 'closingRoom', value: true });
   };
   
   return (

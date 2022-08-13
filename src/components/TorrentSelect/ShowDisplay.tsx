@@ -160,7 +160,15 @@ const TitleDisplay: React.FC<Props> = ({ title, onTitleSelect, close, socket }) 
             </Stack>
           </Box>
         ) : (
-          <Loader />
+          <Stack
+            align="center"
+            sx={{
+              height: '100%',
+              width: '100%',
+            }}
+          >
+            <Loader />
+          </Stack>
         )}
       </Stack>
     </Box>
