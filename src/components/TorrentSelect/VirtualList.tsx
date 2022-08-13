@@ -47,10 +47,10 @@ const VirtualList = ({
     }
 
     const lastPage = useRef(1);
-    const hasMore = useRef(hasMoreData());
+    const hasMore = hasMoreData();
 
     const onEndReached = () => {
-        if (shallowFetch || !hasMore.current) {
+        if (shallowFetch || !hasMore) {
             return;
         };
 
