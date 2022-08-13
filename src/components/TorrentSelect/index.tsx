@@ -49,15 +49,15 @@ const TorrentSelect: React.FC<Props> = ({ socket }) => {
     }, (response: any) => {
       setLoadingTitles(false);
 
+      if (typeof callback === "function") {
+        callback();
+      }
+
       if (response.error) {
         setTorrentList([]);
         console.error(response.error);
         return;
       };
-
-      if (typeof callback === "function") {
-        callback();
-      }
 
       if (concat) {
         const newTorrentList = [...torrentList, ...response.titles];
