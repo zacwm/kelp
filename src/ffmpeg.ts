@@ -72,6 +72,7 @@ class FFmpeg implements FFmpegInterface {
 
   stop(): void {
     if (this.process) this.process.kill();
+    this.process = null;
   }
 }
 
