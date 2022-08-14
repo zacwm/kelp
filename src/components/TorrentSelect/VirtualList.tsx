@@ -16,12 +16,12 @@ const useStyles = createStyles((theme) => ({
   list: {
     display: 'flex',
     flexWrap: 'wrap',
+    justifyContent: 'center'
   },
   itemContainer: {
-    width: '20%',
+    width: '15%',
     display: 'flex',
     flex: 'none',
-    padding: '10px',
     alignContent: 'stretch',
     boxSizing: 'border-box',
     // [`@media (max-width: ${theme.breakpoints.lg}px)`]: {

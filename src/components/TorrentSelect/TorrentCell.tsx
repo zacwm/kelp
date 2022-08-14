@@ -99,7 +99,7 @@ const Torrent = (props: Props) => {
       sx={{
         position: 'relative',
         width: '100%',
-        height: '380px',
+        height: '280px',
         margin: 12,
       }}
       title={props.title.title}
@@ -114,6 +114,7 @@ const Torrent = (props: Props) => {
             shadow="md"
             radius="sm"
             sx={{
+              position: 'relative',
               background: '#2C2E33',
               cursor: 'pointer',
               userSelect: 'none',
@@ -138,7 +139,17 @@ const Torrent = (props: Props) => {
                 alt={props.title.title}
               />
             </Box>
-            <Box sx={{ padding: '4px 6px' }}>
+            <Box
+              sx={{
+                position: 'absolute',
+                bottom: 0,
+                left: 0,
+                width: '100%',
+                height: 'fit-content',
+                padding: '4px 6px',
+                background: 'rgba(26, 27, 30, 0.85)'
+              }}
+            >
               <Text weight={600} style={{
                 whiteSpace: 'pre-wrap',
               }}>{ props.title.title }</Text>
