@@ -64,7 +64,7 @@ class Room implements RoomInterface {
     this.authToken = makeid(32);
     this.users = [];
     this.statusCode = 1;
-    this.status = 'Looking for a movie...';
+    this.status = 'Looking for something to watch...';
     this.statusPercentage = 0;
     this.statusTimeRemaining = 0;
     this.statusSpeed = '';
@@ -353,7 +353,7 @@ class Room implements RoomInterface {
     await fs.emptyDir(path.join(__dirname, `../.temp/${this.id}`));
     await fs.emptyDir(path.join(__dirname, `../.streams/${this.id}`));
 
-    this.setStatus(1, 'Looking for a movie...');
+    this.setStatus(1, 'Looking for something to watch...');
   }
 
   // Internal class functions
