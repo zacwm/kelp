@@ -124,7 +124,7 @@ const TorrentSelect: React.FC<Props> = ({ socket }) => {
         {(styles) => (
           <MovieDisplay
             styles={styles}
-            title={selectedTitle}
+            title={titleCategory == 'movies' && selectedTitle}
             onTitleSelect={(url) => onTorrentStart(url)}
             close={() => setSelectedTitle(null)}
           />
@@ -139,7 +139,7 @@ const TorrentSelect: React.FC<Props> = ({ socket }) => {
         {(styles) => (
           <ShowDisplay
             styles={styles}
-            title={selectedTitle}
+            title={titleCategory == 'shows' && selectedTitle}
             onTitleSelect={(url) => onTorrentStart(url)}
             close={() => setSelectedTitle(null)}
             socket={socket}
