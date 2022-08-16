@@ -1,14 +1,15 @@
-import React, { useState, useRef, useMemo } from 'react';
+import React, { useState, useRef, useMemo, useEffect } from 'react';
 import { VirtuosoGrid, GridComponents, GridItemContent } from 'react-virtuoso';
 import { Box, Loader, createStyles, LoadingOverlay } from '@mantine/core';
 
 import MemoizedTorrent from './TorrentCell';
 
 interface Props {
-    itemData: object[];
-    isLoading: boolean;
-    setSelectedTitle: React.Dispatch<React.SetStateAction<any>>;
-    fetchTorrentList: (page: number, concat: boolean, forceLoad: boolean, callback?: () => void) => void;
+  titleCategory: string,
+  itemData: object[];
+  isLoading: boolean;
+  setSelectedTitle: React.Dispatch<React.SetStateAction<any>>;
+  fetchTorrentList: (page: number, concat: boolean, forceLoad: boolean, callback?: () => void) => void;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -34,6 +35,7 @@ const useStyles = createStyles((theme) => ({
 }));
 
 const VirtualList = ({
+  titleCategory,
   itemData,
   isLoading,
   setSelectedTitle,
@@ -49,6 +51,10 @@ const VirtualList = ({
 
   const lastPage = useRef(1);
   const hasMore = hasMoreData();
+
+  useEffect(() => {
+    lastPage.current = 1;
+  }, [titleCategory]);
 
   const onEndReached = () => {
     if (shallowFetch || !hasMore) {
@@ -121,7 +127,7 @@ const VirtualList = ({
           height: '100%',
         }}
         totalCount={itemData.length}
-        overscan={150}
+        overscan={250}
         components={Components}
         itemContent={itemContent}
         endReached={onEndReached}

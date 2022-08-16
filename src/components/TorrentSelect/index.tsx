@@ -42,6 +42,8 @@ const TorrentSelect: React.FC<Props> = ({ socket }) => {
       setLoadingTitles(true);
     }
 
+    console.dir(page);
+
     socket.emit('getTitles', {
       page: page || 1,
       category: titleCategory,
@@ -196,6 +198,7 @@ const TorrentSelect: React.FC<Props> = ({ socket }) => {
           </Group>
         </Group>
         <VirtualList 
+          titleCategory={titleCategory}
           itemData={torrentList}
           isLoading={loadingTitles}
           setSelectedTitle={setSelectedTitle}
