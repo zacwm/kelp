@@ -28,13 +28,16 @@ const FanartBanner: React.FC<any> = ({ imgSrc }) => {
 };
 
 type Props = {
+  styles: any,
   title: any,
   onTitleSelect: (url: string) => void,
   close: () => void,
   socket: any,
 }
 
-const TitleDisplay: React.FC<Props> = ({ title, onTitleSelect, close, socket }) => {
+const TitleDisplay: React.FC<Props> = ({ styles, title, onTitleSelect, close, socket }) => {
+  if (!title) return null;
+
   const [isLoading, setIsLoading] = React.useState(true);
   const [showData, setShowData] = React.useState<any>({});
   const [seasonEpisodesData, setSeasonEpisodesData] = React.useState<any>({});
@@ -65,11 +68,18 @@ const TitleDisplay: React.FC<Props> = ({ title, onTitleSelect, close, socket }) 
   }, [showData]);
 
   return (
-    <Box sx={{
-      height: '100%',
-      width: '100%',
-      position: 'relative',
-    }}>
+    <Box
+      style={styles}
+      sx={{
+        position: 'absolute',
+        background: 'rgba(26, 27, 30)',
+        top: 0,
+        left: 0,
+        height: '100%',
+        width: '100%',
+        zIndex: 100,
+      }}
+    >
       <FanartBanner imgSrc={title?.images?.fanart} />
       <Stack sx={{
         height: '100%',

@@ -26,12 +26,15 @@ const FanartBanner: React.FC<any> = ({ imgSrc }) => {
 };
 
 type Props = {
+  styles: any,
   title: any,
   onTitleSelect: (url: string) => void,
   close: () => void,
 }
 
-const TitleDisplay: React.FC<Props> = ({ title, onTitleSelect, close }) => {
+const TitleDisplay: React.FC<Props> = ({ styles, title, onTitleSelect, close }) => {
+  if (!title) return null;
+
   const [optsTorrentLangs, setOptsTorrentLangs] = React.useState([]);
   const [optsTorrentRes, setOptsTorrentRes] = React.useState([]);
 
@@ -39,7 +42,7 @@ const TitleDisplay: React.FC<Props> = ({ title, onTitleSelect, close }) => {
   const [inputTorrentRes, setInputTorrentRes] = React.useState('');
 
   React.useEffect(() => {
-    if (!title) return;
+    if (!title) return null;
 
     const langOpts = Object.keys(title.torrents);
     if (!langOpts) return;
@@ -79,11 +82,18 @@ const TitleDisplay: React.FC<Props> = ({ title, onTitleSelect, close }) => {
   };
 
   return (
-    <Box sx={{
-      height: '100%',
-      width: '100%',
-      position: 'relative',
-    }}>
+    <Box
+      style={styles}
+      sx={{
+        position: 'absolute',
+        background: 'rgba(26, 27, 30)',
+        top: 0,
+        left: 0,
+        height: '100%',
+        width: '100%',
+        zIndex: 100,
+      }}
+    >
       <FanartBanner imgSrc={title?.images?.fanart} />
       <Stack sx={{
         height: '100%',

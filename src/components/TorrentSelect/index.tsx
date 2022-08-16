@@ -9,7 +9,7 @@ import ShowDisplay from './ShowDisplay';
 import CustomTorrentPrompt from './CustomTorrentPrompt';
 import VirtualList from './VirtualList';
 
-import { Box, Button, Paper, Stack, Group, Loader, TextInput } from '@mantine/core';
+import { Box, Button, Paper, Stack, Group, Loader, TextInput, Transition } from '@mantine/core';
 
 type Props = {
   socket: Socket;
@@ -92,6 +92,7 @@ const TorrentSelect: React.FC<Props> = ({ socket }) => {
       shadow="md"
       radius="sm"
       sx={{
+        position: 'relative',
         height: 'calc(100% - 100px)',
         width: 'calc(100% - 60px)',
         maxWidth: 1400,
@@ -100,85 +101,106 @@ const TorrentSelect: React.FC<Props> = ({ socket }) => {
         overflow: 'hidden',
       }}
     >
-      <Stack sx={{ height: '100%' }} spacing={0}>
-        { openCustomTorrentPrompt ? (
+      <Transition
+        mounted={openCustomTorrentPrompt}
+        transition="slide-up"
+        duration={400}
+        timingFunction="ease"
+      >
+        {(styles) => (
           <CustomTorrentPrompt
+            styles={styles}
             setTorrent={(url) => onTorrentStart(url)}
             close={() => setOpenCustomTorrentPrompt(false)}
           />
-        ) : selectedTitle ? (
-          titleCategory == 'movies' ? (
-            <MovieDisplay
-              title={selectedTitle}
-              onTitleSelect={(url) => onTorrentStart(url)}
-              close={() => setSelectedTitle(null)}
-            />
-          ) : (
-            <ShowDisplay
-              title={selectedTitle}
-              onTitleSelect={(url) => onTorrentStart(url)}
-              close={() => setSelectedTitle(null)}
-              socket={socket}
-            />
-          )
-        ) : (
-          <React.Fragment>
-            <Group
-              position="apart"
-              sx={{
-                width: '100%',
-                borderBottom: 'solid 1px #2C2E33',
-                padding: '12px 12px 0 12px'
-              }}
+        )}
+      </Transition>
+      <Transition
+        mounted={selectedTitle && titleCategory == 'movies'}
+        transition="slide-up"
+        duration={400}
+        timingFunction="ease"
+      >
+        {(styles) => (
+          <MovieDisplay
+            styles={styles}
+            title={selectedTitle}
+            onTitleSelect={(url) => onTorrentStart(url)}
+            close={() => setSelectedTitle(null)}
+          />
+        )}
+      </Transition>
+      <Transition
+        mounted={selectedTitle && titleCategory == 'shows'}
+        transition="slide-up"
+        duration={400}
+        timingFunction="ease"
+      >
+        {(styles) => (
+          <ShowDisplay
+            styles={styles}
+            title={selectedTitle}
+            onTitleSelect={(url) => onTorrentStart(url)}
+            close={() => setSelectedTitle(null)}
+            socket={socket}
+          />
+        )}
+      </Transition>
+      <Stack sx={{ height: '100%' }} spacing={0}>
+        <Group
+          position="apart"
+          sx={{
+            width: '100%',
+            borderBottom: 'solid 1px #2C2E33',
+            padding: '12px 12px 0 12px'
+          }}
+        >
+          <Group>
+            {['Movies', 'Shows'].map((type, index) => (
+              <Box
+                key={index}
+                sx={{
+                  height: '100%',
+                  padding: '6px 12px',
+                  borderRadius: '4px 4px 0 0',
+                  cursor: 'pointer',
+                  color: '#fff',
+                  background: type.toLowerCase() == titleCategory ? '#2f9e44' : '#2C2E33',
+                }}
+                onClick={() => {
+                  if (loadingTitles) return;
+                  setTitleCategory(type.toLowerCase());
+                }}
+              >
+                { type }
+              </Box>
+            ))}
+          </Group>
+          <TextInput
+            value={inputKeywords}
+            onChange={onSearchChange}
+            disabled={loadingTitles}
+            placeholder="Search"
+            sx={{ width: '500px' }}
+            variant="filled"
+          />
+          <Group>
+            { loadingTitles && <Loader size="sm" /> }
+            <Button
+              variant="filled"
+              color={openCustomTorrentPrompt && 'red'}
+              onClick={() => setOpenCustomTorrentPrompt(!openCustomTorrentPrompt)}
             >
-              <Group>
-                {['Movies', 'Shows'].map((type, index) => (
-                  <Box
-                    key={index}
-                    sx={{
-                      height: '100%',
-                      padding: '6px 12px',
-                      borderRadius: '4px 4px 0 0',
-                      cursor: 'pointer',
-                      color: '#fff',
-                      background: type.toLowerCase() == titleCategory ? '#2f9e44' : '#2C2E33',
-                    }}
-                    onClick={() => {
-                      if (loadingTitles) return;
-                      setTitleCategory(type.toLowerCase());
-                    }}
-                  >
-                    { type }
-                  </Box>
-                ))}
-              </Group>
-              <TextInput
-                value={inputKeywords}
-                onChange={onSearchChange}
-                disabled={loadingTitles}
-                placeholder="Search"
-                sx={{ width: '500px' }}
-                variant="filled"
-              />
-              <Group>
-                { loadingTitles && <Loader size="sm" /> }
-                <Button
-                  variant="filled"
-                  color={openCustomTorrentPrompt && 'red'}
-                  onClick={() => setOpenCustomTorrentPrompt(!openCustomTorrentPrompt)}
-                >
-                  { !openCustomTorrentPrompt ? 'Enter Torrent/Magnet URI' : 'Close' }
-                </Button>
-              </Group>
-            </Group>
-            <VirtualList 
-              itemData={torrentList}
-              isLoading={loadingTitles}
-              setSelectedTitle={setSelectedTitle}
-              fetchTorrentList={loadTorrentList}
-            />
-          </React.Fragment>
-        ) }
+              { !openCustomTorrentPrompt ? 'Enter Torrent/Magnet URI' : 'Close' }
+            </Button>
+          </Group>
+        </Group>
+        <VirtualList 
+          itemData={torrentList}
+          isLoading={loadingTitles}
+          setSelectedTitle={setSelectedTitle}
+          fetchTorrentList={loadTorrentList}
+        />
       </Stack>
     </Paper>
   );
