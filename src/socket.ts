@@ -23,6 +23,10 @@ class SocketServer {
         if (!currentRoom) return;
 
         const room: Room = this.Rooms.getRoomById(currentRoom);
+        
+        // Check if the room still exists. Disconnect event still runs if the room was closed.
+        if (!room) return;
+
         room.removeUser(user.id);
 
         this.io.emit('updateRoom', {
