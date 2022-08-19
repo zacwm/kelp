@@ -40,6 +40,8 @@ const ActiveRooms: React.FC<Props> = ({ socket }) => {
     };
   }, [socket]);
 
+  if (activeRooms.length < 1 && !roomClosedMessage) return null;
+
   return(
     <Box
       sx={{
@@ -67,50 +69,52 @@ const ActiveRooms: React.FC<Props> = ({ socket }) => {
               { roomClosedMessage == 2 && 'Room was closed successfully.' }
             </Alert>
           )}
-          <Paper shadow="xs" p="md" withBorder sx={{
-            padding: 2,
-          }}>
-            <Text size={25} mb={4} align="center">
-                  Active rooms
-            </Text>
-            <Stack alignItems="stretch" spacing={2}>
-              {activeRooms.length === 0 && <Text>No rooms found...</Text>}
-              {
-                activeRooms.map(room => (
-                  <React.Fragment key={room.id}>
-                    <Stack
-                      direction="row"
-                      justifyContent="flex-start"
-                      alignItems="center" 
-                      spacing={2}
-                    >
-                      {room.hasPassword ? (
-                        <IconLock size={40} />
-                      ) : (
-                        <IconLockOpen size={40} />
-                      )}
+          {activeRooms.length > 0 && (
+            <Paper shadow="xs" p="md" withBorder sx={{
+              padding: 2,
+            }}>
+              <Text size={25} mb={4} align="center">
+                    Active rooms
+              </Text>
+              <Stack alignItems="stretch" spacing={2}>
+                {activeRooms.length === 0 && <Text>No rooms found...</Text>}
+                {
+                  activeRooms.map(room => (
+                    <React.Fragment key={room.id}>
                       <Stack
-                        direction="column"
-                        justifyContent="center"
-                        alignItems="flex-start" 
-                        spacing={0}
-                        sx={{ flex: 1 }}
+                        direction="row"
+                        justifyContent="flex-start"
+                        alignItems="center" 
+                        spacing={2}
                       >
-                        <Text size="xl" weight={700}>
-                          {room.name}
-                        </Text>
-                        <Text size="sm" italic>
-                          {room.status}
-                        </Text>
+                        {room.hasPassword ? (
+                          <IconLock size={40} />
+                        ) : (
+                          <IconLockOpen size={40} />
+                        )}
+                        <Stack
+                          direction="column"
+                          justifyContent="center"
+                          alignItems="flex-start" 
+                          spacing={0}
+                          sx={{ flex: 1 }}
+                        >
+                          <Text size="xl" weight={700}>
+                            {room.name}
+                          </Text>
+                          <Text size="sm" italic>
+                            {room.status}
+                          </Text>
+                        </Stack>
+                        <Button onClick={() => router.push(`/room/${room.id}`)}>Join Room</Button>
                       </Stack>
-                      <Button onClick={() => router.push(`/room/${room.id}`)}>Join Room</Button>
-                    </Stack>
-                    {activeRooms.length - 1 !== activeRooms.indexOf(room) && <Divider />}
-                  </React.Fragment>
-                ))
-              }
-            </Stack>
-          </Paper>
+                      {activeRooms.length - 1 !== activeRooms.indexOf(room) && <Divider />}
+                    </React.Fragment>
+                  ))
+                }
+              </Stack>
+            </Paper>
+          )}
         </Grid>
       </Grid>
     </Box>
