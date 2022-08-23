@@ -17,7 +17,8 @@
     "module": "commonjs",
     "moduleResolution": "node",
     "isolatedModules": true,
-    "jsx": "preserve"
+    "jsx": "preserve",
+    "sourceMap": true,
   },
   "include": [
     "next-env.d.ts",
