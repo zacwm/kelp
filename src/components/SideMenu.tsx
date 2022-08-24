@@ -200,7 +200,7 @@ const SideMenu: React.FC<Props> = ({ socket, userId, videoState }) => {
               }}
             >
               <Typography variant="caption" component="span">
-                Version 1.1.2
+                Version 2.0.0
               </Typography>
               <Link
                 component="a"

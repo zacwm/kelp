@@ -118,7 +118,7 @@ const CreateRooms: React.FC<Props> = ({ socket }) => {
               spacing={2}
             >
               <Typography variant="caption" component="span">
-                    Version: 1.1.2
+                    Version: 2.0.0
               </Typography>
               <Link
                 component="a"
