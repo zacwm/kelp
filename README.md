@@ -1,5 +1,10 @@
-# kelp
-  A slimy torrent downloader, temporary hosting & playback syncing server.
+<p align="center">
+  <img src="./src/public/kelp-gradient-text.svg" height="100px">
+</p>
+<p align="center">
+A slimy torrent downloader, temporary hosting & playback syncing server.
+</p>
+<hr />
 
 <p align="center">
   <img src="./kelp.png" height="auto" width="100%" />
