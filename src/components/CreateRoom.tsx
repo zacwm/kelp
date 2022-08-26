@@ -3,8 +3,6 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Stack from '@mui/material/Stack';
-import Typography from '@mui/material/Typography';
-import Link from '@mui/material/Link';
 
 import {IconAlertCircle } from '@tabler/icons';
 
@@ -61,28 +59,47 @@ const CreateRooms: React.FC<Props> = ({ socket }) => {
     >
       <Grid container spacing={2}>
         <Grid item xs={12}>
-          <Paper shadow="xs" p="md" withBorder sx={{
-            padding: 2,
-          }}>
+          <Paper 
+            shadow="xs" 
+            radius={12} 
+            p="md" 
+            withBorder
+            sx={{ backgroundColor: '#08080f' }}
+          >
             <Stack alignItems="center" spacing={2}>
               <Text size={25} mb={4}>
                     Create a room
               </Text>
               <TextInput
                 placeholder="Room name"
-                size="lg"
+                size="md"
+                radius={12}
                 disabled={createRoomPending}
                 ref={refInputRoomName}
-                sx={{ width: '100%' }}
+                sx={{ 
+                  width: '100%',
+                }}
+                styles={{
+                  input: {backgroundColor: '#2f2f3d'}
+                }}
               />
               <PasswordInput
                 placeholder="Room password (optional)"
-                size="lg"
+                size="md"
+                radius={12}
                 disabled={createRoomPending}
                 ref={refInputRoomPassword}
                 sx={{ width: '100%', mb: 2 }}
+                styles={{
+                  input: {
+                    backgroundColor: '#2f2f3d',
+                  }
+                }}
               />
               <Button
+                variant="gradient"  
+                gradient={{ from: '#00bc70', to: '#00a19b', deg: 45 }} 
+                radius={12}
                 onClick={buttonCreateRoom}
                 disabled={createRoomPending}
               >Create Room</Button>
@@ -105,31 +122,6 @@ const CreateRooms: React.FC<Props> = ({ socket }) => {
                 {createRoomErrorMessage}
               </Alert>
             </Collapse>
-          </Paper>
-        </Grid>
-        <Grid item xs={12}>
-          <Paper shadow="xs" p="md" withBorder sx={{
-            padding: 2,
-          }}>
-            <Stack
-              direction="row"
-              justifyContent="center"
-              alignItems="center"
-              spacing={2}
-            >
-              <Typography variant="caption" component="span">
-                    Version: 2.0.0
-              </Typography>
-              <Link
-                component="a"
-                target="_blank"
-                href="https://github.com/zacimac/kelp"
-                rel="noopener"
-                variant="caption"
-              >
-                    GitHub
-              </Link>
-            </Stack>
           </Paper>
         </Grid>
       </Grid>

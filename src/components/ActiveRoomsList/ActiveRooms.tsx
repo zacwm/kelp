@@ -1,13 +1,16 @@
 import * as React from 'react';
 import { useRouter } from 'next/router';
 
+import LockedRoom from './LockedRoom';
+import UnlockedRoom from './UnlockedRoom';
+
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Stack from '@mui/material/Stack';
 
-import {IconAlertCircle, IconLock, IconLockOpen } from '@tabler/icons';
+import { IconAlertCircle } from '@tabler/icons';
 
-import { Button, Paper, Alert, Text, Divider } from '@mantine/core';
+import { Paper, Alert, Text, ScrollArea } from '@mantine/core';
 
 type Props = {
   socket: any;
@@ -51,8 +54,8 @@ const ActiveRooms: React.FC<Props> = ({ socket }) => {
         justifyContent: 'center',
         alignItems: 'center',
         width: '100%',
-        height: '100%',
-      }}
+        height: '100%', 
+      }}    
     >
       <Grid container spacing={2}>
         <Grid item xs={12}>
@@ -70,49 +73,37 @@ const ActiveRooms: React.FC<Props> = ({ socket }) => {
             </Alert>
           )}
           {activeRooms.length > 0 && (
-            <Paper shadow="xs" p="md" withBorder sx={{
-              padding: 2,
-            }}>
+            <Paper 
+              shadow="xs" 
+              radius={12} 
+              p="md" 
+              withBorder
+              sx={{ backgroundColor:'#08080f'}}
+            >
               <Text size={25} mb={4} align="center">
-                    Active rooms
+                  Active rooms
+                <ScrollArea 
+                  scrollbarSize={8}
+                  style={{ height: 168 }}
+                >
+                  
+                  <Stack alignItems="stretch" spacing={2}>
+                    {activeRooms.length === 0 && <Text>No rooms found...</Text>}
+                    {
+                      activeRooms.map(room => (
+                        <React.Fragment key={room.id}>
+                          {room.hasPassword ? (
+                            <LockedRoom room={room} />
+                          ) : (
+                            <UnlockedRoom room={room} />
+                          )}
+                          {activeRooms.length - 1 !== activeRooms.indexOf(room)}
+                        </React.Fragment>
+                      ))
+                    }
+                  </Stack>
+                </ScrollArea>
               </Text>
-              <Stack alignItems="stretch" spacing={2}>
-                {activeRooms.length === 0 && <Text>No rooms found...</Text>}
-                {
-                  activeRooms.map(room => (
-                    <React.Fragment key={room.id}>
-                      <Stack
-                        direction="row"
-                        justifyContent="flex-start"
-                        alignItems="center" 
-                        spacing={2}
-                      >
-                        {room.hasPassword ? (
-                          <IconLock size={40} />
-                        ) : (
-                          <IconLockOpen size={40} />
-                        )}
-                        <Stack
-                          direction="column"
-                          justifyContent="center"
-                          alignItems="flex-start" 
-                          spacing={0}
-                          sx={{ flex: 1 }}
-                        >
-                          <Text size="xl" weight={700}>
-                            {room.name}
-                          </Text>
-                          <Text size="sm" italic>
-                            {room.status}
-                          </Text>
-                        </Stack>
-                        <Button onClick={() => router.push(`/room/${room.id}`)}>Join Room</Button>
-                      </Stack>
-                      {activeRooms.length - 1 !== activeRooms.indexOf(room) && <Divider />}
-                    </React.Fragment>
-                  ))
-                }
-              </Stack>
             </Paper>
           )}
         </Grid>

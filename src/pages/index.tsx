@@ -5,9 +5,13 @@ import io from 'socket.io-client';
 
 import Container from '@mui/material/Container';
 import Box from '@mui/material/Box';
+import Typography from '@mui/material/Typography';
+import Link from '@mui/material/Link';
+import Grid from '@mui/material/Grid';
+import Stack from '@mui/material/Stack';
 
-import {Text} from '@mantine/core';
-import ActiveRooms from '../components/ActiveRooms';
+import {Image, Paper} from '@mantine/core';
+import ActiveRooms from '../components/ActiveRoomsList/ActiveRooms';
 import CreateRooms from '../components/CreateRoom';
 
 const Home: NextPage = () => {
@@ -24,16 +28,17 @@ const Home: NextPage = () => {
       <Head>
         <title>kelp - menu</title>
       </Head>
-      <Text size={60} sx={(theme) => ({
-        position: 'absolute',
-        top: '8%',
-        left: 0,
-        right: 0,
-        textAlign: 'center',
-        color: theme.colors.brand[7],
-      })}>
-        kelp
-      </Text>
+      <Image 
+        src='/kelp-gradient-text.svg'
+        height={70}
+        fit='contain'
+        sx={(theme) => ({
+          position: 'absolute',
+          top: '18%',
+          left: 0,
+          right: 0,
+          textAlign: 'center',
+        })} />
       <Box
         sx={{
           display: 'flex',
@@ -45,7 +50,42 @@ const Home: NextPage = () => {
       >
         <CreateRooms socket={socket}/>
         <ActiveRooms socket={socket}/>
+        <Grid item xs={12}>
+          <Paper  p="md" sx={{ backgroundColor: '#08080f' }}>
+            <Stack
+              direction="row"
+              justifyContent="center"
+              alignItems="center"
+              spacing={2}
+            >
+              <Typography variant="caption" component="span">
+                    Version: 1.1.2
+              </Typography>
+              <Link
+                component="a"
+                target="_blank"
+                href="https://github.com/zacimac/kelp"
+                rel="noopener"
+                variant="caption"
+              >
+                    GitHub
+              </Link>
+            </Stack>
+          </Paper>
+        </Grid>
       </Box>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'row',
+          justifyContent: 'center',
+          alignItems: 'bottom',
+          height: '100vh',
+        }}
+      >
+
+      </Box>
+      
     </Container>
   );
 };

@@ -13,13 +13,29 @@ export default function App(props: AppProps ) {
       <Head>
         <meta name="viewport" content="initial-scale=1, width=device-width" />
       </Head>
-      <MantineProvider theme={{
-        colorScheme: 'dark',
-        colors: {
-          brand: ['#00a152', '#00a152', '#00a152', '#00a152', '#00a152', '#00a152', '#00a152', '#00a152', '#00a152','#00a152'],
-        },
-        primaryColor: 'brand',
-      }} withGlobalStyles withNormalizeCSS>
+      <MantineProvider 
+        theme={{
+          components: {
+            Button: {
+              defaultProps: {
+                radius: 12,
+              },
+            },
+            Paper: {
+              defaultProps: {
+                
+              },
+            }
+          },
+          colorScheme: 'dark',
+          colors: {
+            brand: ['#00a152', '#00a152', '#00a152', '#00a152', '#00a152', '#00a152', '#00a152', '#00a152', '#00a152','#00a152'],
+          },
+          primaryColor: 'brand',
+        }} 
+        withGlobalStyles 
+        withNormalizeCSS
+      >
         <Component {...pageProps} />
       </MantineProvider>
     </React.Fragment>
