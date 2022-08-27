@@ -84,29 +84,30 @@ const ActiveRooms: React.FC<Props> = ({ socket }) => {
                 mb={4} 
                 align="center" 
                 className='light'
+                color="#98989a"
               >
-                  Active Rooms
-                <ScrollArea 
-                  scrollbarSize={8}
-                  type='always'
-                  style={{ 
-                    height: 168,
-                    marginTop: '20px'
-                  }}
-                >
-                  <Stack alignItems="stretch" spacing={2}>
-                    {activeRooms.length === 0 && <Text>No rooms found...</Text>}
-                    {
-                      activeRooms.map(room => (
-                        <React.Fragment key={room.id}>
-                          <UnlockedRoom room={room} />
-                          {activeRooms.length - 1 !== activeRooms.indexOf(room)}
-                        </React.Fragment>
-                      ))
-                    }
-                  </Stack>
-                </ScrollArea>
+                Active Rooms
               </Text>
+              <ScrollArea 
+                scrollbarSize={8}
+                type='always'
+                style={{ 
+                  height: 168,
+                  marginTop: '20px'
+                }}
+              >
+                <Stack alignItems="stretch" spacing={2}>
+                  {activeRooms.length === 0 && <Text>No rooms found...</Text>}
+                  {
+                    activeRooms.map(room => (
+                      <React.Fragment key={room.id}>
+                        <UnlockedRoom room={room} />
+                        {activeRooms.length - 1 !== activeRooms.indexOf(room)}
+                      </React.Fragment>
+                    ))
+                  }
+                </Stack>
+              </ScrollArea>
             </Paper>
           )}
         </Grid>

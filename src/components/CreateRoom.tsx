@@ -71,7 +71,12 @@ const CreateRooms: React.FC<Props> = ({ socket }) => {
             sx={{ backgroundColor: '#08080f' }}
           >
             <Stack alignItems="center" spacing={2}>
-              <Text size={25} mb={4} className='light'>
+              <Text
+                size={25}
+                mb={4}
+                className='light'
+                color="#98989a"
+              >
                 Create Room
               </Text>
               <TextInput
