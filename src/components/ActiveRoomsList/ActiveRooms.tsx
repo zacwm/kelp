@@ -97,7 +97,6 @@ const ActiveRooms: React.FC<Props> = ({ socket }) => {
                 }}
               >
                 <Stack alignItems="stretch" spacing={2}>
-                  {activeRooms.length === 0 && <Text>No rooms found...</Text>}
                   {
                     activeRooms.map(room => (
                       <React.Fragment key={room.id}>
