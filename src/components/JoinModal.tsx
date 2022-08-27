@@ -62,7 +62,7 @@ const JoinModal: React.FC<Props> = ({ socket, setUserId, setMenuVisible }) => {
   const inputs = (
     <React.Fragment>
       <Stack align="center">
-        <Text size={23} sx={{ marginBottom: '10px' }}>Who's watching?</Text>
+        <Text size={23} sx={{ marginBottom: '10px' }}>Who&apos;s watching?</Text>
         {/*
           TODO: Need to change to use the style of the inputs on the home page.
           Best to turn them into it's own component once pushed though.
@@ -112,7 +112,7 @@ const JoinModal: React.FC<Props> = ({ socket, setUserId, setMenuVisible }) => {
         </Alert>
       </Collapse>
     </React.Fragment>
-  )
+  );
 
   return (
     <React.Fragment>

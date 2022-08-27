@@ -14,7 +14,7 @@ import TorrentSelect from '../../components/TorrentSelect';
 
 import { Grid } from '@mui/material';
 
-import { Box, Button, Text, Paper, Stack, Group, Progress } from '@mantine/core';
+import { Box, Text, Paper, Stack, Group, Progress } from '@mantine/core';
 
 function LinearProgressWithLabel(props: any & { value: number }) {
   return (
@@ -35,8 +35,6 @@ const Room: React.FC = () => {
 
   const [socket, setSocket] = React.useState(null);
   const [userId, setUserId] = React.useState(null);
-
-  const [roomNotFound, setRoomNotFound] = React.useState<boolean>(false);
 
   const [videoState, setVideoState] = React.useState(null);
 
