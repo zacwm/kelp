@@ -6,7 +6,10 @@ import Stack from '@mui/material/Stack';
 
 import {IconAlertCircle } from '@tabler/icons';
 
-import { Button, Paper, Alert, Text, TextInput, PasswordInput, Collapse} from '@mantine/core';
+import { Paper, Alert, Text, Collapse} from '@mantine/core';
+import TextInput from './TextInput';
+import PasswordInput from './PasswordInput';
+import Button from './Button';
 
 type Props = {
   socket: any;
@@ -15,8 +18,9 @@ type Props = {
 const CreateRooms: React.FC<Props> = ({ socket }) => {
   const [createRoomPending, setCreateRoomPending] = React.useState(false);
   const [createRoomErrorMessage, setCreateRoomErrorMessage] = React.useState(null);
-  const refInputRoomName = React.useRef<HTMLInputElement>(null);
-  const refInputRoomPassword = React.useRef<HTMLInputElement>(null);
+  
+  const [inputRoomName, setInputRoomName] = React.useState<string>('');
+  const [inputRoomPassword, setInputRoomPassword] = React.useState<string>('');
 
   function timeout(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
@@ -31,13 +35,13 @@ const CreateRooms: React.FC<Props> = ({ socket }) => {
       await timeout(300);
     }
     socket.emit('createRoom', {
-      name: refInputRoomName.current?.value,
-      password: refInputRoomPassword.current?.value,
+      name: inputRoomName,
+      password: inputRoomPassword,
     }, (res) => {
       setCreateRoomPending(false);
       if (res.error) return setCreateRoomErrorMessage(res.error);
       if (res.roomId) {
-        window.location.href = refInputRoomPassword.current?.value ? `/room/${res.roomId}?password=${refInputRoomPassword.current?.value}` : `/room/${res.roomId}`;
+        window.location.href = inputRoomPassword ? `/room/${res.roomId}?password=${inputRoomPassword}` : `/room/${res.roomId}`;
       } else {
         setCreateRoomErrorMessage('Unknown error');
       }
@@ -72,40 +76,29 @@ const CreateRooms: React.FC<Props> = ({ socket }) => {
               </Text>
               <TextInput
                 placeholder="Room name"
-                size="sm"
-                radius={12}
                 disabled={createRoomPending}
-                ref={refInputRoomName}
+                value={inputRoomName}
+                onChange={(e) => setInputRoomName(e.currentTarget.value)}
                 sx={{ 
                   width: '100%',
-                }}
-                styles={{
-                  input: {backgroundColor: '#2f2f3d'}
                 }}
               />
               <PasswordInput
                 placeholder="Room password (optional)"
-                size="sm"
-                radius={12}
                 disabled={createRoomPending}
-                ref={refInputRoomPassword}
+                value={inputRoomPassword}
+                onChange={(e) => setInputRoomPassword(e.currentTarget.value)}
                 sx={{ width: '100%', mb: 2 }}
-                styles={{
-                  input: {
-                    backgroundColor: '#2f2f3d',
-                  }
-                }}
               />
               <Button
-                variant="gradient"  
-                gradient={{ from: '#00bc70', to: '#00a19b', deg: 135 }} 
-                radius={12}
                 onClick={buttonCreateRoom}
                 disabled={createRoomPending}
                 sx={{
                   width: 130,
                 }}
-              >Create Room</Button>
+              >
+                Create Room
+              </Button>
             </Stack>
             <Collapse
               in={createRoomErrorMessage} 

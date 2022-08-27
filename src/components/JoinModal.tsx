@@ -7,7 +7,10 @@ import { useRoom } from '../contexts/room.context';
 import Alert from '@mui/material/Alert';
 import Collapse from '@mui/material/Collapse';
 
-import { Box, Text, Paper, Button, TextInput, PasswordInput, Transition, Stack, Loader } from '@mantine/core';
+import { Box, Text, Paper, Transition, Stack, Loader, Image, Group } from '@mantine/core';
+import TextInput from './TextInput';
+import PasswordInput from './PasswordInput';
+import Button from './Button';
 
 type Props = {
   socket: any;
@@ -86,12 +89,10 @@ const JoinModal: React.FC<Props> = ({ socket, setUserId, setMenuVisible }) => {
         ) }
         {/* And the button from the home page. */}
         <Button
-          size="md"
-          variant="filled"
           onClick={handleSubmit}
           disabled={isLoadingSubmit}
         >
-          Enter
+          Confirm
         </Button>
       </Stack>
       <Collapse
@@ -139,6 +140,18 @@ const JoinModal: React.FC<Props> = ({ socket, setUserId, setMenuVisible }) => {
               background: '#08080f',
             }}
           >
+            <Image 
+              src='/kelp-gradient-text.svg'
+              height={70}
+              fit='contain'
+              sx={{
+                position: 'absolute',
+                top: '18%',
+                left: 0,
+                right: 0,
+                textAlign: 'center',
+              }}
+            />
             <Stack
               align="center"
               justify="center"
@@ -152,13 +165,13 @@ const JoinModal: React.FC<Props> = ({ socket, setUserId, setMenuVisible }) => {
                   <Loader size="xl" />
                 ) : (
                   <Paper
-                    shadow="xs"
-                    p="md"
+                    shadow="xs" 
+                    radius={12} 
+                    p="md" 
+                    withBorder
                     sx={{
-                      width: 600,
+                      width: 500,
                       backgroundColor: '#08080f',
-                      border: '2px solid #191921',
-                      borderRadius: 12,
                     }}
                   >
                     {
@@ -179,6 +192,36 @@ const JoinModal: React.FC<Props> = ({ socket, setUserId, setMenuVisible }) => {
                 )
               }
             </Stack>
+            <Paper
+              p="md" 
+              sx={{
+                position: 'absolute',
+                bottom: '0px',
+                left: 0,
+                right: 0,
+                textAlign: 'center',
+                backgroundColor: '#08080f'
+              }}
+            >
+              <Group
+                position="center"
+              >
+                <Text
+                  size="sm"
+                >
+                  Version: 2.0.0
+                </Text>
+                <Text
+                  variant="link"
+                  component="a"
+                  target="_blank"
+                  href="https://github.com/zacimac/kelp"
+                  size="sm"
+                >
+                  GitHub
+                </Text>
+              </Group>
+            </Paper>
           </Box>
         )}
       </Transition>

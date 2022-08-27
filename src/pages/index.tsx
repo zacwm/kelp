@@ -5,12 +5,9 @@ import io from 'socket.io-client';
 
 import Container from '@mui/material/Container';
 import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
-import Stack from '@mui/material/Stack';
 
-import {Image, Paper} from '@mantine/core';
+import { Image, Paper, Group, Text } from '@mantine/core';
 import ActiveRooms from '../components/ActiveRoomsList/ActiveRooms';
 import CreateRooms from '../components/CreateRoom';
 
@@ -38,7 +35,8 @@ const Home: NextPage = () => {
           left: 0,
           right: 0,
           textAlign: 'center',
-        }} />
+        }}
+      />
       <Box
         sx={{
           display: 'flex',
@@ -51,36 +49,36 @@ const Home: NextPage = () => {
         <CreateRooms socket={socket}/>
         <ActiveRooms socket={socket}/>  
       </Box>
-      <Grid item xs={12}>
-        <Paper  p="md" 
-          sx={{
-            position: 'absolute',
-            bottom: '0px',
-            left: 0,
-            right: 0,
-            textAlign: 'center',
-            backgroundColor: '#08080f' }}>
-          <Stack
-            direction="row"
-            justifyContent="center"
-            alignItems="center"
-            spacing={2}
+      <Paper
+        p="md" 
+        sx={{
+          position: 'absolute',
+          bottom: '0px',
+          left: 0,
+          right: 0,
+          textAlign: 'center',
+          backgroundColor: '#08080f'
+        }}
+      >
+        <Group
+          position="center"
+        >
+          <Text
+            size="sm"
           >
-            <Typography variant="caption" component="span">
-                Version: 1.1.2
-            </Typography>
-            <Link
-              component="a"
-              target="_blank"
-              href="https://github.com/zacimac/kelp"
-              rel="noopener"
-              variant="caption"
-            >
-                GitHub
-            </Link>
-          </Stack>
-        </Paper>
-      </Grid>
+            Version: 2.0.0
+          </Text>
+          <Text
+            variant="link"
+            component="a"
+            target="_blank"
+            href="https://github.com/zacimac/kelp"
+            size="sm"
+          >
+            GitHub
+          </Text>
+        </Group>
+      </Paper>
     </Container>
   );
 };
