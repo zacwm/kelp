@@ -63,16 +63,27 @@ class SocketServer {
   
         this.io.emit('getRoomsList', this.Rooms.getRoomList());
       });
+
+      socket.on('getRoomSummary', (roomId: string, callback: any) => {
+        const room: Room = this.Rooms.getRoomById(roomId);
+        if (!room) return callback({ error: 'Room does not exist' });
+        callback({
+          id: room.id,
+          name: room.name,
+          hasPassword: room.hasPassword(),
+        });
+      });
   
       socket.on('joinRoom', (roomData: any, callback: any) => {
-        // TODO: Use socket rooms to prevent requiring the client to filter out if it's the room they're in.
         const room: Room = this.Rooms.getRoomById(roomData.id);
         if (!room) return callback({ error: 'Room does not exist', roomNotFound: true });
-        if (room.hasPassword() && (!roomData.password || roomData.password === '')) return callback({ error: 'Room requires a password', passwordRequest: true });
-        if (room.hasPassword() && roomData.password !== room.getPassword()) return callback({ error: 'Room password is incorrect', passwordRequest: true });
+        // NOTE: Checks if room has password, but it may not be needed after 'getRoomSummary' socket event.
+        if (room.hasPassword() && (!roomData.password || roomData.password === '')) return callback({ userError: 'Room requires a password', hasPassword: true });
+        if (room.hasPassword() && roomData.password !== room.getPassword()) return callback({ userError: 'Room password is incorrect', hasPassword: true });
         socket.join(room.id);
         currentRoom = room.id;
-        user = new User(socket.id, `User ${room.getUsers().length + 1}`);
+        // TODO: Have a name validation check for allowed characters and length. If not, throw userError.
+        user = new User(socket.id, roomData.name);
         room.addUser(user);
         const roomDataToSend: any = {
           id: room.id,

@@ -1,7 +1,5 @@
 import * as React from 'react';
-import Head from 'next/head';
 import type { NextPage } from 'next';
-import { useRouter } from 'next/router';
 import io from 'socket.io-client';
 import { CookiesProvider } from 'react-cookie';
 import moment from 'moment';
@@ -9,14 +7,14 @@ import moment from 'moment';
 import { RoomProvider, useRoom } from '../../contexts/room.context';
 import { VideoProvider, useVideo } from '../../contexts/video.context';
 
-import PasswordRequestWindow from '../../components/PasswordRequestWindow';
+import JoinModal from '../../components/JoinModal';
 import Player from '../../components/Player';
 import SideMenu from '../../components/SideMenu';
 import TorrentSelect from '../../components/TorrentSelect';
 
 import { Grid } from '@mui/material';
 
-import { Box, Button, Text, Paper, Stack, Group, Progress } from '@mantine/core';
+import { Box, Text, Paper, Stack, Group, Progress } from '@mantine/core';
 
 function LinearProgressWithLabel(props: any & { value: number }) {
   return (
@@ -35,14 +33,8 @@ const Room: React.FC = () => {
   const { room, closingRoom, setRoom } = useRoom();
   const { video, setVideo } = useVideo();
 
-  const router = useRouter();
-  const { id, password } = router.query;
-
   const [socket, setSocket] = React.useState(null);
-  const [loadingRoomData, setLoadingRoomData] = React.useState(true);
   const [userId, setUserId] = React.useState(null);
-  const [roomNotFound, setRoomNotFound] = React.useState(false);
-  const [openPRW, setOpenPRW] = React.useState(false);
 
   const [videoState, setVideoState] = React.useState(null);
 
@@ -104,75 +96,13 @@ const Room: React.FC = () => {
       socket.off('roomClosed', onRoomClosed);
     };
   }, [room, closingRoom, socket]);
-
-  React.useEffect((): any => {
-    if (!socket) return;
-    if (!id) return;
-    if (room) return;
-    setLoadingRoomData(true);
-    if (password) {
-      router.push(`/room/${id}`, undefined, { shallow: true });
-    }
-    socket.emit('joinRoom', { id, password }, (res) => {
-      setLoadingRoomData(false);
-      if (res.roomNotFound) return setRoomNotFound(true);
-      if (res.passwordRequest) return setOpenPRW(true);
-      if (res.error) return;
-      setUserId(res.user);
-      setRoom(res.room);
-      setMenuVisible(true);
-    });
-  }, [socket, id]);
-
-  const passwordSubmit = (password: string, callback: any): void => {
-    if (!socket) return;
-    if (!id) return;
-    setLoadingRoomData(true);
-    socket.emit('joinRoom', { id, password }, (res) => {
-      setLoadingRoomData(false);
-      if (res.roomNotFound) return setRoomNotFound(true);
-      if (res.error) return callback(res);
-      setOpenPRW(false);
-      setUserId(res.user);
-      setRoom(res.room);
-      setMenuVisible(true);
-    });
-  };
   
   return (
     <React.Fragment>
-      <Head>
-        <title>kelp - room</title>
-      </Head>
-      {roomNotFound && (
-        <Box
-          sx={{
-            zIndex: 9999,
-            position: 'fixed',
-            top: 0,
-            height: '100vh',
-            width: '100vw',
-            boxSizing: 'border-box',
-          }}
-        >
-          <Stack align="center" sx={{ height: '100vh' }}>
-            <Paper p="md">
-              <Stack align="center">
-                <Text size={30}>Room not found</Text>
-                <Button variant="filled" onClick={() => {
-                  router.push('/');
-                }}>
-                  Go back to menu
-                </Button>
-              </Stack>
-            </Paper>
-          </Stack>
-        </Box>
-      )}
-      <PasswordRequestWindow
-        open={openPRW}
-        isLoading={loadingRoomData}
-        passwordSubmit={passwordSubmit}
+      <JoinModal
+        socket={socket}
+        setUserId={(id) => setUserId(id)}
+        setMenuVisible={() => setMenuVisible(true)}
       />
       <Box
         sx={{
