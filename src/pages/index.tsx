@@ -44,43 +44,43 @@ const Home: NextPage = () => {
           display: 'flex',
           flexDirection: 'row',
           justifyContent: 'center',
-          alignItems: 'center',
+          alignItems: 'flex-start',
           height: '100vh',
         }}
       >
         <CreateRooms socket={socket}/>
-        <ActiveRooms socket={socket}/>
-        <Grid item xs={12}>
-          <Paper  p="md" 
-            sx={{
-              position: 'absolute',
-              bottom: '0px',
-              left: 0,
-              right: 0,
-              textAlign: 'center',
-              backgroundColor: '#08080f' }}>
-            <Stack
-              direction="row"
-              justifyContent="center"
-              alignItems="center"
-              spacing={2}
-            >
-              <Typography variant="caption" component="span">
-                Version: 1.1.2
-              </Typography>
-              <Link
-                component="a"
-                target="_blank"
-                href="https://github.com/zacimac/kelp"
-                rel="noopener"
-                variant="caption"
-              >
-                GitHub
-              </Link>
-            </Stack>
-          </Paper>
-        </Grid>
+        <ActiveRooms socket={socket}/>  
       </Box>
+      <Grid item xs={12}>
+        <Paper  p="md" 
+          sx={{
+            position: 'absolute',
+            bottom: '0px',
+            left: 0,
+            right: 0,
+            textAlign: 'center',
+            backgroundColor: '#08080f' }}>
+          <Stack
+            direction="row"
+            justifyContent="center"
+            alignItems="center"
+            spacing={2}
+          >
+            <Typography variant="caption" component="span">
+                Version: 1.1.2
+            </Typography>
+            <Link
+              component="a"
+              target="_blank"
+              href="https://github.com/zacimac/kelp"
+              rel="noopener"
+              variant="caption"
+            >
+                GitHub
+            </Link>
+          </Stack>
+        </Paper>
+      </Grid>
     </Container>
   );
 };

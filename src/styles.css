@@ -13,3 +13,7 @@ body {
 .bold {
   font-family: 'Helvetica Neue Bold', Helvetica, sans-serif !important;
 }
+
+.light {
+  font-family: 'Helvetica Neue Light', Helvetica, sans-serif !important;
+}

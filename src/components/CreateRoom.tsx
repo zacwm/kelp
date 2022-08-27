@@ -67,8 +67,8 @@ const CreateRooms: React.FC<Props> = ({ socket }) => {
             sx={{ backgroundColor: '#08080f' }}
           >
             <Stack alignItems="center" spacing={2}>
-              <Text size={25} mb={4}>
-                    Create a room
+              <Text size={25} mb={4} className='light'>
+                Create Room
               </Text>
               <TextInput
                 placeholder="Room name"
@@ -98,7 +98,7 @@ const CreateRooms: React.FC<Props> = ({ socket }) => {
               />
               <Button
                 variant="gradient"  
-                gradient={{ from: '#00bc70', to: '#00a19b', deg: 45 }} 
+                gradient={{ from: '#00bc70', to: '#00a19b', deg: 135 }} 
                 radius={12}
                 onClick={buttonCreateRoom}
                 disabled={createRoomPending}

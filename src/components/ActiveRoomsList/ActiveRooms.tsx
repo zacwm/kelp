@@ -79,11 +79,19 @@ const ActiveRooms: React.FC<Props> = ({ socket }) => {
               withBorder
               sx={{ backgroundColor:'#08080f'}}
             >
-              <Text size={25} mb={4} align="center">
-                  Active rooms
+              <Text 
+                size={25} 
+                mb={4} 
+                align="center" 
+                className='light'
+              >
+                  Active Rooms
                 <ScrollArea 
                   scrollbarSize={8}
-                  style={{ height: 168 }}
+                  style={{ 
+                    height: 168,
+                    marginTop: '20px'
+                  }}
                 >
                   <Stack alignItems="stretch" spacing={2}>
                     {activeRooms.length === 0 && <Text>No rooms found...</Text>}
