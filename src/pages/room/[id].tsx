@@ -104,159 +104,163 @@ const Room: React.FC = () => {
         setUserId={(id) => setUserId(id)}
         setMenuVisible={() => setMenuVisible(true)}
       />
-      <Box
-        sx={{
-          position: 'fixed',
-          top: 0,
-          height: '100vh',
-          width: '100vw',
-          display: 'flex',
-          flexDirection: 'column',
-        }}
-      >
-        <Grid
-          container
-          direction="row"
-          justifyContent="space-between"
-          alignItems="stretch"
-          sx={{
-            height: '100%',
-          }}
-        >
-          <Grid item xs={menuVisible ? 9.5 : 12}>
-            <Box>
-              <Box sx={{
-                background: 'black',
-                position: 'relative',
-              }}>
-                <Stack
-                  sx={{
-                    height: '100vh',
-                  }}
-                >
-                  { video?.statusCode === 0 && video?.url ? (
-                    <Player
-                      socket={socket}
-                      menuVisible={menuVisible}
-                      toggleMenu={(value?: boolean) => {
-                        if (value === undefined) return setMenuVisible(!menuVisible);
-                        setMenuVisible(value);
-                      }}
-                      videoState={videoState}
-                      setVideoState={setVideoState}
-                    />
-                  ) : (
-                    <Box
-                      sx={{
-                        backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),url(/novideo.gif)',
-                        backgroundSize: 'cover',
-                        height: '100vh',
-                        width: '100%',
-                      }}
-                    >
-                      <Stack
-                        align="center"
-                        justify="center"
-                        sx={{
-                          height: '100vh',
-                        }}
-                        spacing={0}
-                      >
-                        {video?.statusCode === -1 && (
-                          <Paper
-                            shadow="md"
-                            radius="sm"
-                            p="md"
-                            sx={{
-                              minWidth: '400px',
-                              maxWidth: '600px',
-                            }}
-                          >
-                            <Text>
-                              There was an error...
-                            </Text>
-                            <Text>
-                              {video.status}
-                            </Text>
-                          </Paper>
-                        )}
-                        {video?.statusCode === 1 && (
-                          <TorrentSelect socket={socket} />
-                        )}
-                        {video?.statusCode === 2 && (
-                          <Paper
-                            shadow="md"
-                            radius="sm"
-                            p="md"
-                            sx={{
-                              minWidth: '400px',
-                              maxWidth: '600px',
-                            }}
-                          >
-                            <Text>
-                              Starting download...
-                            </Text>
-                          </Paper>
-                        )}
-                        {video?.statusCode >= 3 && (
-                          <Paper
-                            shadow="md"
-                            radius="sm"
-                            p="md"
-                            sx={{
-                              minWidth: '400px',
-                              maxWidth: '600px',
-                            }}
-                          >
-                            <Stack
-                              sx={{
-                                minWidth: 400,
-                                maxWidth: 500,
-                              }}
-                            >
-                              <Text size={30}>{ video.status }</Text>
-                              { video.percentage !== 0 && ( <LinearProgressWithLabel value={video.percentage}  /> ) }
-                              {
-                                (video.percentage !== 0 || video.downloadSpeed) && (
-                                  <Group position="center" grow>
-                                    { video.timeRemaining && (
-                                      <Text sx={{ textAlign: 'center' }}>
-                                        {moment().to(moment().add(video.timeRemaining, 'ms'), true)} remaining
-                                      </Text>
-                                    ) }
-                                    { video.downloadSpeed && (
-                                      <Text sx={{ textAlign: 'center' }}>
-                                        {video.downloadSpeed}
-                                      </Text>
-                                    ) }
-                                  </Group>
-                                )
-                              }
-                            </Stack>
-                          </Paper>
-                        )}
-                      </Stack>
-                    </Box>
-                  )}
-                </Stack>
-              </Box>
-            </Box>
-          </Grid>
-          <Grid 
-            item 
-            xs={2.5} 
+      {
+        room && (
+          <Box
             sx={{
-              height: '100%',
+              position: 'fixed',
+              top: 0,
+              height: '100vh',
+              width: '100vw',
+              display: 'flex',
+              flexDirection: 'column',
             }}
           >
-            <SideMenu
-              socket={socket}
-              userId={userId}
-              videoState={videoState}
-            />
-          </Grid>
-        </Grid>
-      </Box>
+            <Grid
+              container
+              direction="row"
+              justifyContent="space-between"
+              alignItems="stretch"
+              sx={{
+                height: '100%',
+              }}
+            >
+              <Grid item xs={menuVisible ? 9.5 : 12}>
+                <Box>
+                  <Box sx={{
+                    background: 'black',
+                    position: 'relative',
+                  }}>
+                    <Stack
+                      sx={{
+                        height: '100vh',
+                      }}
+                    >
+                      { video?.statusCode === 0 && video?.url ? (
+                        <Player
+                          socket={socket}
+                          menuVisible={menuVisible}
+                          toggleMenu={(value?: boolean) => {
+                            if (value === undefined) return setMenuVisible(!menuVisible);
+                            setMenuVisible(value);
+                          }}
+                          videoState={videoState}
+                          setVideoState={setVideoState}
+                        />
+                      ) : (
+                        <Box
+                          sx={{
+                            backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),url(/novideo.gif)',
+                            backgroundSize: 'cover',
+                            height: '100vh',
+                            width: '100%',
+                          }}
+                        >
+                          <Stack
+                            align="center"
+                            justify="center"
+                            sx={{
+                              height: '100vh',
+                            }}
+                            spacing={0}
+                          >
+                            {video?.statusCode === -1 && (
+                              <Paper
+                                shadow="md"
+                                radius="sm"
+                                p="md"
+                                sx={{
+                                  minWidth: '400px',
+                                  maxWidth: '600px',
+                                }}
+                              >
+                                <Text>
+                                  There was an error...
+                                </Text>
+                                <Text>
+                                  {video.status}
+                                </Text>
+                              </Paper>
+                            )}
+                            {video?.statusCode === 1 && (
+                              <TorrentSelect socket={socket} />
+                            )}
+                            {video?.statusCode === 2 && (
+                              <Paper
+                                shadow="md"
+                                radius="sm"
+                                p="md"
+                                sx={{
+                                  minWidth: '400px',
+                                  maxWidth: '600px',
+                                }}
+                              >
+                                <Text>
+                                  Starting download...
+                                </Text>
+                              </Paper>
+                            )}
+                            {video?.statusCode >= 3 && (
+                              <Paper
+                                shadow="md"
+                                radius="sm"
+                                p="md"
+                                sx={{
+                                  minWidth: '400px',
+                                  maxWidth: '600px',
+                                }}
+                              >
+                                <Stack
+                                  sx={{
+                                    minWidth: 400,
+                                    maxWidth: 500,
+                                  }}
+                                >
+                                  <Text size={30}>{ video.status }</Text>
+                                  { video.percentage !== 0 && ( <LinearProgressWithLabel value={video.percentage}  /> ) }
+                                  {
+                                    (video.percentage !== 0 || video.downloadSpeed) && (
+                                      <Group position="center" grow>
+                                        { video.timeRemaining && (
+                                          <Text sx={{ textAlign: 'center' }}>
+                                            {moment().to(moment().add(video.timeRemaining, 'ms'), true)} remaining
+                                          </Text>
+                                        ) }
+                                        { video.downloadSpeed && (
+                                          <Text sx={{ textAlign: 'center' }}>
+                                            {video.downloadSpeed}
+                                          </Text>
+                                        ) }
+                                      </Group>
+                                    )
+                                  }
+                                </Stack>
+                              </Paper>
+                            )}
+                          </Stack>
+                        </Box>
+                      )}
+                    </Stack>
+                  </Box>
+                </Box>
+              </Grid>
+              <Grid 
+                item 
+                xs={2.5} 
+                sx={{
+                  height: '100%',
+                }}
+              >
+                <SideMenu
+                  socket={socket}
+                  userId={userId}
+                  videoState={videoState}
+                />
+              </Grid>
+            </Grid>
+          </Box>
+        )
+      }
     </React.Fragment>
   );
 };
