@@ -80,8 +80,7 @@ const ActiveRooms: React.FC<Props> = ({ socket }) => {
               sx={{ backgroundColor:'#08080f'}}
             >
               <Text 
-                size={25} 
-                mb={4} 
+                size={25}
                 align="center" 
                 className='light'
                 color="#98989a"
