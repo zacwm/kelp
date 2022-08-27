@@ -29,7 +29,7 @@ export default function App(props: AppProps ) {
           },
           colorScheme: 'dark',
           colors: {
-            brand: ['#00a152', '#00a152', '#00a152', '#00a152', '#00a152', '#00a152', '#00a152', '#00a152', '#00a152','#00a152'],
+            brand: ['#3bd4ae', '#3bd4ae', '#3bd4ae', '#3bd4ae', '#3bd4ae', '#3bd4ae', '#3bd4ae', '#3bd4ae', '#3bd4ae','#3bd4ae'],
           },
           primaryColor: 'brand',
         }}
