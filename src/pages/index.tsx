@@ -32,13 +32,13 @@ const Home: NextPage = () => {
         src='/kelp-gradient-text.svg'
         height={70}
         fit='contain'
-        sx={(theme) => ({
+        sx={{
           position: 'absolute',
           top: '18%',
           left: 0,
           right: 0,
           textAlign: 'center',
-        })} />
+        }} />
       <Box
         sx={{
           display: 'flex',
@@ -51,7 +51,14 @@ const Home: NextPage = () => {
         <CreateRooms socket={socket}/>
         <ActiveRooms socket={socket}/>
         <Grid item xs={12}>
-          <Paper  p="md" sx={{ backgroundColor: '#08080f' }}>
+          <Paper  p="md" 
+            sx={{
+              position: 'absolute',
+              bottom: '0px',
+              left: 0,
+              right: 0,
+              textAlign: 'center',
+              backgroundColor: '#08080f' }}>
             <Stack
               direction="row"
               justifyContent="center"
@@ -59,7 +66,7 @@ const Home: NextPage = () => {
               spacing={2}
             >
               <Typography variant="caption" component="span">
-                    Version: 1.1.2
+                Version: 1.1.2
               </Typography>
               <Link
                 component="a"
@@ -68,24 +75,12 @@ const Home: NextPage = () => {
                 rel="noopener"
                 variant="caption"
               >
-                    GitHub
+                GitHub
               </Link>
             </Stack>
           </Paper>
         </Grid>
       </Box>
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'row',
-          justifyContent: 'center',
-          alignItems: 'bottom',
-          height: '100vh',
-        }}
-      >
-
-      </Box>
-      
     </Container>
   );
 };

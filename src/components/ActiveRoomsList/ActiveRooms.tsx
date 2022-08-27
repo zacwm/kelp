@@ -1,7 +1,6 @@
 import * as React from 'react';
 import { useRouter } from 'next/router';
 
-import LockedRoom from './LockedRoom';
 import UnlockedRoom from './UnlockedRoom';
 
 import Box from '@mui/material/Box';
@@ -86,17 +85,12 @@ const ActiveRooms: React.FC<Props> = ({ socket }) => {
                   scrollbarSize={8}
                   style={{ height: 168 }}
                 >
-                  
                   <Stack alignItems="stretch" spacing={2}>
                     {activeRooms.length === 0 && <Text>No rooms found...</Text>}
                     {
                       activeRooms.map(room => (
                         <React.Fragment key={room.id}>
-                          {room.hasPassword ? (
-                            <LockedRoom room={room} />
-                          ) : (
-                            <UnlockedRoom room={room} />
-                          )}
+                          <UnlockedRoom room={room} />
                           {activeRooms.length - 1 !== activeRooms.indexOf(room)}
                         </React.Fragment>
                       ))

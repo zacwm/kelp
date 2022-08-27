@@ -72,7 +72,7 @@ const CreateRooms: React.FC<Props> = ({ socket }) => {
               </Text>
               <TextInput
                 placeholder="Room name"
-                size="md"
+                size="sm"
                 radius={12}
                 disabled={createRoomPending}
                 ref={refInputRoomName}
@@ -85,7 +85,7 @@ const CreateRooms: React.FC<Props> = ({ socket }) => {
               />
               <PasswordInput
                 placeholder="Room password (optional)"
-                size="md"
+                size="sm"
                 radius={12}
                 disabled={createRoomPending}
                 ref={refInputRoomPassword}
@@ -102,6 +102,9 @@ const CreateRooms: React.FC<Props> = ({ socket }) => {
                 radius={12}
                 onClick={buttonCreateRoom}
                 disabled={createRoomPending}
+                sx={{
+                  width: 130,
+                }}
               >Create Room</Button>
             </Stack>
             <Collapse
