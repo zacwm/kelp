@@ -32,8 +32,7 @@ export default function App(props: AppProps ) {
             brand: ['#00a152', '#00a152', '#00a152', '#00a152', '#00a152', '#00a152', '#00a152', '#00a152', '#00a152','#00a152'],
           },
           primaryColor: 'brand',
-        }} 
-        withGlobalStyles 
+        }}
         withNormalizeCSS
       >
         <Component {...pageProps} />
