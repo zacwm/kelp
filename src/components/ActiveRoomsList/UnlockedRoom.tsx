@@ -58,7 +58,9 @@ const UnlockedRoom: React.FC<Props> = ({ room }) => {
           marginRight: '25px',
         }} 
       >
-        Join
+        <Text weight={500}>
+          Join
+        </Text>
       </UnstyledButton>
     </Box>
   );
