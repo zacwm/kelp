@@ -88,6 +88,7 @@ const ActiveRooms: React.FC<Props> = ({ socket }) => {
                   Active Rooms
                 <ScrollArea 
                   scrollbarSize={8}
+                  type='always'
                   style={{ 
                     height: 168,
                     marginTop: '20px'
