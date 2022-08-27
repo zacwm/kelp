@@ -67,8 +67,10 @@ const CreateRooms: React.FC<Props> = ({ socket }) => {
             shadow="xs" 
             radius={12} 
             p="md" 
-            withBorder
-            sx={{ backgroundColor: '#08080f' }}
+            sx={{
+              backgroundColor: '#08080f',
+              border: '1px solid #191921',
+            }}
           >
             <Stack alignItems="center" spacing={2}>
               <Text

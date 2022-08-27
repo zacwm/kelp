@@ -9,7 +9,14 @@ const TextInput: React.FC<any> = (props) => {
       size="sm"
       radius={12}
       styles={{
-        input: { backgroundColor: '#2f2f3d' }
+        input: {
+          backgroundColor: '#2f2f3d',
+          color: '#fff',
+
+          '&::placeholder': {
+            color: '#98989a',
+          }
+        }
       }}
     />
   );

@@ -9,7 +9,17 @@ const PasswordInput: React.FC<any> = (props) => {
       size="sm"
       radius={12}
       styles={{
-        input: { backgroundColor: '#2f2f3d' }
+        input: {
+          backgroundColor: '#2f2f3d',
+        },
+
+        innerInput: {
+          color: '#fff',
+
+          '&::placeholder': {
+            color: '#98989a !important',
+          }
+        }
       }}
     />
   );

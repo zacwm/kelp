@@ -174,10 +174,10 @@ const JoinModal: React.FC<Props> = ({ socket, setUserId, setMenuVisible }) => {
                     shadow="xs" 
                     radius={12} 
                     p="md" 
-                    withBorder
                     sx={{
                       width: 500,
                       backgroundColor: '#08080f',
+                      border: '1px solid #191921',
                     }}
                   >
                     {
