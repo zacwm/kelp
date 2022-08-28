@@ -24,10 +24,15 @@ nextApp.prepare().then(async() => {
   io.attach(server);
 
   // Start socket server
-  new SocketServer(io);
+  const socketManager: any = new SocketServer(io);
 
   // Set `./streams` as a static folder
   app.use('/streams', express.static(path.join(__dirname, './.streams')));
+
+  // Used for a commit hook. Checks if theres rooms open, if so then it won't restart and check later.
+  app.get('/api/openRoomsCount', (req, res) => {
+    res.send({ rooms: socketManager.Rooms.getRoomList().length });
+  });
 
   // Direct any other path to next.js
   app.all('*', (req: any, res: any) => nextHandler(req, res));

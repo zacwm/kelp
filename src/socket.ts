@@ -7,7 +7,7 @@ import axios from 'axios';
 
 class SocketServer {
   private io: SocketIO.Server;
-  private Rooms: RoomManager;
+  public Rooms: RoomManager;
 
   constructor(ioServer: SocketIO.Server) {
     this.io = ioServer;
