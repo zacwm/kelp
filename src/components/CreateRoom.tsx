@@ -56,9 +56,8 @@ const CreateRooms: React.FC<Props> = ({ socket }) => {
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
-        width: '100%',
+        width: 540,
         height: '100%',
-        maxWidth: '32rem',
       }}
     >
       <Grid container spacing={2}>

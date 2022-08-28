@@ -5,7 +5,7 @@ import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faLock } from '@fortawesome/free-solid-svg-icons';
+import { faLock, faUnlock } from '@fortawesome/free-solid-svg-icons';
 
 import { UnstyledButton, Text } from '@mantine/core';
 
@@ -13,26 +13,31 @@ type Props = {
   room: any;
 }
 
-const LockedRoom: React.FC<Props> = ({ room }) => {
+const RoomItem: React.FC<Props> = ({ room }) => {
   const router = useRouter();
+
+  const color = room.hasPassword ? '#ae95da' : '#3bd4ae';
 
   return(
     <Box
       sx={{
-        mx: 2,
         display: 'flex',
+        backgroundColor: '#191921',
+        borderRadius: '12px',
         flexDirection: 'row',
         justifyContent: 'center',
         alignItems: 'center',
         width: '100%',
-        height: '100%', 
+        height: '100%',
+        boxSizing: 'border-box',
       }}    
     >
       <FontAwesomeIcon 
-        icon={faLock} 
+        icon={room.hasPassword ? faLock : faUnlock} 
         style={{ 
-          fontSize:'30px', 
-          color: '#ae95da', 
+          fontSize:'23px', 
+          color: color, 
+          margin: '20px',
         }} 
       />
       <Stack
@@ -42,16 +47,25 @@ const LockedRoom: React.FC<Props> = ({ room }) => {
         spacing={0}
         sx={{ flex: 1 }}
       >
-        <Text size="xl" weight={700} color="#ae95da" >
+        <Text size="md" weight={700} color={color} >
           {room.name}
         </Text>
-        <Text size="sm" italic>
+        <Text size="xs">
           {room.status}
         </Text>
       </Stack>
-      <UnstyledButton onClick={() => router.push(`/room/${room.id}`)} sx={{ color: '#ae95da' }} >Join Room</UnstyledButton>
+      <UnstyledButton onClick={() => router.push(`/room/${room.id}`)} 
+        sx={{ 
+          color: color,
+          marginRight: '25px',
+        }} 
+      >
+        <Text weight={500}>
+          Join
+        </Text>
+      </UnstyledButton>
     </Box>
   );
 };
 
-export default LockedRoom;
+export default RoomItem;

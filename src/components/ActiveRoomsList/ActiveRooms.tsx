@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useRouter } from 'next/router';
 
-import UnlockedRoom from './UnlockedRoom';
+import RoomItem from './RoomItem';
 
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
@@ -52,7 +52,7 @@ const ActiveRooms: React.FC<Props> = ({ socket }) => {
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
-        width: '100%',
+        width: 540,
         height: '100%', 
       }}    
     >
@@ -90,21 +90,21 @@ const ActiveRooms: React.FC<Props> = ({ socket }) => {
               >
                 Active Rooms
               </Text>
-              <ScrollArea 
+              <ScrollArea
                 scrollbarSize={8}
-                type='always'
-                style={{ 
+                style={{
                   height: 168,
-                  marginTop: '20px'
+                  marginTop: '20px',
+                  padding: '0 10px',
                 }}
               >
                 <Stack alignItems="stretch" spacing={2}>
                   {
                     activeRooms.map(room => (
-                      <React.Fragment key={room.id}>
-                        <UnlockedRoom room={room} />
-                        {activeRooms.length - 1 !== activeRooms.indexOf(room)}
-                      </React.Fragment>
+                      <RoomItem
+                        key={room.id}
+                        room={room}
+                      />
                     ))
                   }
                 </Stack>
