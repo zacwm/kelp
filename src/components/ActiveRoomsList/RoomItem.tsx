@@ -60,7 +60,7 @@ const RoomItem: React.FC<Props> = ({ room }) => {
           marginRight: '25px',
         }} 
       >
-        <Text weight={500}>
+        <Text weight={700}>
           Join
         </Text>
       </UnstyledButton>
