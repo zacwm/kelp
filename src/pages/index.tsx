@@ -10,6 +10,7 @@ import Grid from '@mui/material/Grid';
 import { Image, Paper, Group, Text } from '@mantine/core';
 import ActiveRooms from '../components/ActiveRoomsList/ActiveRooms';
 import CreateRooms from '../components/CreateRoom';
+import HomeFooter from '../components/HomeFooter';
 
 const Home: NextPage = () => {
   const [socket, setSocket] = React.useState(null);
@@ -49,36 +50,7 @@ const Home: NextPage = () => {
         <CreateRooms socket={socket}/>
         <ActiveRooms socket={socket}/>  
       </Box>
-      <Paper
-        p="md" 
-        sx={{
-          position: 'absolute',
-          bottom: '0px',
-          left: 0,
-          right: 0,
-          textAlign: 'center',
-          backgroundColor: '#08080f'
-        }}
-      >
-        <Group
-          position="center"
-        >
-          <Text
-            size="sm"
-          >
-            Version: 2.0.0
-          </Text>
-          <Text
-            variant="link"
-            component="a"
-            target="_blank"
-            href="https://github.com/zacimac/kelp"
-            size="sm"
-          >
-            GitHub
-          </Text>
-        </Group>
-      </Paper>
+      <HomeFooter />
     </Container>
   );
 };

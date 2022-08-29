@@ -7,6 +7,11 @@ import next, { NextApiHandler } from 'next';
 import * as SocketIO from 'socket.io';
 import fs from 'fs-extra';
 import SocketServer from './socket';
+import { execSync } from 'child_process';
+
+// Get version and commit.
+const version: string = fs.readJsonSync(path.join(__dirname, '../package.json')).version;
+const gitCommit: string = execSync('git rev-parse HEAD').toString().trim();
 
 const port: number = +process.env.PORT || 3000;
 const nextApp = next({ dev: process.env.NODE_ENV !== 'production', hostname: 'localhost', port });
@@ -30,8 +35,12 @@ nextApp.prepare().then(async() => {
   app.use('/streams', express.static(path.join(__dirname, './.streams')));
 
   // Used for a commit hook. Checks if theres rooms open, if so then it won't restart and check later.
-  app.get('/api/openRoomsCount', (req, res) => {
-    res.send({ rooms: socketManager.Rooms.getRoomList().length });
+  app.get('/status', (req, res) => {
+    res.send({
+      rooms: socketManager.Rooms.getRoomList().length,
+      version: version,
+      commit: gitCommit || undefined,
+    });
   });
 
   // Direct any other path to next.js

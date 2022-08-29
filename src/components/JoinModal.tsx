@@ -20,6 +20,7 @@ import {
   TextInput,
   PasswordInput,
 } from '@mantine/core';
+import HomeFooter from './HomeFooter';
 
 type Props = {
   socket: any;
@@ -207,36 +208,7 @@ const JoinModal: React.FC<Props> = ({ socket, setUserId, setMenuVisible }) => {
                 )
               }
             </Stack>
-            <Paper
-              p="md" 
-              sx={{
-                position: 'absolute',
-                bottom: '0px',
-                left: 0,
-                right: 0,
-                textAlign: 'center',
-                backgroundColor: '#08080f'
-              }}
-            >
-              <Group
-                position="center"
-              >
-                <Text
-                  size="sm"
-                >
-                  Version: 2.0.0
-                </Text>
-                <Text
-                  variant="link"
-                  component="a"
-                  target="_blank"
-                  href="https://github.com/zacimac/kelp"
-                  size="sm"
-                >
-                  GitHub
-                </Text>
-              </Group>
-            </Paper>
+            <HomeFooter />
           </Box>
         )}
       </Transition>
