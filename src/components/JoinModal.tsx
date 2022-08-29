@@ -15,7 +15,6 @@ import {
   Stack,
   Loader,
   Image,
-  Group,
   Button,
   TextInput,
   PasswordInput,
@@ -194,11 +193,7 @@ const JoinModal: React.FC<Props> = ({ socket, setUserId, setMenuVisible }) => {
                       roomSummary.error ? (
                         <Stack align="center">
                           <Text size={23}>{roomSummary.error}</Text>
-                          <Button
-                            size="md"
-                            variant="filled"
-                            onClick={() => router.push('/')}
-                          >
+                          <Button onClick={() => router.push('/')} >
                             Go back
                           </Button>
                         </Stack>
