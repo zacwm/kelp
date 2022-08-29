@@ -9,6 +9,7 @@ import {
   ButtonProps,
   PasswordInputProps,
   TextInputProps,
+  StackProps,
 } from '@mantine/core';
 
 const ButtonDefaultProps: Partial<ButtonProps> = {
@@ -48,6 +49,12 @@ const PasswordInputDefaultProps: Partial<PasswordInputProps> = {
   }
 };
 
+const StackDefaultProps: Partial<StackProps> = {
+  sx: {
+    boxSizing: 'border-box',
+  }
+};
+
 export default function App(props: AppProps ) {
   const { Component, pageProps } = props;
   return (
@@ -61,6 +68,13 @@ export default function App(props: AppProps ) {
             Button: { defaultProps: ButtonDefaultProps },
             TextInput: { defaultProps: TextInputDefaultProps },
             PasswordInput: { defaultProps: PasswordInputDefaultProps },
+            Stack: {
+              styles: {
+                root: {
+                  boxSizing: 'border-box',
+                },
+              },
+            },
           },
           colorScheme: 'dark',
           colors: {
