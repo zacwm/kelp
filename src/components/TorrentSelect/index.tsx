@@ -9,7 +9,18 @@ import ShowDisplay from './ShowDisplay';
 import CustomTorrentPrompt from './CustomTorrentPrompt';
 import VirtualList from './VirtualList';
 
-import { Box, Button, Paper, Stack, Group, Loader, TextInput, Transition } from '@mantine/core';
+import { 
+  Box,
+  Text, 
+  Select, 
+  Paper, 
+  Stack, 
+  Group,
+  Image, 
+  Loader, 
+  TextInput, 
+  Transition 
+} from '@mantine/core';
 
 type Props = {
   socket: Socket;
@@ -95,9 +106,8 @@ const TorrentSelect: React.FC<Props> = ({ socket }) => {
       radius="sm"
       sx={{
         position: 'relative',
-        height: 'calc(100% - 100px)',
-        width: 'calc(100% - 60px)',
-        maxWidth: 1400,
+        height: '100%',
+        width: '100%',
         boxSizing: 'border-box',
         background: 'rgba(26, 27, 30)',
         overflow: 'hidden',
@@ -153,48 +163,65 @@ const TorrentSelect: React.FC<Props> = ({ socket }) => {
           position="apart"
           sx={{
             width: '100%',
-            borderBottom: 'solid 1px #2C2E33',
-            padding: '12px 12px 0 12px'
+            padding: '20px 12px 20px 12px'
           }}
         >
           <Group>
-            {['Movies', 'Shows'].map((type, index) => (
-              <Box
-                key={index}
+            <Box>
+              <Image 
+                src='/kelp-gradient-text.svg'
+                height={40}
+                fit='contain'
                 sx={{
-                  height: '100%',
-                  padding: '6px 12px',
-                  borderRadius: '4px 4px 0 0',
-                  cursor: 'pointer',
-                  color: '#fff',
-                  background: type.toLowerCase() == titleCategory ? '#2f9e44' : '#2C2E33',
+                  display: 'inline-block',
                 }}
+              />
+            </Box>
+            {['Movies', 'Shows'].map((type, index) => (
+              <Text
+                key={index}
                 onClick={() => {
                   if (loadingTitles) return;
                   setTitleCategory(type.toLowerCase());
                 }}
               >
                 { type }
-              </Box>
+              </Text>
             ))}
+            <Text>Genre</Text>
+            <Select
+              defaultValue="All"
+              data={[
+                { value: 'all', label: 'All' },
+                { value: 'horror', label: 'Horror' },
+              ]}
+            />
+            <Text>Sort By</Text>
+            <Select
+              defaultValue="Trending"
+              data={[
+                { value: 'trending', label: 'Trending' },
+                { value: 'recent', label: 'Recent' },
+              ]}
+            />
           </Group>
-          <TextInput
-            value={inputKeywords}
-            onChange={onSearchChange}
-            disabled={loadingTitles}
-            placeholder="Search"
-            sx={{ width: '500px' }}
-            variant="filled"
-          />
           <Group>
+            <TextInput
+              value={inputKeywords}
+              onChange={onSearchChange}
+              disabled={loadingTitles}
+              placeholder="Search"
+              sx={{ width: '400px' }}
+              variant="filled"
+            />
             { loadingTitles && <Loader size="sm" /> }
-            <Button
+            {/* <Button
               variant="filled"
               color={openCustomTorrentPrompt && 'red'}
               onClick={() => setOpenCustomTorrentPrompt(!openCustomTorrentPrompt)}
             >
               { !openCustomTorrentPrompt ? 'Enter Torrent/Magnet URI' : 'Close' }
-            </Button>
+            </Button> */}
           </Group>
         </Group>
         <VirtualList 
