@@ -9,10 +9,8 @@ import { VideoProvider, useVideo } from '../../contexts/video.context';
 
 import JoinModal from '../../components/JoinModal';
 import Player from '../../components/Player';
-import SideMenu from '../../components/SideMenu';
-import TorrentSelect from '../../components/TorrentSelect';
 
-import { Grid } from '@mui/material';
+import TorrentSelect from '../../components/TorrentSelect';
 
 import { Box, Text, Paper, Stack, Group, Progress } from '@mantine/core';
 

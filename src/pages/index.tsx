@@ -5,9 +5,8 @@ import io from 'socket.io-client';
 
 import Container from '@mui/material/Container';
 import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
 
-import { Image, Paper, Group, Text } from '@mantine/core';
+import { Image } from '@mantine/core';
 import ActiveRooms from '../components/ActiveRoomsList/ActiveRooms';
 import CreateRooms from '../components/CreateRoom';
 import HomeFooter from '../components/HomeFooter';
