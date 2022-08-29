@@ -49,12 +49,6 @@ const PasswordInputDefaultProps: Partial<PasswordInputProps> = {
   }
 };
 
-const StackDefaultProps: Partial<StackProps> = {
-  sx: {
-    boxSizing: 'border-box',
-  }
-};
-
 export default function App(props: AppProps ) {
   const { Component, pageProps } = props;
   return (
