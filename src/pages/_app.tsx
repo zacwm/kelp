@@ -4,7 +4,49 @@ import { AppProps } from 'next/app';
 
 import '../styles.css';
 
-import { MantineProvider } from '@mantine/core';
+import {
+  MantineProvider,
+  ButtonProps,
+  PasswordInputProps,
+  TextInputProps,
+} from '@mantine/core';
+
+const ButtonDefaultProps: Partial<ButtonProps> = {
+  radius: 12,
+  variant: 'gradient',
+  gradient: { from: '#00bc70', to: '#00a19b', deg: 135 },
+};
+
+const TextInputDefaultProps: Partial<TextInputProps> = {
+  radius: 12,
+  size: 'sm',
+  styles: {
+    input: {
+      backgroundColor: '#2f2f3d',
+      color: '#fff',
+
+      '&::placeholder': {
+        color: '#98989a',
+      }
+    },
+  }
+};
+
+const PasswordInputDefaultProps: Partial<PasswordInputProps> = {
+  radius: 12,
+  size: 'sm',
+  styles: {
+    input: {
+      backgroundColor: '#2f2f3d',
+    },
+    innerInput: {
+      color: '#fff',
+      '&::placeholder': {
+        color: '#98989a !important',
+      }
+    }
+  }
+};
 
 export default function App(props: AppProps ) {
   const { Component, pageProps } = props;
@@ -16,16 +58,9 @@ export default function App(props: AppProps ) {
       <MantineProvider 
         theme={{
           components: {
-            Button: {
-              defaultProps: {
-                radius: 12,
-              },
-            },
-            Paper: {
-              defaultProps: {
-                
-              },
-            }
+            Button: { defaultProps: ButtonDefaultProps },
+            TextInput: { defaultProps: TextInputDefaultProps },
+            PasswordInput: { defaultProps: PasswordInputDefaultProps },
           },
           colorScheme: 'dark',
           colors: {

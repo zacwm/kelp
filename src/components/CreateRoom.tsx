@@ -4,12 +4,9 @@ import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Stack from '@mui/material/Stack';
 
-import {IconAlertCircle } from '@tabler/icons';
+import { IconAlertCircle } from '@tabler/icons';
 
-import { Paper, Alert, Text, Collapse} from '@mantine/core';
-import TextInput from './TextInput';
-import PasswordInput from './PasswordInput';
-import Button from './Button';
+import { Paper, Alert, Text, Collapse, Button, TextInput, PasswordInput } from '@mantine/core';
 
 type Props = {
   socket: any;

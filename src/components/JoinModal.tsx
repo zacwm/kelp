@@ -7,10 +7,19 @@ import { useRoom } from '../contexts/room.context';
 import Alert from '@mui/material/Alert';
 import Collapse from '@mui/material/Collapse';
 
-import { Box, Text, Paper, Transition, Stack, Loader, Image, Group } from '@mantine/core';
-import TextInput from './TextInput';
-import PasswordInput from './PasswordInput';
-import Button from './Button';
+import {
+  Box,
+  Text,
+  Paper,
+  Transition,
+  Stack,
+  Loader,
+  Image,
+  Group,
+  Button,
+  TextInput,
+  PasswordInput,
+} from '@mantine/core';
 
 type Props = {
   socket: any;
