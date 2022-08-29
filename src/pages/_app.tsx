@@ -8,8 +8,7 @@ import {
   MantineProvider,
   ButtonProps,
   PasswordInputProps,
-  TextInputProps,
-  StackProps,
+  TextInputProps, 
 } from '@mantine/core';
 
 const ButtonDefaultProps: Partial<ButtonProps> = {
