@@ -288,6 +288,7 @@ const Player: React.FC<Props> = ({ socket, menuVisible, videoState, setVideoStat
                   width: '100%',
                   background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.0) 100%)',
                   padding: '16px',
+                  boxSizing: 'border-box',
                 }}
                 onMouseEnter={() => setMouseOverControls(true) }
                 onMouseLeave={() => setMouseOverControls(false) }

@@ -248,6 +248,7 @@ class Room implements RoomInterface {
         /* // TODO: This issue marked as a bug from over 2 years ago... https://github.com/webtorrent/webtorrent/issues/1931
         if (this.wtClient) this.wtClient.destory();
         */
+        torrent.destroy();
         this.wtClient = null;
         if (this.torrentCheckInterval) clearInterval(this.torrentCheckInterval);
         this.videoTitle = torrent.name;
