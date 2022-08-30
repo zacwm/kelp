@@ -13,7 +13,6 @@ import Player from '../../components/Player';
 import TorrentSelect from '../../components/TorrentSelect';
 
 import { Box, Text, Paper, Stack, Group, Progress } from '@mantine/core';
-import { useDebouncedValue } from '@mantine/hooks';
 
 function LinearProgressWithLabel(props: any & { value: number }) {
   return (
@@ -102,6 +101,21 @@ const Room: React.FC = () => {
       socket.off('roomClosed', onRoomClosed);
     };
   }, [room, closingRoom, socket]);
+
+  if (video?.statusCode === 0 && video?.url) {
+    return (
+      <Player
+        socket={socket}
+        menuVisible={menuVisible}
+        toggleMenu={(value?: boolean) => {
+          if (value === undefined) return setMenuVisible(!menuVisible);
+          setMenuVisible(value);
+        }}
+        videoState={videoState}
+        setVideoState={setVideoState}
+      />
+    );
+  }
   
   return (
     <React.Fragment>
@@ -133,133 +147,96 @@ const Room: React.FC = () => {
             {/* "The screen" parent */}
             <Box sx={{
               marginTop: '20px',
-              height: '100%'
+              height: '100%',
+              borderRadius: 12,
+              overflow: 'hidden',
             }}>
-              <TorrentSelect
-                socket={socket}
-                loadingTitles={loadingTitles}
-                setLoadingTitles={setLoadingTitles}
-                titleCategory={titleCategory}
-                searchKeywords={searchKeywords}
-              />
-            </Box>
-            {/* <Box>
-              <Box sx={{
-                background: 'black',
-                position: 'relative',
-              }}>
-                <Stack
-                  sx={{
-                    height: '100vh',
-                  }}
-                >
-                  { video?.statusCode === 0 && video?.url ? (
-                    <Player
-                      socket={socket}
-                      menuVisible={menuVisible}
-                      toggleMenu={(value?: boolean) => {
-                        if (value === undefined) return setMenuVisible(!menuVisible);
-                        setMenuVisible(value);
-                      }}
-                      videoState={videoState}
-                      setVideoState={setVideoState}
-                    />
-                  ) : (
-                    <Box
+              {
+                // Torrent select screen
+                video?.statusCode === 1 ? (
+                  <TorrentSelect
+                    socket={socket}
+                    loadingTitles={loadingTitles}
+                    setLoadingTitles={setLoadingTitles}
+                    titleCategory={titleCategory}
+                    searchKeywords={searchKeywords}
+                  />
+                )
+                // Starting download screen
+                : video?.statusCode === 2 ? (
+                  <Paper
+                    shadow="md"
+                    radius="sm"
+                    p="md"
+                    sx={{
+                      minWidth: '400px',
+                      maxWidth: '600px',
+                    }}
+                  >
+                    <Text>
+                      Starting download...
+                    </Text>
+                  </Paper>
+                )
+                // Downloading screen
+                : video?.statusCode === 3 ? (
+                  <Paper
+                    shadow="md"
+                    radius="sm"
+                    p="md"
+                    sx={{
+                      minWidth: '400px',
+                      maxWidth: '600px',
+                    }}
+                  >
+                    <Stack
                       sx={{
-                        backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),url(/novideo.gif)',
-                        backgroundSize: 'cover',
-                        height: '100vh',
-                        width: '100%',
+                        minWidth: 400,
+                        maxWidth: 500,
                       }}
                     >
-                      <Stack
-                        align="center"
-                        justify="center"
-                        sx={{
-                          height: '100vh',
-                        }}
-                        spacing={0}
-                      >
-                        {video?.statusCode === -1 && (
-                          <Paper
-                            shadow="md"
-                            radius="sm"
-                            p="md"
-                            sx={{
-                              minWidth: '400px',
-                              maxWidth: '600px',
-                            }}
-                          >
-                            <Text>
-                                There was an error...
-                            </Text>
-                            <Text>
-                              {video.status}
-                            </Text>
-                          </Paper>
-                        )}
-                        {video?.statusCode === 1 && (
-                          <TorrentSelect socket={socket} />
-                        )}
-                        {video?.statusCode === 2 && (
-                          <Paper
-                            shadow="md"
-                            radius="sm"
-                            p="md"
-                            sx={{
-                              minWidth: '400px',
-                              maxWidth: '600px',
-                            }}
-                          >
-                            <Text>
-                                Starting download...
-                            </Text>
-                          </Paper>
-                        )}
-                        {video?.statusCode >= 3 && (
-                          <Paper
-                            shadow="md"
-                            radius="sm"
-                            p="md"
-                            sx={{
-                              minWidth: '400px',
-                              maxWidth: '600px',
-                            }}
-                          >
-                            <Stack
-                              sx={{
-                                minWidth: 400,
-                                maxWidth: 500,
-                              }}
-                            >
-                              <Text size={30}>{ video.status }</Text>
-                              { video.percentage !== 0 && ( <LinearProgressWithLabel value={video.percentage}  /> ) }
-                              {
-                                (video.percentage !== 0 || video.downloadSpeed) && (
-                                  <Group position="center" grow>
-                                    { video.timeRemaining && (
-                                      <Text sx={{ textAlign: 'center' }}>
-                                        {moment().to(moment().add(video.timeRemaining, 'ms'), true)} remaining
-                                      </Text>
-                                    ) }
-                                    { video.downloadSpeed && (
-                                      <Text sx={{ textAlign: 'center' }}>
-                                        {video.downloadSpeed}
-                                      </Text>
-                                    ) }
-                                  </Group>
-                                )
-                              }
-                            </Stack>
-                          </Paper>
-                        )}
-                      </Stack>
-                    </Box>
-                  )}
-                </Stack>
-              </Box>
-            </Box> */}
+                      <Text size={30}>{ video.status }</Text>
+                      { video.percentage !== 0 && ( <LinearProgressWithLabel value={video.percentage}  /> ) }
+                      {
+                        (video.percentage !== 0 || video.downloadSpeed) && (
+                          <Group position="center" grow>
+                            { video.timeRemaining && (
+                              <Text sx={{ textAlign: 'center' }}>
+                                {moment().to(moment().add(video.timeRemaining, 'ms'), true)} remaining
+                              </Text>
+                            ) }
+                            { video.downloadSpeed && (
+                              <Text sx={{ textAlign: 'center' }}>
+                                {video.downloadSpeed}
+                              </Text>
+                            ) }
+                          </Group>
+                        )
+                      }
+                    </Stack>
+                  </Paper>
+                )
+                // Error screen
+                : video?.statusCode === -1 ? (
+                  <Paper
+                    shadow="md"
+                    radius="sm"
+                    p="md"
+                    sx={{
+                      minWidth: '400px',
+                      maxWidth: '600px',
+                    }}
+                  >
+                    <Text>
+                        There was an error...
+                    </Text>
+                    <Text>
+                      {video.status}
+                    </Text>
+                  </Paper>
+                ) : null
+              }
+            </Box>
           </Box>
         )
       }

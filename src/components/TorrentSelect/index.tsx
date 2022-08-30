@@ -95,7 +95,6 @@ const TorrentSelect: React.FC<Props> = ({ socket, titleCategory, searchKeywords,
   return (
     <Paper
       shadow="md"
-      radius={12}
       sx={{
         position: 'relative',
         height: '100%',

@@ -78,7 +78,9 @@ const RoomNavigation: React.FC<Props> = ({ loadingTitles, titleCategory, setTitl
       <Group>
         <TextInput
           value={inputKeywords}
-          onChange={(e) => { setInputKeywords(e.target.value) }}
+          onChange={(e) => {
+            setInputKeywords(e.target.value);
+          }}
           disabled={loadingTitles}
           placeholder="Search"
           sx={{
@@ -101,7 +103,7 @@ const RoomNavigation: React.FC<Props> = ({ loadingTitles, titleCategory, setTitl
         </Button> */}
       </Group>
     </Group>
-  )
+  );
 };
 
 export default RoomNavigation;
