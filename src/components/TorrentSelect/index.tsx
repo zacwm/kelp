@@ -1,6 +1,5 @@
 import * as React from 'react';
 import type { Socket } from 'socket.io-client';
-import { useDebouncedValue } from '@mantine/hooks';
 
 import { useRoom } from '../../contexts/room.context';
 
@@ -10,15 +9,7 @@ import CustomTorrentPrompt from './CustomTorrentPrompt';
 import VirtualList from './VirtualList';
 
 import { 
-  Box,
-  Text, 
-  Select, 
-  Paper, 
-  Stack, 
-  Group,
-  Image, 
-  Loader, 
-  TextInput, 
+  Paper,
   Transition 
 } from '@mantine/core';
 

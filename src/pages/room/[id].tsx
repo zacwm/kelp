@@ -41,9 +41,8 @@ const Room: React.FC = () => {
   // States that are shared between RoomNavigation and TorrentSelect.
   const [titleCategory, setTitleCategory] = React.useState('movies');
   const [searchKeywords, setSearchKeywords] = React.useState('');
-  const [openCustomTorrentPrompt, setOpenCustomTorrentPrompt] = React.useState<boolean>(false);
+  // const [openCustomTorrentPrompt, setOpenCustomTorrentPrompt] = React.useState<boolean>(false);
   const [loadingTitles, setLoadingTitles] = React.useState<boolean>(true);
-  const [torrentList, setTorrentList] = React.useState<object[]>([]);
 
   React.useEffect((): any => {
     const newSocket = io();
@@ -162,79 +161,79 @@ const Room: React.FC = () => {
                     searchKeywords={searchKeywords}
                   />
                 )
-                // Starting download screen
-                : video?.statusCode === 2 ? (
-                  <Paper
-                    shadow="md"
-                    radius="sm"
-                    p="md"
-                    sx={{
-                      minWidth: '400px',
-                      maxWidth: '600px',
-                    }}
-                  >
-                    <Text>
-                      Starting download...
-                    </Text>
-                  </Paper>
-                )
-                // Downloading screen
-                : video?.statusCode === 3 ? (
-                  <Paper
-                    shadow="md"
-                    radius="sm"
-                    p="md"
-                    sx={{
-                      minWidth: '400px',
-                      maxWidth: '600px',
-                    }}
-                  >
-                    <Stack
+                  // Starting download screen
+                  : video?.statusCode === 2 ? (
+                    <Paper
+                      shadow="md"
+                      radius="sm"
+                      p="md"
                       sx={{
-                        minWidth: 400,
-                        maxWidth: 500,
+                        minWidth: '400px',
+                        maxWidth: '600px',
                       }}
                     >
-                      <Text size={30}>{ video.status }</Text>
-                      { video.percentage !== 0 && ( <LinearProgressWithLabel value={video.percentage}  /> ) }
-                      {
-                        (video.percentage !== 0 || video.downloadSpeed) && (
-                          <Group position="center" grow>
-                            { video.timeRemaining && (
-                              <Text sx={{ textAlign: 'center' }}>
-                                {moment().to(moment().add(video.timeRemaining, 'ms'), true)} remaining
-                              </Text>
-                            ) }
-                            { video.downloadSpeed && (
-                              <Text sx={{ textAlign: 'center' }}>
-                                {video.downloadSpeed}
-                              </Text>
-                            ) }
-                          </Group>
-                        )
-                      }
-                    </Stack>
-                  </Paper>
-                )
-                // Error screen
-                : video?.statusCode === -1 ? (
-                  <Paper
-                    shadow="md"
-                    radius="sm"
-                    p="md"
-                    sx={{
-                      minWidth: '400px',
-                      maxWidth: '600px',
-                    }}
-                  >
-                    <Text>
+                      <Text>
+                      Starting download...
+                      </Text>
+                    </Paper>
+                  )
+                  // Downloading screen
+                    : video?.statusCode === 3 ? (
+                      <Paper
+                        shadow="md"
+                        radius="sm"
+                        p="md"
+                        sx={{
+                          minWidth: '400px',
+                          maxWidth: '600px',
+                        }}
+                      >
+                        <Stack
+                          sx={{
+                            minWidth: 400,
+                            maxWidth: 500,
+                          }}
+                        >
+                          <Text size={30}>{ video.status }</Text>
+                          { video.percentage !== 0 && ( <LinearProgressWithLabel value={video.percentage}  /> ) }
+                          {
+                            (video.percentage !== 0 || video.downloadSpeed) && (
+                              <Group position="center" grow>
+                                { video.timeRemaining && (
+                                  <Text sx={{ textAlign: 'center' }}>
+                                    {moment().to(moment().add(video.timeRemaining, 'ms'), true)} remaining
+                                  </Text>
+                                ) }
+                                { video.downloadSpeed && (
+                                  <Text sx={{ textAlign: 'center' }}>
+                                    {video.downloadSpeed}
+                                  </Text>
+                                ) }
+                              </Group>
+                            )
+                          }
+                        </Stack>
+                      </Paper>
+                    )
+                    // Error screen
+                      : video?.statusCode === -1 ? (
+                        <Paper
+                          shadow="md"
+                          radius="sm"
+                          p="md"
+                          sx={{
+                            minWidth: '400px',
+                            maxWidth: '600px',
+                          }}
+                        >
+                          <Text>
                         There was an error...
-                    </Text>
-                    <Text>
-                      {video.status}
-                    </Text>
-                  </Paper>
-                ) : null
+                          </Text>
+                          <Text>
+                            {video.status}
+                          </Text>
+                        </Paper>
+                      ) : null
               }
             </Box>
           </Box>
