@@ -15,6 +15,21 @@ const ButtonDefaultProps: Partial<ButtonProps> = {
   radius: 12,
   variant: 'gradient',
   gradient: { from: '#00bc70', to: '#00a19b', deg: 135 },
+  styles: {
+    root: {
+      transition: '.2s ease-in-out',
+      backgroundImage: 'linear-gradient(135deg, #00bc70 0%, #00a19b 100%)',
+      
+      '&:hover, &:focus': {
+        transform: 'scale(1.05)',
+        backgroundSize: '100% !important',
+      },
+
+      '&:disabled': {
+        color: "#fff",
+      },
+    },
+  },
 };
 
 const TextInputDefaultProps: Partial<TextInputProps> = {
@@ -27,7 +42,12 @@ const TextInputDefaultProps: Partial<TextInputProps> = {
 
       '&::placeholder': {
         color: '#98989a',
-      }
+      },
+
+      '&:disabled': {
+        backgroundColor: '#191921',
+        color: '#2f2f3d',
+      },
     },
   }
 };
@@ -38,15 +58,31 @@ const PasswordInputDefaultProps: Partial<PasswordInputProps> = {
   styles: {
     input: {
       backgroundColor: '#2f2f3d',
+
+      '&:disabled': {
+        backgroundColor: '#191921',
+      },
     },
     innerInput: {
       color: '#fff',
       '&::placeholder': {
         color: '#98989a !important',
-      }
+      },
+
+      '&:disabled': {
+        backgroundColor: '#191921',
+        color: '#2f2f3d',
+      },
     },
     visibilityToggle: {
       color: '#98989a',
+
+      '&:disabled': {
+        backgroundColor: '#191921',
+      },
+    },
+    disabled: {
+      backgroundColor: '#191921',
     }
   }
 };
@@ -61,20 +97,7 @@ export default function App(props: AppProps ) {
       <MantineProvider 
         theme={{
           components: {
-            Button: {
-              defaultProps: ButtonDefaultProps,
-              styles: {
-                root: {
-                  transition: '.2s ease-in-out',
-                  backgroundImage: 'linear-gradient(135deg, #00bc70 0%, #00a19b 100%)',
-                  
-                  '&:hover, &:focus': {
-                    transform: 'scale(1.02)',
-                    backgroundSize: '100% !important',
-                  },
-                },
-              }
-            },
+            Button: { defaultProps: ButtonDefaultProps },
             TextInput: { defaultProps: TextInputDefaultProps },
             PasswordInput: { defaultProps: PasswordInputDefaultProps },
             Stack: {
