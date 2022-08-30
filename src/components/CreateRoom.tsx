@@ -70,6 +70,7 @@ const CreateRooms: React.FC<Props> = ({ socket }) => {
             <Stack alignItems="center" spacing={2}>
               <Text
                 size={25}
+                weight={300}
                 color="#98989a"
               >
                 Create Room
