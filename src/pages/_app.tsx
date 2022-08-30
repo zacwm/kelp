@@ -39,6 +39,7 @@ const TextInputDefaultProps: Partial<TextInputProps> = {
     input: {
       backgroundColor: '#2f2f3d',
       color: '#fff',
+      border: '1px solid #2f2f3d',
 
       '&::placeholder': {
         color: '#98989a',
@@ -58,6 +59,7 @@ const PasswordInputDefaultProps: Partial<PasswordInputProps> = {
   styles: {
     input: {
       backgroundColor: '#2f2f3d',
+      border: '1px solid #2f2f3d',
 
       '&:disabled': {
         backgroundColor: '#191921',
@@ -65,6 +67,7 @@ const PasswordInputDefaultProps: Partial<PasswordInputProps> = {
     },
     innerInput: {
       color: '#fff',
+
       '&::placeholder': {
         color: '#98989a !important',
       },
