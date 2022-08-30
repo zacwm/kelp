@@ -95,7 +95,21 @@ const ActiveRooms: React.FC<Props> = ({ socket }) => {
                 style={{
                   height: 168,
                   marginTop: '20px',
-                  padding: '0 10px',
+                  padding: '0 12px',
+                }}
+                styles={{
+                  scrollbar: {
+                    backgroundColor: 'transparent',
+                    '&:hover': {
+                      backgroundColor: 'transparent',
+                    },
+                  },
+                  thumb: {
+                    backgroundColor: '#2f2f3d',
+                    '&:hover': {
+                      backgroundColor: '#2f2f3d !important',
+                    },
+                  }
                 }}
               >
                 <Stack alignItems="stretch" spacing={2}>
