@@ -10,10 +10,18 @@ body {
   background-color: #08080f;
 }
 
-.bold {
-  font-family: 'Helvetica Neue Bold', Helvetica, sans-serif !important;
+::-webkit-scrollbar {
+  width: 10px;
 }
 
-.light {
-  font-family: 'Helvetica Neue Light', Helvetica, sans-serif !important;
+::-webkit-scrollbar-track {
+  background: #f1f1f1; 
+}
+
+::-webkit-scrollbar-thumb {
+  background: #888; 
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #555; 
 }
