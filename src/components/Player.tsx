@@ -213,6 +213,7 @@ const Player: React.FC<Props> = ({ socket, menuVisible, videoState, setVideoStat
       <Box sx={{
         background: 'black',
         position: 'relative',
+        color: '#fff',
       }}>
         <Stack
           direction="column"
@@ -241,6 +242,7 @@ const Player: React.FC<Props> = ({ socket, menuVisible, videoState, setVideoStat
                   width: '100%',
                   background: 'linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.0) 100%)',
                   padding: '16px',
+                  boxSizing: 'border-box',
                 }}
                 onMouseEnter={() => setMouseOverControls(true) }
                 onMouseLeave={() => setMouseOverControls(false) }
@@ -270,6 +272,7 @@ const Player: React.FC<Props> = ({ socket, menuVisible, videoState, setVideoStat
                       top: 0,
                       height: '100%',
                       width: '100%',
+                      boxSizing: 'border-box',
                     }}
                   >
                     <ActionIcon size={120} onClick={buttonPlayback}>
