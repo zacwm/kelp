@@ -26,7 +26,7 @@ const ButtonDefaultProps: Partial<ButtonProps> = {
       },
 
       '&:disabled': {
-        color: "#fff",
+        color: '#fff',
       },
     },
   },
