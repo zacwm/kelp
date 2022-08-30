@@ -50,7 +50,7 @@ const RoomItem: React.FC<Props> = ({ room }) => {
         <Text size="md" weight={700} color={color} >
           {room.name}
         </Text>
-        <Text size="xs">
+        <Text size="xs" sx={{ color: '#98989a' }}>
           {room.status}
         </Text>
       </Stack>

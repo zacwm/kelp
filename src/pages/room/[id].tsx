@@ -8,11 +8,12 @@ import { RoomProvider, useRoom } from '../../contexts/room.context';
 import { VideoProvider, useVideo } from '../../contexts/video.context';
 
 import JoinModal from '../../components/JoinModal';
+import RoomNavigation from '../../components/RoomNavigation';
 import Player from '../../components/Player';
-
 import TorrentSelect from '../../components/TorrentSelect';
 
 import { Box, Text, Paper, Stack, Group, Progress } from '@mantine/core';
+import { useDebouncedValue } from '@mantine/hooks';
 
 function LinearProgressWithLabel(props: any & { value: number }) {
   return (
@@ -37,6 +38,13 @@ const Room: React.FC = () => {
   const [videoState, setVideoState] = React.useState(null);
 
   const [menuVisible, setMenuVisible] = React.useState(false);
+
+  // States that are shared between RoomNavigation and TorrentSelect.
+  const [titleCategory, setTitleCategory] = React.useState('movies');
+  const [searchKeywords, setSearchKeywords] = React.useState('');
+  const [openCustomTorrentPrompt, setOpenCustomTorrentPrompt] = React.useState<boolean>(false);
+  const [loadingTitles, setLoadingTitles] = React.useState<boolean>(true);
+  const [torrentList, setTorrentList] = React.useState<object[]>([]);
 
   React.useEffect((): any => {
     const newSocket = io();
@@ -112,9 +120,30 @@ const Room: React.FC = () => {
               width: '100vw',
               display: 'flex',
               flexDirection: 'column',
+              padding: '30px',
+              boxSizing: 'border-box',
             }}
-          >           
-            <Box>
+          >
+            <RoomNavigation
+              loadingTitles={loadingTitles}
+              titleCategory={titleCategory}
+              setTitleCategory={setTitleCategory}
+              setSearchKeywords={setSearchKeywords}
+            />
+            {/* "The screen" parent */}
+            <Box sx={{
+              marginTop: '20px',
+              height: '100%'
+            }}>
+              <TorrentSelect
+                socket={socket}
+                loadingTitles={loadingTitles}
+                setLoadingTitles={setLoadingTitles}
+                titleCategory={titleCategory}
+                searchKeywords={searchKeywords}
+              />
+            </Box>
+            {/* <Box>
               <Box sx={{
                 background: 'black',
                 position: 'relative',
@@ -230,7 +259,7 @@ const Room: React.FC = () => {
                   )}
                 </Stack>
               </Box>
-            </Box>
+            </Box> */}
           </Box>
         )
       }

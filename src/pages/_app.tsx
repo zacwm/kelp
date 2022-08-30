@@ -48,6 +48,7 @@ const TextInputDefaultProps: Partial<TextInputProps> = {
       '&:disabled': {
         backgroundColor: '#191921',
         color: '#2f2f3d',
+        border: '1px solid #191921',
       },
     },
   }
@@ -63,6 +64,7 @@ const PasswordInputDefaultProps: Partial<PasswordInputProps> = {
 
       '&:disabled': {
         backgroundColor: '#191921',
+        border: '1px solid #191921',
       },
     },
     innerInput: {
@@ -75,6 +77,7 @@ const PasswordInputDefaultProps: Partial<PasswordInputProps> = {
       '&:disabled': {
         backgroundColor: '#191921',
         color: '#2f2f3d',
+        border: '1px solid #191921',
       },
     },
     visibilityToggle: {
@@ -86,6 +89,7 @@ const PasswordInputDefaultProps: Partial<PasswordInputProps> = {
     },
     disabled: {
       backgroundColor: '#191921',
+      border: '1px solid #191921',
     }
   }
 };

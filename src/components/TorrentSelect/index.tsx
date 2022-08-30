@@ -24,24 +24,22 @@ import {
 
 type Props = {
   socket: Socket;
+  titleCategory: string;
+  searchKeywords: string;
+  loadingTitles: boolean;
+  setLoadingTitles: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const TorrentSelect: React.FC<Props> = ({ socket }) => {
+const TorrentSelect: React.FC<Props> = ({ socket, titleCategory, searchKeywords, loadingTitles, setLoadingTitles }) => {
   const { room } = useRoom();
 
-  const [titleCategory, setTitleCategory] = React.useState('movies');
-
-  const [inputKeywords, setInputKeywords] = React.useState('');
-  const [debouncedKeywords] = useDebouncedValue(inputKeywords, 1000);
-
   const [openCustomTorrentPrompt, setOpenCustomTorrentPrompt] = React.useState<boolean>(false);
-  const [loadingTitles, setLoadingTitles] = React.useState<boolean>(true);
   const [torrentList, setTorrentList] = React.useState<object[]>([]);
   const [selectedTitle, setSelectedTitle] = React.useState<any>(null);
   
   React.useEffect(() => {
     loadTorrentList(1, false, true);
-  }, [titleCategory, debouncedKeywords]);
+  }, [titleCategory, searchKeywords]);
 
   const loadTorrentList = async (
     page: number,
@@ -58,7 +56,7 @@ const TorrentSelect: React.FC<Props> = ({ socket }) => {
     socket.emit('getTitles', {
       page: page || 1,
       category: titleCategory,
-      keywords: debouncedKeywords
+      keywords: searchKeywords
     }, (response: any) => {
       setLoadingTitles(false);
 
@@ -94,22 +92,17 @@ const TorrentSelect: React.FC<Props> = ({ socket }) => {
     });
   };
 
-  const onSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-
-    setInputKeywords(value);
-  };
-
   return (
     <Paper
       shadow="md"
-      radius="sm"
+      radius={12}
       sx={{
         position: 'relative',
         height: '100%',
+        flex: 1,
         width: '100%',
         boxSizing: 'border-box',
-        background: 'rgba(26, 27, 30)',
+        background: '#191921',
         overflow: 'hidden',
       }}
     >
@@ -158,80 +151,13 @@ const TorrentSelect: React.FC<Props> = ({ socket }) => {
           />
         )}
       </Transition>
-      <Stack sx={{ height: '100%' }} spacing={0}>
-        <Group
-          position="apart"
-          sx={{
-            width: '100%',
-            padding: '20px 12px 20px 12px'
-          }}
-        >
-          <Group>
-            <Box>
-              <Image 
-                src='/kelp-gradient-text.svg'
-                height={40}
-                fit='contain'
-                sx={{
-                  display: 'inline-block',
-                }}
-              />
-            </Box>
-            {['Movies', 'Shows'].map((type, index) => (
-              <Text
-                key={index}
-                onClick={() => {
-                  if (loadingTitles) return;
-                  setTitleCategory(type.toLowerCase());
-                }}
-              >
-                { type }
-              </Text>
-            ))}
-            <Text>Genre</Text>
-            <Select
-              defaultValue="All"
-              data={[
-                { value: 'all', label: 'All' },
-                { value: 'horror', label: 'Horror' },
-              ]}
-            />
-            <Text>Sort By</Text>
-            <Select
-              defaultValue="Trending"
-              data={[
-                { value: 'trending', label: 'Trending' },
-                { value: 'recent', label: 'Recent' },
-              ]}
-            />
-          </Group>
-          <Group>
-            <TextInput
-              value={inputKeywords}
-              onChange={onSearchChange}
-              disabled={loadingTitles}
-              placeholder="Search"
-              sx={{ width: '400px' }}
-              variant="filled"
-            />
-            { loadingTitles && <Loader size="sm" /> }
-            {/* <Button
-              variant="filled"
-              color={openCustomTorrentPrompt && 'red'}
-              onClick={() => setOpenCustomTorrentPrompt(!openCustomTorrentPrompt)}
-            >
-              { !openCustomTorrentPrompt ? 'Enter Torrent/Magnet URI' : 'Close' }
-            </Button> */}
-          </Group>
-        </Group>
-        <VirtualList 
-          titleCategory={titleCategory}
-          itemData={torrentList}
-          isLoading={loadingTitles}
-          setSelectedTitle={setSelectedTitle}
-          fetchTorrentList={loadTorrentList}
-        />
-      </Stack>
+      <VirtualList
+        titleCategory={titleCategory}
+        itemData={torrentList}
+        isLoading={loadingTitles}
+        setSelectedTitle={setSelectedTitle}
+        fetchTorrentList={loadTorrentList}
+      />
     </Paper>
   );
 };

@@ -85,7 +85,7 @@ const ActiveRooms: React.FC<Props> = ({ socket }) => {
               <Text 
                 size={25}
                 align="center" 
-                className='light'
+                weight={300}
                 color="#98989a"
               >
                 Active Rooms

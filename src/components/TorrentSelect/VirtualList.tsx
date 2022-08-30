@@ -20,7 +20,7 @@ const useStyles = createStyles((theme) => ({
     justifyContent: 'center'
   },
   itemContainer: {
-    width: '15%',
+    width: '200px',
     display: 'flex',
     flex: 'none',
     alignContent: 'stretch',
@@ -117,14 +117,18 @@ const VirtualList = ({
   }
 
   return (
-    <div style={{
-      height: '100%',
-      width: '100%',
-    }}>
+    <Box
+      sx={{
+        height: '100%',
+        width: '100%',
+        boxSizing: 'border-box',
+      }}
+    >
       <LoadingOverlay visible={shallowFetch} />
       <VirtuosoGrid
         style={{
           height: '100%',
+          boxSizing: 'border-box',
         }}
         totalCount={itemData.length}
         overscan={250}
@@ -132,7 +136,7 @@ const VirtualList = ({
         itemContent={itemContent}
         endReached={onEndReached}
       />
-    </div>
+    </Box>
   );
 };
 

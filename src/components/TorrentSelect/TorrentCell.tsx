@@ -1,41 +1,21 @@
 import React, { useEffect, useState } from 'react';
 
-import { Box, Text, Paper, Group, Transition, Loader, Image, createStyles } from '@mantine/core';
+import { Box, Text, Paper, Group, Transition, Loader, Image, Stack, Center } from '@mantine/core';
 
 interface Props {
-    title: any;
-    delayIndex: number;
-    onSelect(): void;
+  title: any;
+  delayIndex: number;
+  onSelect(): void;
 }
 
 interface ImageProps {
-    src: string;
-    alt: string;
+  src: string;
+  alt: string;
 }
-
-const useClasses = createStyles((theme) => ({
-  image: {
-    height: '100%',
-    width: '100%',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: theme.colors.dark[8],
-  },
-  loading: {
-    position: 'absolute',
-    zIndex: 2,
-  },
-  error: {
-    color: theme.colors.red[7],
-  }
-}));
 
 const PosterImage = React.memo(function PosterImage(props: ImageProps) {
   const [isLoading, setLoading] = useState(true);
   const [hasError, setError] = useState(!props.src);
-
-  const { cx, classes } = useClasses();
 
   const onLoad = () => {
     setLoading(false);
@@ -48,19 +28,36 @@ const PosterImage = React.memo(function PosterImage(props: ImageProps) {
 
   if (hasError) {
     return (
-      <Paper className={cx(classes.image, classes.error)}>
+      <Paper
+        sx={{
+          width: 170,
+          height: 250,
+        }}
+      >
         <Text>Failed to load image poster</Text>
       </Paper>
     );
   }
 
   return (
-    <React.Fragment>
+    <Box
+      sx={{
+        position: 'relative',
+        width: 170,
+        height: 250,
+      }}
+    >
       {
         isLoading && (
-          <Paper className={cx(classes.image, classes.loading)}
+          <Paper
+            sx={{
+              width: 170,
+              height: 250,
+            }}
           >
-            <Loader variant="bars" size="md"/>
+            <Center sx={{ height: 250 }}>
+              <Loader size="lg" />
+            </Center>
           </Paper>
         )
       }
@@ -68,9 +65,13 @@ const PosterImage = React.memo(function PosterImage(props: ImageProps) {
         src={props.src}
         alt={props.alt}
         onLoad={onLoad}
-        onError={onError} 
+        onError={onError}
+        width={170}
+        height={250}
+        fit="cover"
+        radius={12}
       /> 
-    </React.Fragment>
+    </Box>
   );
 });
 
@@ -99,8 +100,8 @@ const Torrent = (props: Props) => {
       sx={{
         position: 'relative',
         width: '100%',
-        height: '280px',
-        margin: 12,
+        height: 295,
+        margin: 15,
       }}
       title={props.title.title}
     >
@@ -110,55 +111,49 @@ const Torrent = (props: Props) => {
         transition="fade"
       >
         {(styles) => (
-          <Paper 
-            shadow="md"
-            radius="sm"
+          <Stack
             sx={{
               position: 'relative',
-              background: '#2C2E33',
               cursor: 'pointer',
               userSelect: 'none',
               overflow: 'hidden',
-              '&:hover': {
-                background: 'rgba(57, 59, 66)',
-              },
-              display: 'flex',
-              flexDirection: 'column',
-              height: '100% '
+              height: '100%',
+              width: '100%',
             }}
             onClick={props.onSelect}
             style={styles}
+            spacing={1}
           >
-            <Box sx={{
-              height: '100%',
-              position: 'relative',
-              overflow: 'hidden',
-            }}>
-              <PosterImage 
-                src={props.title.images?.poster} 
-                alt={props.title.title}
-              />
-            </Box>
-            <Box
+            <PosterImage 
+              src={props.title.images?.poster} 
+              alt={props.title.title}
+            />
+            <Stack
               sx={{
-                position: 'absolute',
-                bottom: 0,
-                left: 0,
                 width: '100%',
-                height: 'fit-content',
-                padding: '4px 6px',
-                background: 'rgba(26, 27, 30, 0.85)'
+                paddingTop: 6,
               }}
+              spacing={1}
             >
-              <Text weight={600} style={{
-                whiteSpace: 'pre-wrap',
-              }}>{ props.title.title }</Text>
-              <Group spacing="xs">
+              <Text
+                weight={600}
+                style={{
+                  width: 170,
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                }}
+                size="sm"
+                color="#fff"
+              >
+                { props.title.title }
+              </Text>
+              <Group position="apart">
                 <Text size={12}>{ props.title.year }</Text>
                 <Text size={12}>{ props.title.certification }</Text>
               </Group>
-            </Box>
-          </Paper>
+            </Stack>
+          </Stack>
         )}
       </Transition>
     </Box>
