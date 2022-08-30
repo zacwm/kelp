@@ -209,7 +209,14 @@ const Player: React.FC<Props> = ({ socket, menuVisible, videoState, setVideoStat
   };
   
   return (
-    <Box>
+    <Box sx={{
+      position: 'fixed',
+      height: '100vh',
+      width: '100vw',
+      top: 0,
+      left: 0,
+      overflow: 'hidden',
+    }}>
       <Box sx={{
         background: 'black',
         position: 'relative',
