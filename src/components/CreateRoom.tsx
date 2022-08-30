@@ -35,13 +35,12 @@ const CreateRooms: React.FC<Props> = ({ socket }) => {
       name: inputRoomName,
       password: inputRoomPassword,
     }, (res) => {
+      if (res.roomId) return window.location.href = inputRoomPassword ? `/room/${res.roomId}?password=${inputRoomPassword}` : `/room/${res.roomId}`;
       setCreateRoomPending(false);
       if (res.error) return setCreateRoomErrorMessage(res.error);
-      if (res.roomId) {
-        window.location.href = inputRoomPassword ? `/room/${res.roomId}?password=${inputRoomPassword}` : `/room/${res.roomId}`;
-      } else {
-        setCreateRoomErrorMessage('Unknown error');
-      }
+      // If unknown error
+      setCreateRoomErrorMessage('Unknown error');
+      setCreateRoomPending(false);
     });
   };
   
