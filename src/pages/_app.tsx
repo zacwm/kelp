@@ -44,6 +44,9 @@ const PasswordInputDefaultProps: Partial<PasswordInputProps> = {
       '&::placeholder': {
         color: '#98989a !important',
       }
+    },
+    visibilityToggle: {
+      color: '#98989a',
     }
   }
 };
