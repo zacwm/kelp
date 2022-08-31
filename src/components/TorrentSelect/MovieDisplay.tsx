@@ -14,7 +14,7 @@ const FanartBanner: React.FC<any> = ({ imgSrc }) => {
       sx={{
         position: 'absolute',
         width: '100%',
-        height: '50%',
+        height: '400px',
         top: 0,
         left: 0,
         backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.7), #191921), url(${sourceUrl});`,
@@ -95,13 +95,16 @@ const TitleDisplay: React.FC<Props> = ({ styles, title, onTitleSelect, close }) 
       }}
     >
       <FanartBanner imgSrc={title?.images?.fanart} />
-      <Stack sx={{
-        height: '100%',
-        width: '100%',
-        padding: '8px 16px',
-        position: 'relative',
-        boxSizing: 'border-box',
-      }}>
+      <Stack
+        sx={{
+          height: '100%',
+          width: '100%',
+          padding: '8px 16px',
+          position: 'relative',
+          boxSizing: 'border-box',
+        }}
+        spacing={0}
+      >
         <Group position="apart" spacing="xl" align="center">
           <Group>
             <ActionIcon onClick={close} size="lg">
@@ -136,14 +139,15 @@ const TitleDisplay: React.FC<Props> = ({ styles, title, onTitleSelect, close }) 
             </Button>
           </Group>
         </Group>
-        <Box sx={{
-          position: 'relative',
-          display: 'flex',
-          flexDirection: 'row',
-          padding: '10px 6%',
-          overflowY: 'auto',
-          height: '100%'
-        }}>
+        <Group
+          sx={{
+            position: 'relative',
+            padding: '10px 6%',
+            overflowY: 'auto',
+            height: '100%',
+          }}
+          align="flex-start"
+        >
           <Stack
             sx={{
               width: '250px',
@@ -172,32 +176,44 @@ const TitleDisplay: React.FC<Props> = ({ styles, title, onTitleSelect, close }) 
               <Text sx={{ marginRight: '8px' }}>{ title.rating.percentage }%</Text>
             </Group>
             <Group>
+              {(title.genres || []).map((genre, index) => <Badge key={index}>{ genre }</Badge>)}
+            </Group>
+            <Group>
               <Button
                 compact
                 leftIcon={<IconExternalLink />}
                 onClick={() => window.open(`https://www.imdb.com/title/${title['imdb_id']}`, '_blank', 'noopener,noreferrer')}
+                styles={{
+                  root: {
+                    backgroundImage: 'none',
+                    color: '#3bd4ae',
+                  }
+                }}
               >
-                IMDB
+                IMDb
               </Button>
-            </Group>
-            <Group>
-              {(title.genres || []).map((genre, index) => <Badge key={index}>{ genre }</Badge>)}
             </Group>
           </Stack>
           <Stack
             sx={{
               height: '100%',
-              width: '100%',
+              flex: 0.75,
             }}
           >
-            <Text size={38}>{ title.title }</Text>
-            <Text size={14}>{ title.synopsis }</Text>
+            <Text
+              size={38}
+              color="#fff"
+              weight={700}
+            >
+              { title.title }
+            </Text>
+            <Text size={15} color="#98989a">{ title.synopsis }</Text>
             <Box
               sx={{
                 height: '100%',
                 width: '100%',
-                margin: '10px',
-                borderRadius: '10px',
+                marginTop: 30,
+                borderRadius: 12,
                 overflow: 'hidden',
               }}
             >
@@ -224,7 +240,7 @@ const TitleDisplay: React.FC<Props> = ({ styles, title, onTitleSelect, close }) 
               )}
             </Box>
           </Stack>
-        </Box>
+        </Group>
       </Stack>
     </Box>
   );
