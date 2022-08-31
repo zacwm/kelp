@@ -58,6 +58,32 @@ const CreateRooms: React.FC<Props> = ({ socket }) => {
     >
       <Grid container spacing={2}>
         <Grid item xs={12}>
+          <Collapse
+            in={createRoomErrorMessage} 
+            sx={{
+              width: '100%',
+            }}
+          >
+            <Alert
+              icon={<IconAlertCircle size={16} />}
+              title="Oh, uhh..."
+              withCloseButton
+              variant="outline"
+              color="kelpPalette.7"
+              onClose={() => setCreateRoomErrorMessage(null)}
+              styles={{
+                root: {
+                  backgroundColor: '#191921',
+                  marginBottom: 15
+                },
+                message: {
+                  color: '#98989a',
+                }
+              }}
+            >
+              {createRoomErrorMessage}
+            </Alert>
+          </Collapse>
           <Paper 
             shadow="xs" 
             radius={12} 
@@ -101,24 +127,6 @@ const CreateRooms: React.FC<Props> = ({ socket }) => {
                 Create Room
               </Button>
             </Stack>
-            <Collapse
-              in={createRoomErrorMessage} 
-              sx={{
-                width: '100%',
-              }}
-            >
-              <Alert
-                icon={<IconAlertCircle size={16} />}
-                title="Oh, uhh..."
-                withCloseButton
-                variant="outline"
-                color="red"
-                onClose={() => setCreateRoomErrorMessage(null)}
-                sx={{ marginTop: 15 }}
-              >
-                {createRoomErrorMessage}
-              </Alert>
-            </Collapse>
           </Paper>
         </Grid>
       </Grid>

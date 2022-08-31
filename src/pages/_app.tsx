@@ -118,6 +118,7 @@ export default function App(props: AppProps ) {
           colorScheme: 'dark',
           colors: {
             brand: ['#3bd4ae', '#3bd4ae', '#3bd4ae', '#3bd4ae', '#3bd4ae', '#3bd4ae', '#3bd4ae', '#3bd4ae', '#3bd4ae','#3bd4ae'],
+            kelpPalette: ['#000000', '#08080f', '#191921', '#2f2f3d', '#3bd4ae', '#98989a', '#ffffff', '#ae95da', '#00bc70', '#00a19b'],
           },
           primaryColor: 'brand',
         }}
