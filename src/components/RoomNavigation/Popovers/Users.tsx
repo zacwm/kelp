@@ -4,6 +4,7 @@ import type { Socket } from 'socket.io-client';
 import {
   Popover,
   ActionIcon,
+  Indicator,
 } from '@mantine/core';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -15,15 +16,21 @@ type Props = {
   userId: string;
 };
 
-const RoomsPopover: React.FC<Props> = ({ socket, userId }) => {
+const UserPopover: React.FC<Props> = ({ socket, userId }) => {
 
   return (
     <Popover width={300} position="bottom" shadow="md">
       <Popover.Target>
         <ActionIcon>
-          <FontAwesomeIcon 
-            icon={faUser}
-          />
+          <Indicator inline label={UserList.length} size={16}>
+            <FontAwesomeIcon 
+              icon={faUser}
+              style={{ 
+                fontSize:'22px', 
+                marginRight: '8px',
+              }} 
+            />
+          </Indicator>
         </ActionIcon>
       </Popover.Target>
       <Popover.Dropdown>
@@ -33,4 +40,4 @@ const RoomsPopover: React.FC<Props> = ({ socket, userId }) => {
   );
 };
 
-export default RoomsPopover;
+export default UserPopover;

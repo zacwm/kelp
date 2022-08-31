@@ -13,7 +13,7 @@ import {
 import { useDebouncedValue } from '@mantine/hooks';
 
 import TestingPopover from './Popovers/Testing';
-import RoomsPopover from './Popovers/Rooms';
+import RoomsPopover from './Popovers/Users';
 
 type Props = {
   socket: Socket;
