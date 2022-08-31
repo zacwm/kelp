@@ -16,10 +16,10 @@ const FanartBanner: React.FC<any> = ({ imgSrc }) => {
       sx={{
         position: 'absolute',
         width: '100%',
-        height: 400,
+        height: '50%',
         top: 0,
         left: 0,
-        backgroundImage: `linear-gradient(rgba(26, 27, 30, 0.7), rgba(26, 27, 30, 1)), url(${sourceUrl});`,
+        backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.7), #191921), url(${sourceUrl});`,
         backgroundPosition: 'center',
         backgroundSize: 'cover',
       }}
@@ -72,7 +72,7 @@ const TitleDisplay: React.FC<Props> = ({ styles, title, onTitleSelect, close, so
       style={styles}
       sx={{
         position: 'absolute',
-        background: 'rgba(26, 27, 30)',
+        background: '#191921',
         top: 0,
         left: 0,
         height: '100%',
