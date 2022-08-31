@@ -76,25 +76,6 @@ const PosterImage = React.memo(function PosterImage(props: ImageProps) {
 });
 
 const Torrent = (props: Props) => {
-  // TODO: Add fade in effect with `mounted`
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [mounted, isMounted] = useState(false);
-
-  let timeout = null;
-
-  // I believe this causes a memory leak
-  // be careful when using this
-  useEffect(() => {
-    timeout = setTimeout(() => {
-      isMounted(true);
-    }, props.delayIndex * 5);
-
-    return () => {
-      clearTimeout(timeout);
-      isMounted(false);
-    };
-  }, [props.delayIndex]);
-
   return (
     <Box
       sx={{
@@ -105,57 +86,48 @@ const Torrent = (props: Props) => {
       }}
       title={props.title.title}
     >
-      <Transition
-        mounted
-        duration={300}
-        transition="fade"
+      <Stack
+        sx={{
+          position: 'relative',
+          cursor: 'pointer',
+          userSelect: 'none',
+          overflow: 'hidden',
+          height: '100%',
+          width: '100%',
+        }}
+        onClick={props.onSelect}
+        spacing={1}
       >
-        {(styles) => (
-          <Stack
-            sx={{
-              position: 'relative',
-              cursor: 'pointer',
-              userSelect: 'none',
+        <PosterImage 
+          src={props.title.images?.poster} 
+          alt={props.title.title}
+        />
+        <Stack
+          sx={{
+            width: '100%',
+            paddingTop: 6,
+          }}
+          spacing={1}
+        >
+          <Text
+            weight={600}
+            style={{
+              width: 170,
               overflow: 'hidden',
-              height: '100%',
-              width: '100%',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
             }}
-            onClick={props.onSelect}
-            style={styles}
-            spacing={1}
+            size="sm"
+            color="#fff"
           >
-            <PosterImage 
-              src={props.title.images?.poster} 
-              alt={props.title.title}
-            />
-            <Stack
-              sx={{
-                width: '100%',
-                paddingTop: 6,
-              }}
-              spacing={1}
-            >
-              <Text
-                weight={600}
-                style={{
-                  width: 170,
-                  overflow: 'hidden',
-                  textOverflow: 'ellipsis',
-                  whiteSpace: 'nowrap',
-                }}
-                size="sm"
-                color="#fff"
-              >
-                { props.title.title }
-              </Text>
-              <Group position="apart">
-                <Text size={12}>{ props.title.year }</Text>
-                <Text size={12}>{ props.title.certification }</Text>
-              </Group>
-            </Stack>
-          </Stack>
-        )}
-      </Transition>
+            { props.title.title }
+          </Text>
+          <Group position="apart">
+            <Text size={12}>{ props.title.year }</Text>
+            <Text size={12}>{ props.title.certification }</Text>
+          </Group>
+        </Stack>
+      </Stack>
     </Box>
   );
 };
