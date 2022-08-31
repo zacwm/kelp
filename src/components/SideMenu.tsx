@@ -4,7 +4,6 @@ import type { Socket } from 'socket.io-client';
 import { useRoom } from '../contexts/room.context';
 import { useVideo } from '../contexts/video.context';
 
-import UserList from './UserList';
 import FileSelectList from './FileSelectList';
 
 import Box from '@mui/material/Box';
@@ -20,7 +19,7 @@ type Props = {
   videoState: any;
 }
 
-const SideMenu: React.FC<Props> = ({ socket, userId, videoState }) => {
+const SideMenu: React.FC<Props> = ({ socket, videoState }) => {
   const { room, setClosingRoom } = useRoom();
   const { video } = useVideo();
 

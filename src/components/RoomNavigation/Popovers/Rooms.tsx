@@ -1,15 +1,9 @@
 import * as React from 'react';
 import type { Socket } from 'socket.io-client';
 
-import { useRoom } from '../../../contexts/room.context';
-
 import {
   Popover,
   ActionIcon,
-  Text,
-  Stack,
-  Button,
-  Select,
 } from '@mantine/core';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
