@@ -85,6 +85,10 @@ const Torrent = (props: Props) => {
         width: '100%',
         height: 295,
         margin: '30px 15px 0 15px',
+        transition: 'all 0.3s ease',
+        '&:hover': {
+          transform: 'scale(1.05)',
+        }
       }}
       title={props.title.title}
     >
