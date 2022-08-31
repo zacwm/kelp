@@ -1,5 +1,6 @@
 * {
   font-family: 'Helvetica Now Var', Helvetica, sans-serif !important;
+  box-sizing: border-box;
 }
 
 video::cue {
@@ -15,13 +16,9 @@ body {
 }
 
 ::-webkit-scrollbar-track {
-  background: #191921; 
+  background: #191921;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #888; 
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #555; 
+  background: #2f2f3d; 
 }

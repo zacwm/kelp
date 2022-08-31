@@ -19,17 +19,16 @@ import FullscreenIcon from '@mui/icons-material/Fullscreen';
 
 import { Box, ActionIcon, Slider } from '@mantine/core';
 
-import { IconArrowLeft, IconArrowRight, IconPlayerPlay } from '@tabler/icons';
+import { IconArrowLeft, IconPlayerPlay } from '@tabler/icons';
 
 type Props = {
   socket: Socket;
-  menuVisible: boolean;
   videoState: any;
   setVideoState: any;
   toggleMenu: (forceValue?: boolean) => void;
 }
 
-const Player: React.FC<Props> = ({ socket, menuVisible, videoState, setVideoState, toggleMenu }) => {
+const Player: React.FC<Props> = ({ socket, videoState, setVideoState, toggleMenu }) => {
   const [cookies, setCookie] = useCookies(['kelp-volume']);
   const { room } = useRoom();
   const { video } = useVideo();

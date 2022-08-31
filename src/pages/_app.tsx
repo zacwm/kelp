@@ -8,17 +8,20 @@ import {
   MantineProvider,
   ButtonProps,
   PasswordInputProps,
-  TextInputProps, 
+  TextInputProps,
+  SelectProps,
 } from '@mantine/core';
+
+const kelpPalette: any = ['#000000', '#08080f', '#191921', '#2f2f3d', '#3bd4ae', '#98989a', '#ffffff', '#ae95da', '#00bc70', '#00a19b'];
 
 const ButtonDefaultProps: Partial<ButtonProps> = {
   radius: 12,
   variant: 'gradient',
-  gradient: { from: '#00bc70', to: '#00a19b', deg: 135 },
+  gradient: { from: kelpPalette[8], to: kelpPalette[9], deg: 135 },
   styles: {
     root: {
       transition: '.2s ease-in-out',
-      backgroundImage: 'linear-gradient(135deg, #00bc70 0%, #00a19b 100%)',
+      backgroundImage: `linear-gradient(135deg, ${kelpPalette[8]} 0%, ${kelpPalette[9]} 100%)`,
       
       '&:hover, &:focus': {
         transform: 'scale(1.05)',
@@ -37,18 +40,18 @@ const TextInputDefaultProps: Partial<TextInputProps> = {
   size: 'sm',
   styles: {
     input: {
-      backgroundColor: '#2f2f3d',
+      backgroundColor: kelpPalette[3],
       color: '#fff',
-      border: '1px solid #2f2f3d',
+      border: `1px solid ${kelpPalette[3]}`,
 
       '&::placeholder': {
-        color: '#98989a',
+        color: kelpPalette[5],
       },
 
       '&:disabled': {
-        backgroundColor: '#191921',
-        color: '#2f2f3d',
-        border: '1px solid #191921',
+        backgroundColor: kelpPalette[2],
+        color: kelpPalette[3],
+        border: `1px solid ${kelpPalette[2]}`,
       },
     },
   }
@@ -59,39 +62,64 @@ const PasswordInputDefaultProps: Partial<PasswordInputProps> = {
   size: 'sm',
   styles: {
     input: {
-      backgroundColor: '#2f2f3d',
-      border: '1px solid #2f2f3d',
+      backgroundColor: kelpPalette[3],
+      border: `1px solid ${kelpPalette[3]}`,
 
       '&:disabled': {
-        backgroundColor: '#191921',
-        border: '1px solid #191921',
+        backgroundColor: kelpPalette[2],
+        border: `1px solid ${kelpPalette[2]}`,
       },
     },
     innerInput: {
       color: '#fff',
 
       '&::placeholder': {
-        color: '#98989a !important',
+        color: `${kelpPalette[5]} !important`,
       },
 
       '&:disabled': {
-        backgroundColor: '#191921',
-        color: '#2f2f3d',
-        border: '1px solid #191921',
+        backgroundColor: kelpPalette[2],
+        color: kelpPalette[3],
+        border: `1px solid ${kelpPalette[2]}`,
       },
     },
     visibilityToggle: {
-      color: '#98989a',
+      color: kelpPalette[5],
 
       '&:disabled': {
-        backgroundColor: '#191921',
+        backgroundColor: kelpPalette[2],
       },
     },
     disabled: {
-      backgroundColor: '#191921',
-      border: '1px solid #191921',
+      backgroundColor: kelpPalette[2],
+      border: `1px solid ${kelpPalette[2]}`,
     }
   }
+};
+
+const SelectDefaultProps: Partial<SelectProps> = {
+  styles: {
+    input: {
+      borderRadius: 12,
+      width: 200,
+      backgroundColor: kelpPalette[2],
+      border: 'none',
+      color: kelpPalette[4],
+      fontWeight: 700,
+    },
+    dropdown: {
+      borderRadius: 12,
+      backgroundColor: kelpPalette[2],
+      border: 'none',
+      color: kelpPalette[5],
+    },
+    item: {
+      borderRadius: 12,
+      '&:hover': {
+        backgroundColor: kelpPalette[3],
+      },
+    },
+  },
 };
 
 export default function App(props: AppProps ) {
@@ -114,11 +142,12 @@ export default function App(props: AppProps ) {
                 },
               },
             },
+            Select: { defaultProps: SelectDefaultProps },
           },
           colorScheme: 'dark',
           colors: {
             brand: ['#3bd4ae', '#3bd4ae', '#3bd4ae', '#3bd4ae', '#3bd4ae', '#3bd4ae', '#3bd4ae', '#3bd4ae', '#3bd4ae','#3bd4ae'],
-            kelpPalette: ['#000000', '#08080f', '#191921', '#2f2f3d', '#3bd4ae', '#98989a', '#ffffff', '#ae95da', '#00bc70', '#00a19b'],
+            kelpPalette: kelpPalette,
           },
           primaryColor: 'brand',
         }}

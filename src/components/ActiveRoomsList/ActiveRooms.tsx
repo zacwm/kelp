@@ -47,7 +47,7 @@ const ActiveRooms: React.FC<Props> = ({ socket }) => {
   return(
     <Box
       sx={{
-        mx: 2,
+        mx: '15px',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',

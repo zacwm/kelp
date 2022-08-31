@@ -82,7 +82,7 @@ const Torrent = (props: Props) => {
         position: 'relative',
         width: '100%',
         height: 295,
-        margin: 15,
+        margin: '30px 15px 0 15px',
       }}
       title={props.title.title}
     >

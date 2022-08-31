@@ -105,7 +105,6 @@ const Room: React.FC = () => {
     return (
       <Player
         socket={socket}
-        menuVisible={menuVisible}
         toggleMenu={(value?: boolean) => {
           if (value === undefined) return setMenuVisible(!menuVisible);
           setMenuVisible(value);
@@ -138,6 +137,7 @@ const Room: React.FC = () => {
             }}
           >
             <RoomNavigation
+              socket={socket}
               loadingTitles={loadingTitles}
               titleCategory={titleCategory}
               setTitleCategory={setTitleCategory}
@@ -178,7 +178,7 @@ const Room: React.FC = () => {
                     </Paper>
                   )
                   // Downloading screen
-                    : video?.statusCode === 3 ? (
+                    : video?.statusCode >= 3 ? (
                       <Paper
                         shadow="md"
                         radius="sm"

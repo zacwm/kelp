@@ -73,13 +73,12 @@ const JoinModal: React.FC<Props> = ({ socket, setUserId, setMenuVisible }) => {
 
   const inputs = (
     <React.Fragment>
-      <Stack align="center">
+      <Stack align="center" spacing={15}>
         <Text
           size={23}
-          sx={{ marginBottom: '10px' }} 
           color="#98989a"
         >
-          Who&apos;s watching?
+          Who&apos;s Watching?
         </Text>
         {/*
           TODO: Need to change to use the style of the inputs on the home page.

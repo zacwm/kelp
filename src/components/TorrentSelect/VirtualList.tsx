@@ -17,7 +17,7 @@ const useStyles = createStyles((theme) => ({
   list: {
     display: 'flex',
     flexWrap: 'wrap',
-    justifyContent: 'center'
+    justifyContent: 'center',
   },
   itemContainer: {
     width: '200px',
