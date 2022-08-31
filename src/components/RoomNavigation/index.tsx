@@ -158,10 +158,13 @@ const RoomNavigation: React.FC<Props> = ({
             }}
             disabled={loadingTitles}
             placeholder="Search"
-            sx={{
-              width: '400px',
-            }}
             styles={{
+              root: {
+                width: 400,
+                '@media (max-width: 1600px)': {
+                  width: 250,
+                }
+              },
               input: {
                 backgroundColor: '#2f2f3d',
                 color: '#fff',
