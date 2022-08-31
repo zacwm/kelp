@@ -1,7 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
-import { Box, Text, Paper, Group, Transition, Loader, Image, Stack, Center } from '@mantine/core';
+import { Box, Text, Paper, Group, Loader, Image, Stack, Center } from '@mantine/core';
 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faStar } from '@fortawesome/free-solid-svg-icons';
 interface Props {
   title: any;
   delayIndex: number;
@@ -124,7 +126,16 @@ const Torrent = (props: Props) => {
           </Text>
           <Group position="apart">
             <Text size={12}>{ props.title.year }</Text>
-            <Text size={12}>{ props.title.certification }</Text>
+            <Group spacing={3}>
+              <FontAwesomeIcon 
+                icon={faStar} 
+                style={{ 
+                  fontSize:'12px', 
+                  color: '#3bd4ae', 
+                }} 
+              />
+              <Text color="kelpPalette.4" size={12}>{ props.title.rating.percentage/10 }</Text>
+            </Group>
           </Group>
         </Stack>
       </Stack>
