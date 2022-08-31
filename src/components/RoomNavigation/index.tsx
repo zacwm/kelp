@@ -20,9 +20,23 @@ type Props = {
   titleCategory: string;
   setTitleCategory: React.Dispatch<React.SetStateAction<string>>;
   setSearchKeywords: (e: string) => void;
+  selectGenre: string | null;
+  setSelectGenre: React.Dispatch<React.SetStateAction<string | null>>;
+  selectSort: string | null;
+  setSelectSort: React.Dispatch<React.SetStateAction<string | null>>;
 }
 
-const RoomNavigation: React.FC<Props> = ({ socket, loadingTitles, titleCategory, setTitleCategory, setSearchKeywords }) => {
+const RoomNavigation: React.FC<Props> = ({
+  socket,
+  loadingTitles,
+  titleCategory,
+  setTitleCategory,
+  setSearchKeywords,
+  selectGenre,
+  setSelectGenre,
+  selectSort,
+  setSelectSort,
+}) => {
 
   const [inputKeywords, setInputKeywords] = React.useState('');
   const [debouncedKeywords] = useDebouncedValue(inputKeywords, 1000);
@@ -86,7 +100,8 @@ const RoomNavigation: React.FC<Props> = ({ socket, loadingTitles, titleCategory,
         >
           <Text color="kelpPalette.5" sx={{ marginRight: 15 }}>Genre</Text>
           <Select
-            defaultValue="All"
+            value={selectGenre}
+            onChange={setSelectGenre}
             data={[
               { value: '', label: 'All'  },
               { value: 'action', label: 'Action' },
@@ -131,7 +146,8 @@ const RoomNavigation: React.FC<Props> = ({ socket, loadingTitles, titleCategory,
             Sort by
           </Text>
           <Select
-            defaultValue="Trending"
+            value={selectSort}
+            onChange={setSelectSort}
             data={[
               { value: 'trending', label: 'Trending' },
               { value: 'rating', label: 'Rating' },

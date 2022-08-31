@@ -19,9 +19,19 @@ type Props = {
   searchKeywords: string;
   loadingTitles: boolean;
   setLoadingTitles: React.Dispatch<React.SetStateAction<boolean>>;
+  selectGenre: string | null;
+  selectSort: string | null;
 }
 
-const TorrentSelect: React.FC<Props> = ({ socket, titleCategory, searchKeywords, loadingTitles, setLoadingTitles }) => {
+const TorrentSelect: React.FC<Props> = ({
+  socket,
+  titleCategory,
+  searchKeywords,
+  loadingTitles,
+  setLoadingTitles,
+  selectGenre,
+  selectSort,
+}) => {
   const { room } = useRoom();
 
   const [openCustomTorrentPrompt, setOpenCustomTorrentPrompt] = React.useState<boolean>(false);
@@ -30,7 +40,7 @@ const TorrentSelect: React.FC<Props> = ({ socket, titleCategory, searchKeywords,
   
   React.useEffect(() => {
     loadTorrentList(1, false, true);
-  }, [titleCategory, searchKeywords]);
+  }, [titleCategory, searchKeywords, selectGenre, selectSort]);
 
   const loadTorrentList = async (
     page: number,
@@ -47,7 +57,9 @@ const TorrentSelect: React.FC<Props> = ({ socket, titleCategory, searchKeywords,
     socket.emit('getTitles', {
       page: page || 1,
       category: titleCategory,
-      keywords: searchKeywords
+      keywords: searchKeywords,
+      genre: selectGenre,
+      sort: selectSort,
     }, (response: any) => {
       setLoadingTitles(false);
 

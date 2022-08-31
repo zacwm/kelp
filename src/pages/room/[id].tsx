@@ -41,6 +41,8 @@ const Room: React.FC = () => {
   // States that are shared between RoomNavigation and TorrentSelect.
   const [titleCategory, setTitleCategory] = React.useState('movies');
   const [searchKeywords, setSearchKeywords] = React.useState('');
+  const [selectGenre, setSelectGenre] = React.useState<string | null>('');
+  const [selectSort, setSelectSort] = React.useState<string | null>('trending');
   // const [openCustomTorrentPrompt, setOpenCustomTorrentPrompt] = React.useState<boolean>(false);
   const [loadingTitles, setLoadingTitles] = React.useState<boolean>(true);
 
@@ -142,6 +144,10 @@ const Room: React.FC = () => {
               titleCategory={titleCategory}
               setTitleCategory={setTitleCategory}
               setSearchKeywords={setSearchKeywords}
+              selectGenre={selectGenre}
+              setSelectGenre={setSelectGenre}
+              selectSort={selectSort}
+              setSelectSort={setSelectSort}
             />
             {/* "The screen" parent */}
             <Box sx={{
@@ -159,6 +165,8 @@ const Room: React.FC = () => {
                     setLoadingTitles={setLoadingTitles}
                     titleCategory={titleCategory}
                     searchKeywords={searchKeywords}
+                    selectGenre={selectGenre}
+                    selectSort={selectSort}
                   />
                 )
                   // Starting download screen
