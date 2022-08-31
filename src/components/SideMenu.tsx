@@ -115,7 +115,7 @@ const SideMenu: React.FC<Props> = ({ socket, userId, videoState }) => {
               <Accordion.Item value="users">
                 <Accordion.Control>Users</Accordion.Control>
                 <Accordion.Panel>
-                  <UserList socket={socket} userId={userId} />
+                  
                 </Accordion.Panel>
               </Accordion.Item>
               { (video?.files || []).length > 1 && (

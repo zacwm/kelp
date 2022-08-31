@@ -148,6 +148,7 @@ const Room: React.FC = () => {
               setSelectGenre={setSelectGenre}
               selectSort={selectSort}
               setSelectSort={setSelectSort}
+              userId={userId}
             />
             {/* "The screen" parent */}
             <Box sx={{

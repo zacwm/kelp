@@ -13,6 +13,7 @@ import {
 import { useDebouncedValue } from '@mantine/hooks';
 
 import TestingPopover from './Popovers/Testing';
+import RoomsPopover from './Popovers/Rooms';
 
 type Props = {
   socket: Socket;
@@ -24,6 +25,7 @@ type Props = {
   setSelectGenre: React.Dispatch<React.SetStateAction<string | null>>;
   selectSort: string | null;
   setSelectSort: React.Dispatch<React.SetStateAction<string | null>>;
+  userId: string;
 }
 
 const RoomNavigation: React.FC<Props> = ({
@@ -36,6 +38,7 @@ const RoomNavigation: React.FC<Props> = ({
   setSelectGenre,
   selectSort,
   setSelectSort,
+  userId,
 }) => {
 
   const [inputKeywords, setInputKeywords] = React.useState('');
@@ -176,6 +179,7 @@ const RoomNavigation: React.FC<Props> = ({
           variant="filled"
         />
         <TestingPopover socket={socket} />
+        <RoomsPopover socket={socket} userId={userId} />
         {/* <Button
           variant="filled"
           color={openCustomTorrentPrompt && 'red'}
