@@ -11,6 +11,8 @@ import {
   Loader,
 } from '@mantine/core';
 import { useDebouncedValue } from '@mantine/hooks';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 
 import TestingPopover from './Popovers/Testing';
 import RoomsPopover from './Popovers/Users';
@@ -161,23 +163,38 @@ const RoomNavigation: React.FC<Props> = ({
       </Group>
       <Group>
         { loadingTitles && <Loader size="sm" /> }
-        <TextInput
-          value={inputKeywords}
-          onChange={(e) => {
-            setInputKeywords(e.target.value);
-          }}
-          disabled={loadingTitles}
-          placeholder="Search"
-          sx={{
-            width: '400px',
-          }}
-          styles={{
-            input: {
-              borderRadius: '12px 0 0 12px',
-            }
-          }}
-          variant="filled"
-        />
+        <Group>
+          <TextInput
+            value={inputKeywords}
+            onChange={(e) => {
+              setInputKeywords(e.target.value);
+            }}
+            disabled={loadingTitles}
+            placeholder="Search"
+            sx={{
+              width: '400px',
+            }}
+            styles={{
+              input: {
+                borderRadius: '12px 0 0 12px',
+              }
+            }}
+            variant="filled"
+          />
+          <FontAwesomeIcon 
+            icon={faMagnifyingGlass}
+            style={{
+              display: 'block',
+              backgroundImage: 'linear-gradient(135deg, #00bc70 0%, #00a19b 100%);',
+              borderRadius: '0 12px 12px 0',
+              height: '20px',
+              width: '20px',
+              marginLeft: '-18px',
+              padding: '8px',
+            } }
+          />
+        </Group>
+        
         <TestingPopover socket={socket} />
         <RoomsPopover socket={socket} userId={userId} />
         {/* <Button
