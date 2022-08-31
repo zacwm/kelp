@@ -9,7 +9,9 @@ import {
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser } from '@fortawesome/free-regular-svg-icons';
+
 import UserList from '../../UserList';
+import { useRoom } from '../../../contexts/room.context';
 
 type Props = {
   socket: Socket;
@@ -17,12 +19,13 @@ type Props = {
 };
 
 const UserPopover: React.FC<Props> = ({ socket, userId }) => {
+  const { room } = useRoom();
 
   return (
     <Popover width={300} position="bottom" shadow="md">
       <Popover.Target>
         <ActionIcon>
-          <Indicator inline label={UserList.length} size={16}>
+          <Indicator inline label={(room?.users || []).length} size={16}>
             <FontAwesomeIcon 
               icon={faUser}
               style={{ 
