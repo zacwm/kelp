@@ -38,6 +38,9 @@ const TestingPopover: React.FC<Props> = ({ socket }) => {
         <ActionIcon>
           <FontAwesomeIcon 
             icon={faToilet}
+            style={{ 
+              fontSize:'22px', 
+            }}
           />
         </ActionIcon>
       </Popover.Target>

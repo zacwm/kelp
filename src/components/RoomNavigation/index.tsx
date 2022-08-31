@@ -11,8 +11,6 @@ import {
   Loader,
 } from '@mantine/core';
 import { useDebouncedValue } from '@mantine/hooks';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
 
 import TestingPopover from './Popovers/Testing';
 import RoomsPopover from './Popovers/Users';
@@ -150,9 +148,9 @@ const RoomNavigation: React.FC<Props> = ({
           />
         </Group>
       </Group>
-      <Group>
+      <Group spacing={30}>
         { loadingTitles && <Loader size="sm" /> }
-        <Group>
+        <Group spacing={0} sx={{ marginRight: 30 }}>
           <TextInput
             value={inputKeywords}
             onChange={(e) => {
@@ -165,25 +163,36 @@ const RoomNavigation: React.FC<Props> = ({
             }}
             styles={{
               input: {
+                backgroundColor: '#2f2f3d',
+                color: '#fff',
+                border: '1px solid #2f2f3d',
                 borderRadius: '12px 0 0 12px',
-              }
+          
+                '&::placeholder': {
+                  color: '#98989a',
+                },
+          
+                '&:disabled': {
+                  backgroundColor: '#191921',
+                  color: '#2f2f3d',
+                  border: '1px solid #191921',
+                },
+              },
             }}
             variant="filled"
           />
-          <FontAwesomeIcon 
-            icon={faMagnifyingGlass}
-            style={{
-              display: 'block',
-              backgroundImage: 'linear-gradient(135deg, #00bc70 0%, #00a19b 100%);',
+          <Box
+            sx={{
+              width: '36px',
+              height: '36px',
+              backgroundImage: 'linear-gradient(135deg, #00bc70 0%, #00a19b 100%)',
+              padding: '7px 10px 10px 8px',
               borderRadius: '0 12px 12px 0',
-              height: '20px',
-              width: '20px',
-              marginLeft: '-18px',
-              padding: '8px',
-            } }
-          />
+            }}
+          >
+            <img src="/SearchIcon.svg" />
+          </Box>
         </Group>
-        
         <TestingPopover socket={socket} />
         <RoomsPopover socket={socket} userId={userId} />
         {/* <Button
