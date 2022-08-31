@@ -95,7 +95,6 @@ const ActiveRooms: React.FC<Props> = ({ socket }) => {
                 style={{
                   height: 168,
                   marginTop: '20px',
-                  padding: '0 12px',
                 }}
                 styles={{
                   scrollbar: {
