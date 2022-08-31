@@ -257,15 +257,22 @@ const Player: React.FC<Props> = ({ socket, menuVisible, videoState, setVideoStat
                   <Stack
                     direction="row"
                     alignItems="center"
-                    justifyContent="space-between"
+                    justifyContent="flex-start"
                     spacing={2}
                   >
+                    <ActionIcon
+                      size="lg"
+                      onClick={() => {
+                        // TODO: Display some confirmation dialog first
+                        socket.emit('resetRoom', room.id);
+                      }}
+                      sx={{ zIndex: 1000 }}
+                    >
+                      <IconArrowLeft />
+                    </ActionIcon>
                     <Typography color={!video.title ? 'primary' : 'default'}>
                       {video.title || 'kelp'}
                     </Typography>
-                    <ActionIcon size="lg" onClick={() => toggleMenu()} sx={{ zIndex: 1000 }}>
-                      {menuVisible ? <IconArrowRight /> : <IconArrowLeft /> }
-                    </ActionIcon>
                   </Stack>
                 </Box>
                 <Fade in={!videoState?.playing}>
