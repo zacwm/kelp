@@ -36,7 +36,13 @@ const UserPopover: React.FC<Props> = ({ socket, userId }) => {
           </Indicator>
         </ActionIcon>
       </Popover.Target>
-      <Popover.Dropdown>
+      <Popover.Dropdown
+        sx={{
+          borderRadius: 12,
+          backgroundColor: '#2f2f3d',
+          border: 'none',
+        }}
+      >
         <UserList socket={socket} userId={userId} />
       </Popover.Dropdown>
     </Popover>

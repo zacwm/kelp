@@ -44,7 +44,13 @@ const TestingPopover: React.FC<Props> = ({ socket }) => {
           />
         </ActionIcon>
       </Popover.Target>
-      <Popover.Dropdown>
+      <Popover.Dropdown
+        sx={{
+          borderRadius: 12,
+          backgroundColor: '#2f2f3d',
+          border: 'none',
+        }}
+      >
         <Stack>
           <Text>Testing toolz</Text>
           <Select
@@ -53,6 +59,27 @@ const TestingPopover: React.FC<Props> = ({ socket }) => {
               setInputSelect(parseInt(value));
             }}
             data={selectActionTypeOptions}
+            styles={{
+              input: {
+                borderRadius: 12,
+                backgroundColor: '#191921',
+                border: 'none',
+                color: '#3bd4ae',
+                fontWeight: 700,
+              },
+              dropdown: {
+                borderRadius: 12,
+                backgroundColor: '#191921',
+                border: 'none',
+                color: '#98989a',
+              },
+              item: {
+                borderRadius: 12,
+                '&:hover': {
+                  backgroundColor: '#2f2f3d',
+                },
+              },
+            }}
           />
           <Button onClick={() => socket.emit('playerTest', room.id, inputSelect) }>
             Run action
