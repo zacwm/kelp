@@ -103,6 +103,20 @@ const Room: React.FC = () => {
     };
   }, [room, closingRoom, socket]);
 
+  const onTorrentStart = (torrentURL: string) => {
+    console.dir('x4899');
+    if (!socket) return console.dir('b1');
+    if (!room) return console.dir('b2');
+    if (!torrentURL) return console.dir('b3');
+    socket.emit('roomStartTorrent', {
+      id: room.id,
+      url: torrentURL,
+    }, (res) => {
+      console.dir(res);
+      if (res.error) alert(res.error);
+    });
+  };
+
   if (video?.statusCode === 0 && video?.url) {
     return (
       <Player
@@ -149,6 +163,7 @@ const Room: React.FC = () => {
               selectSort={selectSort}
               setSelectSort={setSelectSort}
               userId={userId}
+              onTorrentStart={onTorrentStart}
             />
             {/* "The screen" parent */}
             <Box sx={{
@@ -168,6 +183,7 @@ const Room: React.FC = () => {
                     searchKeywords={searchKeywords}
                     selectGenre={selectGenre}
                     selectSort={selectSort}
+                    onTorrentStart={onTorrentStart}
                   />
                 )
                   // Starting download screen

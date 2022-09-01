@@ -21,6 +21,7 @@ type Props = {
   setLoadingTitles: React.Dispatch<React.SetStateAction<boolean>>;
   selectGenre: string | null;
   selectSort: string | null;
+  onTorrentStart: (torrent: string) => void;
 }
 
 const TorrentSelect: React.FC<Props> = ({
@@ -31,9 +32,8 @@ const TorrentSelect: React.FC<Props> = ({
   setLoadingTitles,
   selectGenre,
   selectSort,
+  onTorrentStart,
 }) => {
-  const { room } = useRoom();
-
   const [openCustomTorrentPrompt, setOpenCustomTorrentPrompt] = React.useState<boolean>(false);
   const [torrentList, setTorrentList] = React.useState<object[]>([]);
   const [selectedTitle, setSelectedTitle] = React.useState<any>(null);
@@ -77,19 +77,6 @@ const TorrentSelect: React.FC<Props> = ({
       } else {
         setTorrentList(response.titles || []); 
       }
-    });
-  };
-
-  const onTorrentStart = (torrentURL: string) => {
-    if (!socket) return;
-    if (!room) return;
-    if (!torrentURL) return;
-    socket.emit('roomStartTorrent', {
-      id: room.id,
-      url: torrentURL,
-    }, (res) => {
-      if (res.error) alert(res.error);
-      close();
     });
   };
 

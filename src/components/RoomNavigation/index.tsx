@@ -25,6 +25,7 @@ type Props = {
   selectSort: string | null;
   setSelectSort: React.Dispatch<React.SetStateAction<string | null>>;
   userId: string;
+  onTorrentStart: (torrent: string) => void;
 }
 
 const RoomNavigation: React.FC<Props> = ({
@@ -38,6 +39,7 @@ const RoomNavigation: React.FC<Props> = ({
   selectSort,
   setSelectSort,
   userId,
+  onTorrentStart,
 }) => {
   const [inputKeywords, setInputKeywords] = React.useState('');
   const [isTorrentLink, setIsTorrentLink] = React.useState(false);
@@ -196,7 +198,7 @@ const RoomNavigation: React.FC<Props> = ({
               cursor: 'pointer',
             }}
             onClick={() => {
-              setSearchKeywords(inputKeywords);
+              isTorrentLink ? onTorrentStart(inputKeywords) : setSearchKeywords(inputKeywords);
             }}
           >
             { isTorrentLink ? <img src="/DownloadIcon.svg" /> : <img src="/SearchIcon.svg" /> }
@@ -204,13 +206,6 @@ const RoomNavigation: React.FC<Props> = ({
         </Group>
         <TestingPopover socket={socket} />
         <RoomsPopover socket={socket} userId={userId} />
-        {/* <Button
-          variant="filled"
-          color={openCustomTorrentPrompt && 'red'}
-          onClick={() => setOpenCustomTorrentPrompt(!openCustomTorrentPrompt)}
-        >
-          { !openCustomTorrentPrompt ? 'Enter Torrent/Magnet URI' : 'Close' }
-        </Button> */}
       </Group>
     </Group>
   );
