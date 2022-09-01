@@ -175,6 +175,7 @@ const Room: React.FC = () => {
                     titleCategory={titleCategory}
                     searchKeywords={searchKeywords}
                     selectGenre={selectGenre}
+                    setSelectGenre={setSelectGenre}
                     selectSort={selectSort}
                     onTorrentStart={onTorrentStart}
                   />

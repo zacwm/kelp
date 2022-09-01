@@ -2,22 +2,26 @@ import * as React from 'react';
 
 import { Box, Stack, Group, Text, Button, ActionIcon, Badge, Select, AspectRatio } from '@mantine/core';
 
-import { IconArrowLeft, IconExternalLink, IconClock, IconCalendar, IconStar } from '@tabler/icons';
+import { IconArrowLeft, IconExternalLink } from '@tabler/icons';
+
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faCalendar, faStar } from '@fortawesome/free-regular-svg-icons';
+import { faClock, faCircleQuestion } from '@fortawesome/free-regular-svg-icons';
 
 const FanartBanner: React.FC<any> = ({ imgSrc }) => {
   const srcSplit = imgSrc.split('/');
   const getImagesId = srcSplit[srcSplit.length - 1];
-  const sourceUrl = `https://image.tmdb.org/t/p/w1920_and_h1080_multi_faces/${getImagesId}`;
+  const sourceUrl = `https://iReact.Dispatch<React.SetStateAction<string | null>>mage.tmdb.org/t/p/w1920_and_h1080_multi_faces/${getImagesId}`;
 
   return (
     <Box
       sx={{
         position: 'absolute',
         width: '100%',
-        height: '400px',
+        height: '100%',
         top: 0,
         left: 0,
-        backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.7), #191921), url(${sourceUrl});`,
+        backgroundImage: `linear-gradient(rgba(0, 0, 0, 0.75), #191921, #191921), url(${sourceUrl});`,
         backgroundPosition: 'center',
         backgroundSize: 'cover',
       }}
@@ -29,10 +33,11 @@ type Props = {
   styles: any,
   title: any,
   onTitleSelect: (url: string) => void,
+  setGenre: React.Dispatch<React.SetStateAction<string | null>>,
   close: () => void,
 }
 
-const TitleDisplay: React.FC<Props> = ({ styles, title, onTitleSelect, close }) => {
+const TitleDisplay: React.FC<Props> = ({ styles, title, onTitleSelect, setGenre, close }) => {
   if (!title) return null;
 
   const [optsTorrentLangs, setOptsTorrentLangs] = React.useState([]);
@@ -150,49 +155,125 @@ const TitleDisplay: React.FC<Props> = ({ styles, title, onTitleSelect, close }) 
         >
           <Stack
             sx={{
-              width: '250px',
+              width: '300px',
               marginRight: '40px',
               position: 'relative',
             }}
+            spacing={0}
           >
             <img
               src={ title.images?.poster }
               alt={ title.title }
-              width="250px"
+              width="280px"
               loading="lazy"
               style={{
-                borderRadius: '6px',
+                borderRadius: 12,
                 boxShadow: '0 1px 3px rgb(0 0 0 / 5%), rgb(0 0 0 / 5%) 0px 20px 25px -5px, rgb(0 0 0 / 4%) 0px 10px 10px -5px',
+                marginBottom: 15,
               }}
             />
-            <Group spacing={5}>
-              <IconClock size={18} />
-              <Text sx={{ marginRight: '8px' }}>{ formatTitleRuntime() }</Text>
+            <Stack spacing={20}>
+              <Group spacing={15}>
+                <Group spacing={10}>
+                  <FontAwesomeIcon 
+                    icon={faCalendar} 
+                    style={{ 
+                      color: '#98989a',
+                      fontSize: 14,
+                    }} 
+                  />
+                  <Text
+                    sx={{
+                      fontSize: 14,
+                      color: '#98989a',
+                    }}
+                  >
+                    { title.year }
+                  </Text>
+                </Group>
 
-              <IconCalendar size={18} />
-              <Text sx={{ marginRight: '8px' }}>{ title.year }</Text>
+                <Group spacing={10}>
+                  <FontAwesomeIcon 
+                    icon={faCircleQuestion} 
+                    style={{ 
+                      color: '#98989a',
+                      fontSize: 14,
+                    }} 
+                  />
+                  <Text
+                    sx={{
+                      fontSize: 14,
+                      color: '#98989a',
+                    }}
+                  >
+                    { title.certification }
+                  </Text>
+                </Group>
 
-              <IconStar size={18} />
-              <Text sx={{ marginRight: '8px' }}>{ title.rating.percentage }%</Text>
-            </Group>
-            <Group>
-              {(title.genres || []).map((genre, index) => <Badge key={index}>{ genre }</Badge>)}
-            </Group>
-            <Group>
-              <Button
-                compact
-                leftIcon={<IconExternalLink />}
-                onClick={() => window.open(`https://www.imdb.com/title/${title['imdb_id']}`, '_blank', 'noopener,noreferrer')}
-                styles={{
-                  root: {
-                    backgroundImage: 'none',
-                    color: '#3bd4ae',
-                  }
-                }}
-              >
-                IMDb
-              </Button>
-            </Group>
+                <Group spacing={10}>
+                  <FontAwesomeIcon 
+                    icon={faClock} 
+                    style={{ 
+                      color: '#98989a',
+                      fontSize: 14,
+                    }} 
+                  />
+                  <Text
+                    sx={{
+                      fontSize: 14,
+                      color: '#98989a',
+                    }}
+                  >
+                    { formatTitleRuntime() }
+                  </Text>
+                </Group>
+
+                <Group spacing={10}>
+                  <FontAwesomeIcon 
+                    icon={faStar} 
+                    style={{ 
+                      color: '#98989a',
+                      fontSize: 14,
+                    }} 
+                  />
+                  <Text
+                    sx={{
+                      fontSize: 14,
+                      color: '#98989a',
+                    }}
+                  >
+                    { title.rating.percentage / 10 }
+                  </Text>
+                </Group>
+              </Group>
+              <Group spacing={10}>
+                {(title.genres || []).map((genre, index) => <Badge
+                  key={index}
+                  onClick={() => {
+                    setGenre(genre);
+                    close();
+                  }}
+                  sx={{ cursor: 'pointer' }}
+                >
+                  { genre }
+                </Badge>)}
+              </Group>
+              <Group>
+                <Button
+                  compact
+                  leftIcon={<IconExternalLink />}
+                  onClick={() => window.open(`https://www.imdb.com/title/${title['imdb_id']}`, '_blank', 'noopener,noreferrer')}
+                  styles={{
+                    root: {
+                      backgroundImage: 'none',
+                      color: '#3bd4ae',
+                    }
+                  }}
+                >
+                  IMDb
+                </Button>
+              </Group>
+            </Stack>
           </Stack>
           <Stack
             sx={{

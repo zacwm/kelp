@@ -18,6 +18,7 @@ type Props = {
   loadingTitles: boolean;
   setLoadingTitles: React.Dispatch<React.SetStateAction<boolean>>;
   selectGenre: string | null;
+  setSelectGenre: React.Dispatch<React.SetStateAction<string | null>>;
   selectSort: string | null;
   onTorrentStart: (torrent: string) => void;
 }
@@ -29,6 +30,7 @@ const TorrentSelect: React.FC<Props> = ({
   loadingTitles,
   setLoadingTitles,
   selectGenre,
+  setSelectGenre,
   selectSort,
   onTorrentStart,
 }) => {
@@ -116,6 +118,7 @@ const TorrentSelect: React.FC<Props> = ({
             styles={styles}
             title={titleCategory == 'movies' && selectedTitle}
             onTitleSelect={(url) => onTorrentStart(url)}
+            setGenre={setSelectGenre}
             close={() => setSelectedTitle(null)}
           />
         )}

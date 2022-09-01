@@ -73,6 +73,14 @@ const RoomNavigation: React.FC<Props> = ({
             fit='contain'
             sx={{
               display: 'inline-block',
+              userSelect: 'none',
+              cursor: 'default',
+            }}
+            onClick={() => {
+              setTitleCategory('movies');
+              setInputKeywords('');
+              setSelectGenre('');
+              setSelectSort('trending');
             }}
           />
         </Box>
@@ -105,7 +113,16 @@ const RoomNavigation: React.FC<Props> = ({
           }}
           spacing={0}
         >
-          <Text color="kelpPalette.5" sx={{ marginRight: 15 }}>Genre</Text>
+          <Text 
+            color="kelpPalette.5" 
+            sx={{
+              marginRight: 15,
+              userSelect: 'none',
+              cursor: 'default',
+            }}
+          >
+            Genre
+          </Text>
           <Select
             value={selectGenre}
             onChange={setSelectGenre}
@@ -136,7 +153,9 @@ const RoomNavigation: React.FC<Props> = ({
             color="kelpPalette.5"
             sx={{
               marginLeft: 30,
-              marginRight: 15
+              marginRight: 15,
+              userSelect: 'none',
+              cursor: 'default',
             }}
           >
             Sort by
