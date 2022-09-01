@@ -10,7 +10,6 @@ import {
   TextInput,
   Loader,
 } from '@mantine/core';
-import { useDebouncedValue } from '@mantine/hooks';
 
 import TestingPopover from './Popovers/Testing';
 import RoomsPopover from './Popovers/Users';
@@ -40,13 +39,16 @@ const RoomNavigation: React.FC<Props> = ({
   setSelectSort,
   userId,
 }) => {
-
   const [inputKeywords, setInputKeywords] = React.useState('');
-  const [debouncedKeywords] = useDebouncedValue(inputKeywords, 1000);
+  const [isTorrentLink, setIsTorrentLink] = React.useState(false);
 
   React.useEffect(() => {
-    setSearchKeywords(debouncedKeywords);
-  }, [debouncedKeywords]);
+    if (inputKeywords.startsWith('magnet:')) {
+      setIsTorrentLink(true);
+    } else {
+      setIsTorrentLink(false);
+    }
+  }, [inputKeywords]);
 
   const titleCategories = [
     { label: 'Movies', value: 'movies' },
@@ -157,7 +159,7 @@ const RoomNavigation: React.FC<Props> = ({
               setInputKeywords(e.target.value);
             }}
             disabled={loadingTitles}
-            placeholder="Search"
+            placeholder="Search or Magnet/Torrent Link"
             styles={{
               root: {
                 width: 400,
@@ -191,9 +193,13 @@ const RoomNavigation: React.FC<Props> = ({
               backgroundImage: 'linear-gradient(135deg, #00bc70 0%, #00a19b 100%)',
               padding: '7px 10px 10px 8px',
               borderRadius: '0 12px 12px 0',
+              cursor: 'pointer',
+            }}
+            onClick={() => {
+              setSearchKeywords(inputKeywords);
             }}
           >
-            <img src="/SearchIcon.svg" />
+            { isTorrentLink ? <img src="/DownloadIcon.svg" /> : <img src="/SearchIcon.svg" /> }
           </Box>
         </Group>
         <TestingPopover socket={socket} />
