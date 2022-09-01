@@ -12,20 +12,11 @@ import RoomNavigation from '../../components/RoomNavigation';
 import Player from '../../components/Player';
 import TorrentSelect from '../../components/TorrentSelect';
 
-import { Box, Text, Paper, Stack, Group, Progress } from '@mantine/core';
+import { Box, Text, Paper, Stack, Group, Progress, Center, ActionIcon } from '@mantine/core';
 
-function LinearProgressWithLabel(props: any & { value: number }) {
-  return (
-    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-      <Box sx={{ width: '100%', mr: 1 }}>
-        <Progress {...props} max={100} sx={{ width: '100%' }} />
-      </Box>
-      <Box sx={{ marginLeft: '10px' }}>
-        <Text>{`${Math.round(props.value)}%`}</Text>
-      </Box>
-    </Box>
-  );
-}
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowLeft, faDownload } from '@fortawesome/free-solid-svg-icons';
+import { faClock } from '@fortawesome/free-regular-svg-icons';
 
 const Room: React.FC = () => {
   const { room, closingRoom, setRoom } = useRoom();
@@ -167,8 +158,10 @@ const Room: React.FC = () => {
             />
             {/* "The screen" parent */}
             <Box sx={{
+              position: 'relative',
               marginTop: 30,
               height: '100%',
+              flex: 1,
               borderRadius: 12,
               overflow: 'hidden',
             }}>
@@ -204,60 +197,153 @@ const Room: React.FC = () => {
                   )
                   // Downloading screen
                     : video?.statusCode >= 3 ? (
-                      <Paper
-                        shadow="md"
-                        radius="sm"
-                        p="md"
+                      <Box
                         sx={{
-                          minWidth: '400px',
-                          maxWidth: '600px',
+                          height: '100%',
+                          width: '100%',
+                          backgroundColor: '#000',
                         }}
                       >
-                        <Stack
+                        <ActionIcon
                           sx={{
-                            minWidth: 400,
-                            maxWidth: 500,
+                            position: 'absolute',
+                            top: 30,
+                            left: 30,
+                          }}
+                          onClick={() => {
+                            socket.emit('resetRoom', room.id);
                           }}
                         >
-                          <Text size={30}>{ video.status }</Text>
-                          { video.percentage !== 0 && ( <LinearProgressWithLabel value={video.percentage}  /> ) }
-                          {
-                            (video.percentage !== 0 || video.downloadSpeed) && (
-                              <Group position="center" grow>
-                                { video.timeRemaining && (
-                                  <Text sx={{ textAlign: 'center' }}>
-                                    {moment().to(moment().add(video.timeRemaining, 'ms'), true)} remaining
-                                  </Text>
-                                ) }
-                                { video.downloadSpeed && (
-                                  <Text sx={{ textAlign: 'center' }}>
-                                    {video.downloadSpeed}
-                                  </Text>
-                                ) }
-                              </Group>
-                            )
-                          }
-                        </Stack>
-                      </Paper>
+                          <FontAwesomeIcon 
+                            icon={faArrowLeft} 
+                            style={{ 
+                              color: '#fff',
+                              fontSize: 20,
+                            }} 
+                          />
+                        </ActionIcon>
+                        <Center sx={{ height: '100%' }}>
+                          <Paper
+                            style={{
+                              position: 'relative',
+                              boxSizing: 'border-box',
+                              padding: 30,
+                              width: 465,
+                              borderRadius: 12,
+                              backgroundColor: '#191921',
+                            }}
+                          >
+                            <Stack
+                              sx={{
+                                minWidth: 400,
+                                maxWidth: 500,
+                              }}
+                              spacing={30}
+                            >
+                              <Text sx={{ fontSize: 18, color: '#98989a' }}>
+                                { video.status }
+                              </Text>
+                              { video.percentage !== 0 && (
+                                <Progress
+                                  value={video.percentage}
+                                  sx={{ width: '100%' }}
+                                  size={5}
+                                />
+                              )}
+                              {
+                                (video.percentage !== 0 || video.downloadSpeed) && (
+                                  <Group spacing={20}>
+                                    { video.timeRemaining && (
+                                      <Group spacing={10}>
+                                        <FontAwesomeIcon 
+                                          icon={faDownload} 
+                                          style={{ 
+                                            color: '#98989a',
+                                            fontSize: 18,
+                                          }} 
+                                        />
+                                        <Text sx={{ fontSize: 14, color: '#98989a' }}>
+                                          {moment().to(moment().add(video.timeRemaining, 'ms'), true)} remaining
+                                        </Text>
+                                      </Group>
+                                    ) }
+                                    { video.downloadSpeed && (
+                                      <Group spacing={10}>
+                                        <FontAwesomeIcon 
+                                          icon={faClock} 
+                                          style={{ 
+                                            color: '#98989a',
+                                            fontSize: 18,
+                                          }} 
+                                        />
+                                        <Text sx={{ fontSize: 14, color: '#98989a' }}>
+                                          {video.downloadSpeed}
+                                        </Text>
+                                      </Group>
+                                    ) }
+                                  </Group>
+                                )
+                              }
+                            </Stack>
+                          </Paper>
+                        </Center>
+                      </Box>
                     )
                     // Error screen
                       : video?.statusCode === -1 ? (
-                        <Paper
-                          shadow="md"
-                          radius="sm"
-                          p="md"
+                        <Box
                           sx={{
-                            minWidth: '400px',
-                            maxWidth: '600px',
+                            height: '100%',
+                            width: '100%',
+                            backgroundColor: '#000',
                           }}
                         >
-                          <Text>
-                        There was an error...
-                          </Text>
-                          <Text>
-                            {video.status}
-                          </Text>
-                        </Paper>
+                          <ActionIcon
+                            sx={{
+                              position: 'absolute',
+                              top: 30,
+                              left: 30,
+                            }}
+                            onClick={() => {
+                              socket.emit('resetRoom', room.id);
+                            }}
+                          >
+                            <FontAwesomeIcon 
+                              icon={faArrowLeft} 
+                              style={{ 
+                                color: '#fff',
+                                fontSize: 20,
+                              }} 
+                            />
+                          </ActionIcon>
+                          <Center sx={{ height: '100%' }}>
+                            <Paper
+                              style={{
+                                position: 'relative',
+                                boxSizing: 'border-box',
+                                padding: 30,
+                                width: 465,
+                                borderRadius: 12,
+                                backgroundColor: '#191921',
+                              }}
+                            >
+                              <Stack
+                                sx={{
+                                  minWidth: 400,
+                                  maxWidth: 500,
+                                }}
+                                spacing={30}
+                              >
+                                <Text sx={{ fontSize: 18, color: '#98989a' }}>
+                                  There was an error...
+                                </Text>
+                                <Text sx={{ fontSize: 14, color: '#98989a' }}>
+                                  {video.status}
+                                </Text>
+                              </Stack>
+                            </Paper>
+                          </Center>
+                        </Box>
                       ) : null
               }
             </Box>
