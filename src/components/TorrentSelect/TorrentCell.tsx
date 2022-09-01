@@ -138,7 +138,13 @@ const Torrent = (props: Props) => {
                   color: '#3bd4ae', 
                 }} 
               />
-              <Text color="kelpPalette.4" size={12}>{ props.title.rating.percentage/10 }</Text>
+              <Text
+                color="kelpPalette.4"
+                size={12}
+                weight={700}
+              >
+                { props.title.rating.percentage/10 }
+              </Text>
             </Group>
           </Group>
         </Stack>
