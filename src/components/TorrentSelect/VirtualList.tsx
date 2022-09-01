@@ -18,6 +18,8 @@ const useStyles = createStyles((theme) => ({
     display: 'flex',
     flexWrap: 'wrap',
     justifyContent: 'center',
+    paddingLeft: 30,
+    paddingRight: 20, // 20 because of the scrollbar width of 10px.
   },
   itemContainer: {
     width: '200px',
@@ -119,6 +121,7 @@ const VirtualList = ({
   return (
     <Box
       sx={{
+        position: 'relative',
         height: '100%',
         width: '100%',
         boxSizing: 'border-box',
@@ -128,6 +131,7 @@ const VirtualList = ({
       <VirtuosoGrid
         style={{
           height: '100%',
+          width: '100%',
           boxSizing: 'border-box',
         }}
         totalCount={itemData.length}
