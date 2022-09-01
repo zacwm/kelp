@@ -152,7 +152,7 @@ const Room: React.FC = () => {
             />
             {/* "The screen" parent */}
             <Box sx={{
-              marginTop: '20px',
+              marginTop: 30,
               height: '100%',
               borderRadius: 12,
               overflow: 'hidden',
