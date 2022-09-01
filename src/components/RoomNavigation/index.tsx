@@ -90,7 +90,7 @@ const RoomNavigation: React.FC<Props> = ({
               userSelect: 'none',
               marginRight: 30,
               '&:hover': {
-                color: '#98989a',
+                color: '#bfbfbf',
               }
             }}
           >
