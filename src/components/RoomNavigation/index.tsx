@@ -159,7 +159,7 @@ const RoomNavigation: React.FC<Props> = ({
               setInputKeywords(e.target.value);
             }}
             disabled={loadingTitles}
-            placeholder="Search or Magnet/Torrent Link"
+            placeholder="Search or Torrent/Magnet"
             styles={{
               root: {
                 width: 400,
