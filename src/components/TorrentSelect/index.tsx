@@ -52,8 +52,6 @@ const TorrentSelect: React.FC<Props> = ({
       setLoadingTitles(true);
     }
 
-    console.dir(page);
-
     socket.emit('getTitles', {
       page: page || 1,
       category: titleCategory,
