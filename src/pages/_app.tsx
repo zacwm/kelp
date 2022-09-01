@@ -102,21 +102,21 @@ const SelectDefaultProps: Partial<SelectProps> = {
     input: {
       borderRadius: 12,
       width: 200,
-      backgroundColor: kelpPalette[2],
+      backgroundColor: kelpPalette[3],
       border: 'none',
       color: kelpPalette[4],
       fontWeight: 700,
     },
     dropdown: {
       borderRadius: 12,
-      backgroundColor: kelpPalette[2],
+      backgroundColor: kelpPalette[3],
       border: 'none',
       color: kelpPalette[5],
     },
     item: {
       borderRadius: 12,
       '&:hover': {
-        backgroundColor: kelpPalette[3],
+        backgroundColor: kelpPalette[2],
       },
     },
   },
