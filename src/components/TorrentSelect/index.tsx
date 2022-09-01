@@ -1,8 +1,6 @@
 import * as React from 'react';
 import type { Socket } from 'socket.io-client';
 
-import { useRoom } from '../../contexts/room.context';
-
 import MovieDisplay from './MovieDisplay';
 import ShowDisplay from './ShowDisplay';
 import CustomTorrentPrompt from './CustomTorrentPrompt';

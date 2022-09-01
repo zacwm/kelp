@@ -18,8 +18,6 @@ const useStyles = createStyles((theme) => ({
     display: 'flex',
     flexWrap: 'wrap',
     justifyContent: 'center',
-    paddingLeft: 30,
-    paddingRight: 20, // 20 because of the scrollbar width of 10px.
   },
   itemContainer: {
     width: '200px',
@@ -27,12 +25,12 @@ const useStyles = createStyles((theme) => ({
     flex: 'none',
     alignContent: 'stretch',
     boxSizing: 'border-box',
-    // [`@media (max-width: ${theme.breakpoints.lg}px)`]: {
-    //     width: "33%"
-    // },
-    // [`@media (max-width: ${theme.breakpoints.sm}px)`]: {
-    //     width: "50%"
-    // }
+    [`@media (max-width: ${theme.breakpoints.lg}px)`]: {
+      width: '33%',
+    },
+    [`@media (max-width: ${theme.breakpoints.sm}px)`]: {
+      width: '50%',
+    },
   },
 }));
 
