@@ -11,7 +11,7 @@ import { faClock, faCircleQuestion } from '@fortawesome/free-regular-svg-icons';
 const FanartBanner: React.FC<any> = ({ imgSrc }) => {
   const srcSplit = imgSrc.split('/');
   const getImagesId = srcSplit[srcSplit.length - 1];
-  const sourceUrl = `https://iReact.Dispatch<React.SetStateAction<string | null>>mage.tmdb.org/t/p/w1920_and_h1080_multi_faces/${getImagesId}`;
+  const sourceUrl = `https://image.tmdb.org/t/p/w1920_and_h1080_multi_faces/${getImagesId}`;
 
   return (
     <Box
@@ -40,47 +40,6 @@ type Props = {
 const TitleDisplay: React.FC<Props> = ({ styles, title, onTitleSelect, setGenre, close }) => {
   if (!title) return null;
 
-  const [optsTorrentLangs, setOptsTorrentLangs] = React.useState([]);
-  const [optsTorrentRes, setOptsTorrentRes] = React.useState([]);
-
-  const [inputTorrentLang, setInputTorrentLang] = React.useState('');
-  const [inputTorrentRes, setInputTorrentRes] = React.useState('');
-
-  React.useEffect(() => {
-    if (!title) return null;
-
-    const langOpts = Object.keys(title.torrents);
-    if (!langOpts) return;
-  
-    setOptsTorrentLangs(langOpts);
-
-    if (langOpts.includes('en')) {
-      // Sorry, but english would be the most commonly used, especially while kelp is english only.
-      setInputTorrentLang('en');
-    } else {
-      // Select first from options if english isn't found.
-      setInputTorrentLang(langOpts[0]);
-    }
-  }, [title]);
-
-  React.useEffect(() => {
-    if (!title) return;
-    if (!inputTorrentLang) return;
-
-    const resOpts = Object.keys(title.torrents[inputTorrentLang]);
-    if (!resOpts) return;
-
-    setOptsTorrentRes(resOpts);
-
-    if (resOpts.includes('1080p')) {
-      // Why not the highest? well 4k and above is f**kin HUGE in file size after it's uncompressed, I doubt its necessary for most people.
-      setInputTorrentRes('1080p');
-    } else {
-      // If 1080 isn't an option, I'm still not risking the highest file size, so we go smallest! KEKW
-      setInputTorrentRes(resOpts[0]);
-    }
-  }, [inputTorrentLang]);
-
   const formatTitleRuntime = () => {
     const minutes = parseInt(title.runtime);
     return `${Math.floor(minutes / 60)}h ${minutes % 60}m`;
@@ -100,54 +59,31 @@ const TitleDisplay: React.FC<Props> = ({ styles, title, onTitleSelect, setGenre,
       }}
     >
       <FanartBanner imgSrc={title?.images?.fanart} />
+      <ActionIcon
+        onClick={close}
+        size="lg"
+        sx={{
+          position: 'absolute',
+          top: 20,
+          left: 20,
+          zIndex: 100,
+        }}
+      >
+        <IconArrowLeft size={30} />
+      </ActionIcon>
       <Stack
         sx={{
           height: '100%',
           width: '100%',
-          padding: '8px 16px',
+          padding: '75px',
           position: 'relative',
           boxSizing: 'border-box',
         }}
         spacing={0}
       >
-        <Group position="apart" spacing="xl" align="center">
-          <Group>
-            <ActionIcon onClick={close} size="lg">
-              <IconArrowLeft size={30} />
-            </ActionIcon>
-          </Group>
-          <Group>
-            <Select
-              label="Audio Language"
-              data={optsTorrentLangs.map((lang) => {
-                return { value: lang, label: lang };
-              })}
-              value={inputTorrentLang}
-              onChange={setInputTorrentLang}
-              dropdownPosition="bottom"
-            />
-            <Select
-              label="Video Resolution"
-              data={optsTorrentRes.map((res) => {
-                return { value: res, label: res };
-              })}
-              value={inputTorrentRes}
-              onChange={setInputTorrentRes}
-              dropdownPosition="bottom"
-            />
-            <Button
-              size="md"
-              onClick={() => onTitleSelect(title.torrents[inputTorrentLang][inputTorrentRes].url)}
-              disabled={!inputTorrentLang || !inputTorrentRes}
-            >
-              Start Download
-            </Button>
-          </Group>
-        </Group>
         <Group
           sx={{
             position: 'relative',
-            padding: '10px 6%',
             overflowY: 'auto',
             height: '100%',
           }}
@@ -156,7 +92,7 @@ const TitleDisplay: React.FC<Props> = ({ styles, title, onTitleSelect, setGenre,
           <Stack
             sx={{
               width: '300px',
-              marginRight: '40px',
+              marginRight: '30px',
               position: 'relative',
             }}
             spacing={0}
