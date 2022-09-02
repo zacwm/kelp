@@ -124,7 +124,7 @@ class SocketServer {
           if (opts.genre) urlParamsList.push(`genre=${opts.genre}`);
           if (opts.sort) urlParamsList.push(`sort=${opts.sort}`);
 
-          const { data } = await axios.get(`https://movies-api.ga/${opts.category}/${opts.page || 1}?${urlParamsList.join('&')}`);
+          const { data } = await axios.get(`${process.env.POPCORN_TIME_API}${opts.category}/${opts.page || 1}?${urlParamsList.join('&')}`);
           if ((data || []).length === 0) return callback({ error: 'No titles found' });
           callback({ titles: data || [] });
         } catch (err) {
@@ -135,7 +135,7 @@ class SocketServer {
 
       socket.on('getShowData', async (showId, callback) => {
         try {
-          const { data } = await axios.get(`https://movies-api.ga/show/${showId}`);
+          const { data } = await axios.get(`${process.env.POPCORN_TIME_API}show/${showId}`);
           callback({ show: data });
         } catch (err) {
           console.warn(err);
