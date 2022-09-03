@@ -21,6 +21,7 @@ const useStyles = createStyles((theme) => ({
   },
   itemContainer: {
     width: '200px',
+    height: '330px',
     display: 'flex',
     flex: 'none',
     alignContent: 'stretch',

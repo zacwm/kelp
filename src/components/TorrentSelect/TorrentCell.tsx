@@ -83,8 +83,8 @@ const Torrent = (props: Props) => {
       sx={{
         position: 'relative',
         width: '100%',
-        height: 295,
-        margin: '30px 15px 0 15px',
+        height: 330,
+        padding: '30px 15px 0 15px',
         transition: 'all 0.3s ease',
         '&:hover': {
           transform: 'scale(1.05)',
