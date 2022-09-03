@@ -74,7 +74,7 @@ const RoomNavigation: React.FC<Props> = ({
             sx={{
               display: 'inline-block',
               userSelect: 'none',
-              cursor: 'default',
+              cursor: 'pointer',
             }}
             onClick={() => {
               setTitleCategory('movies');
