@@ -182,19 +182,56 @@ const Room: React.FC = () => {
                 )
                   // Starting download screen
                   : video?.statusCode === 2 ? (
-                    <Paper
-                      shadow="md"
-                      radius="sm"
-                      p="md"
+                    <Box
                       sx={{
-                        minWidth: '400px',
-                        maxWidth: '600px',
+                        height: '100%',
+                        width: '100%',
+                        backgroundColor: '#000',
                       }}
                     >
-                      <Text>
-                      Starting download...
-                      </Text>
-                    </Paper>
+                      <ActionIcon
+                        sx={{
+                          position: 'absolute',
+                          top: 30,
+                          left: 30,
+                        }}
+                        onClick={() => {
+                          socket.emit('resetRoom', room.id);
+                        }}
+                      >
+                        <FontAwesomeIcon 
+                          icon={faArrowLeft} 
+                          style={{ 
+                            color: '#fff',
+                            fontSize: 20,
+                          }} 
+                        />
+                      </ActionIcon>
+                      <Center sx={{ height: '100%' }}>
+                        <Paper
+                          style={{
+                            position: 'relative',
+                            boxSizing: 'border-box',
+                            padding: 30,
+                            width: 465,
+                            borderRadius: 12,
+                            backgroundColor: '#191921',
+                          }}
+                        >
+                          <Stack
+                            sx={{
+                              minWidth: 400,
+                              maxWidth: 500,
+                            }}
+                            spacing={30}
+                          >
+                            <Text sx={{ fontSize: 18, color: '#98989a' }}>
+                              Starting download...
+                            </Text>
+                          </Stack>
+                        </Paper>
+                      </Center>
+                    </Box>
                   )
                   // Downloading screen
                     : video?.statusCode >= 3 ? (
