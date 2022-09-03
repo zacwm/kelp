@@ -134,7 +134,7 @@ const VirtualList = ({
           boxSizing: 'border-box',
         }}
         totalCount={itemData.length}
-        overscan={250}
+        overscan={360}
         components={Components}
         itemContent={itemContent}
         endReached={onEndReached}
