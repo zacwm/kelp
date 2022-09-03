@@ -95,15 +95,13 @@ const Room: React.FC = () => {
   }, [room, closingRoom, socket]);
 
   const onTorrentStart = (torrentURL: string) => {
-    console.dir('x4899');
-    if (!socket) return console.dir('b1');
-    if (!room) return console.dir('b2');
-    if (!torrentURL) return console.dir('b3');
+    if (!socket) return;
+    if (!room) return;
+    if (!torrentURL) return;
     socket.emit('roomStartTorrent', {
       id: room.id,
       url: torrentURL,
     }, (res) => {
-      console.dir(res);
       if (res.error) alert(res.error);
     });
   };
