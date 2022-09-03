@@ -5,8 +5,8 @@ import { Box, Stack, Group, Text, Button, ActionIcon, Badge, AspectRatio } from 
 import { IconArrowLeft, IconExternalLink } from '@tabler/icons';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCalendar, faStar } from '@fortawesome/free-regular-svg-icons';
-import { faClock, faCircleQuestion } from '@fortawesome/free-regular-svg-icons';
+import { faCalendar, faStar, faClock, faCircleQuestion } from '@fortawesome/free-regular-svg-icons';
+import DownloadButton from './DownloadButton';
 
 const FanartBanner: React.FC<any> = ({ imgSrc }) => {
   const srcSplit = imgSrc.split('/');
@@ -37,7 +37,7 @@ type Props = {
   close: () => void,
 }
 
-const TitleDisplay: React.FC<Props> = ({ styles, title, setGenre, close }) => {
+const TitleDisplay: React.FC<Props> = ({ styles, title, onTitleSelect, setGenre, close }) => {
   if (!title) return null;
 
   const formatTitleRuntime = () => {
@@ -64,8 +64,8 @@ const TitleDisplay: React.FC<Props> = ({ styles, title, setGenre, close }) => {
         size="lg"
         sx={{
           position: 'absolute',
-          top: 20,
-          left: 20,
+          top: 30,
+          left: 30,
           zIndex: 100,
         }}
       >
@@ -75,7 +75,6 @@ const TitleDisplay: React.FC<Props> = ({ styles, title, setGenre, close }) => {
         sx={{
           height: '100%',
           width: '100%',
-          padding: '75px',
           position: 'relative',
           boxSizing: 'border-box',
         }}
@@ -84,27 +83,27 @@ const TitleDisplay: React.FC<Props> = ({ styles, title, setGenre, close }) => {
         <Group
           sx={{
             position: 'relative',
-            overflowY: 'auto',
             height: '100%',
           }}
           align="flex-start"
+          spacing={0}
         >
           <Stack
             sx={{
-              width: '300px',
-              marginRight: '30px',
+              width: 320,
               position: 'relative',
+              margin: '90px 60px 0 90px',
+              boxSizing: 'border-box',
             }}
             spacing={0}
           >
             <img
               src={ title.images?.poster }
               alt={ title.title }
-              width="280px"
+              width="100%"
               loading="lazy"
               style={{
                 borderRadius: 12,
-                boxShadow: '0 1px 3px rgb(0 0 0 / 5%), rgb(0 0 0 / 5%) 0px 20px 25px -5px, rgb(0 0 0 / 4%) 0px 10px 10px -5px',
                 marginBottom: 15,
               }}
             />
@@ -213,48 +212,55 @@ const TitleDisplay: React.FC<Props> = ({ styles, title, setGenre, close }) => {
           <Stack
             sx={{
               height: '100%',
+              overflowY: 'auto',
+              padding: '150px 30px 30px 0',
               flex: 0.75,
             }}
+            spacing={0}
           >
             <Text
-              size={38}
+              size={48}
               color="#fff"
               weight={700}
+              sx={{
+                lineHeight: 1,
+                marginBottom: 60,
+              }}
             >
               { title.title }
             </Text>
-            <Text size={15} color="#98989a">{ title.synopsis }</Text>
-            <Box
+            <Text
+              size={14}
+              color="#98989a"
               sx={{
-                height: '100%',
-                width: '100%',
-                marginTop: 30,
-                borderRadius: 12,
-                overflow: 'hidden',
+                marginBottom: 30,
               }}
             >
-              {title.trailer && (
-                <AspectRatio
-                  ratio={16 / 9}
-                  sx={{
-                    width: '100%',
-                    maxWidth: 800,
-                    borderRadius: '10px',
-                    overflow: 'hidden',
-                  }}
-                >
-                  <iframe
-                    width="100%"
-                    height="100%"
-                    src={ 'https://www.youtube.com/embed/' + title.trailer.split('watch?v=')[1] }
-                    title="YouTube video player"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                    frameBorder="0"
-                  />
-                </AspectRatio>
-              )}
-            </Box>
+              { title.synopsis }
+            </Text>
+            <DownloadButton torrents={title.torrents} onTorrentSelect={onTitleSelect} />
+            {title.trailer && (
+              <AspectRatio
+                ratio={16 / 9}
+                sx={{
+                  width: '100%',
+                  maxWidth: 800,
+                  borderRadius: 12,
+                  overflow: 'hidden',
+                  marginTop: 30,
+                }}
+              >
+                <iframe
+                  width="100%"
+                  height="100%"
+                  src={ 'https://www.youtube.com/embed/' + title.trailer.split('watch?v=')[1] }
+                  title="YouTube video player"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  frameBorder="0"
+                />
+              </AspectRatio>
+            )}
           </Stack>
         </Group>
       </Stack>
