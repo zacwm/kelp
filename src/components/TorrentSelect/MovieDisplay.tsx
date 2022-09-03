@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { Box, Stack, Group, Text, Button, ActionIcon, Badge, Select, AspectRatio } from '@mantine/core';
+import { Box, Stack, Group, Text, Button, ActionIcon, Badge, AspectRatio } from '@mantine/core';
 
 import { IconArrowLeft, IconExternalLink } from '@tabler/icons';
 
@@ -37,7 +37,7 @@ type Props = {
   close: () => void,
 }
 
-const TitleDisplay: React.FC<Props> = ({ styles, title, onTitleSelect, setGenre, close }) => {
+const TitleDisplay: React.FC<Props> = ({ styles, title, setGenre, close }) => {
   if (!title) return null;
 
   const formatTitleRuntime = () => {
@@ -145,7 +145,6 @@ const TitleDisplay: React.FC<Props> = ({ styles, title, onTitleSelect, setGenre,
                     { title.certification }
                   </Text>
                 </Group>
-
                 <Group spacing={10}>
                   <FontAwesomeIcon 
                     icon={faClock} 
