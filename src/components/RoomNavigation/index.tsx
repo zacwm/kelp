@@ -26,6 +26,7 @@ type Props = {
   setSelectSort: React.Dispatch<React.SetStateAction<string | null>>;
   userId: string;
   onTorrentStart: (torrent: string) => void;
+  setSelectedTitle: React.Dispatch<React.SetStateAction<any>>;
 }
 
 const RoomNavigation: React.FC<Props> = ({
@@ -40,6 +41,7 @@ const RoomNavigation: React.FC<Props> = ({
   setSelectSort,
   userId,
   onTorrentStart,
+  setSelectedTitle,
 }) => {
   const [inputKeywords, setInputKeywords] = React.useState('');
   const [isTorrentLink, setIsTorrentLink] = React.useState(false);
@@ -79,8 +81,10 @@ const RoomNavigation: React.FC<Props> = ({
             onClick={() => {
               setTitleCategory('movies');
               setInputKeywords('');
+              setSearchKeywords('');
               setSelectGenre('');
               setSelectSort('trending');
+              setSelectedTitle(null);
             }}
           />
         </Box>

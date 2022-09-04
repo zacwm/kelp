@@ -11,6 +11,8 @@ type Props = {
 }
 
 const DownloadButton: React.FC<Props> = ({ torrents, onTorrentSelect }) => {
+  if (!torrents) return null;
+  
   const hasMultipleLanguages: boolean = Object.keys(torrents).length > 1;
   const reducedTorrents: any = Object.values(torrents).reduce((acc: any, val: any, index: number) => {
     const qualities = Object.keys(val).map((key: string) => {

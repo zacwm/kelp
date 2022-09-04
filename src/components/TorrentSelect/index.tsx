@@ -21,6 +21,8 @@ type Props = {
   setSelectGenre: React.Dispatch<React.SetStateAction<string | null>>;
   selectSort: string | null;
   onTorrentStart: (torrent: string) => void;
+  selectedTitle: any;
+  setSelectedTitle: React.Dispatch<React.SetStateAction<any>>;
 }
 
 const TorrentSelect: React.FC<Props> = ({
@@ -33,14 +35,19 @@ const TorrentSelect: React.FC<Props> = ({
   setSelectGenre,
   selectSort,
   onTorrentStart,
+  selectedTitle,
+  setSelectedTitle,
 }) => {
   const [openCustomTorrentPrompt, setOpenCustomTorrentPrompt] = React.useState<boolean>(false);
   const [torrentList, setTorrentList] = React.useState<object[]>([]);
-  const [selectedTitle, setSelectedTitle] = React.useState<any>(null);
   
   React.useEffect(() => {
     loadTorrentList(1, false, true);
   }, [titleCategory, searchKeywords, selectGenre, selectSort]);
+
+  React.useEffect(() => {
+    setSelectedTitle(null);
+  }, [loadingTitles]);
 
   const loadTorrentList = async (
     page: number,

@@ -37,6 +37,8 @@ const Room: React.FC = () => {
   // const [openCustomTorrentPrompt, setOpenCustomTorrentPrompt] = React.useState<boolean>(false);
   const [loadingTitles, setLoadingTitles] = React.useState<boolean>(true);
 
+  const [selectedTitle, setSelectedTitle] = React.useState<any>(null);
+
   React.useEffect((): any => {
     const newSocket = io();
     setSocket(newSocket);
@@ -153,6 +155,7 @@ const Room: React.FC = () => {
               setSelectSort={setSelectSort}
               userId={userId}
               onTorrentStart={onTorrentStart}
+              setSelectedTitle={setSelectedTitle}
             />
             {/* "The screen" parent */}
             <Box sx={{
@@ -176,6 +179,8 @@ const Room: React.FC = () => {
                     setSelectGenre={setSelectGenre}
                     selectSort={selectSort}
                     onTorrentStart={onTorrentStart}
+                    selectedTitle={selectedTitle}
+                    setSelectedTitle={setSelectedTitle}
                   />
                 )
                   // Starting download screen
