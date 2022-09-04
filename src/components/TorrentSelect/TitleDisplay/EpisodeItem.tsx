@@ -1,6 +1,7 @@
 import * as React from 'react';
 
-import { Box, Text, Group, Button, Stack } from '@mantine/core';
+import { Box, Text, Group, Stack } from '@mantine/core';
+import DownloadButton from './DownloadButton';
 
 type Props = {
   episodeData: any,
@@ -22,18 +23,11 @@ const EpisodeItem: React.FC<Props> = ({ episodeData, onSelect }) => {
         <Stack sx={{ flex: 1 }}>
           <Text>{episodeData.title}</Text>
         </Stack>
-        <Button
-          onClick={() => {
-            if (episodeData.torrents['1080p']?.url) {
-              onSelect(episodeData.torrents['1080p'].url);
-            } else {
-              const firstQuality = Object.keys(episodeData.torrents)[0];
-              onSelect(episodeData.torrents[firstQuality].url);
-            }
-          }}
-        >
-          Watch
-        </Button>
+        <DownloadButton
+          torrents={episodeData.torrents}
+          forceLang="en"
+          onTorrentSelect={onSelect}
+        />
       </Group>
     </Box>
   );

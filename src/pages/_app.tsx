@@ -11,6 +11,7 @@ import {
   TextInputProps,
   SelectProps,
   ScrollAreaProps,
+  AccordionProps,
 } from '@mantine/core';
 
 const kelpPalette: any = ['#000000', '#08080f', '#191921', '#2f2f3d', '#3bd4ae', '#98989a', '#ffffff', '#ae95da', '#00bc70', '#00a19b'];
@@ -149,6 +150,21 @@ const ScrollAreaDefaultProps: Partial<ScrollAreaProps> = {
   },
 };
 
+const AccordionDefaultProps: Partial<AccordionProps> = {
+  styles: {
+    item: {
+      backgroundColor: 'transparent',
+      border: `2px solid ${kelpPalette[3]}`,
+      color: kelpPalette[5],
+
+      '&[data-active]': {
+        backgroundColor: 'transparent',
+        border: `2px solid ${kelpPalette[3]}`,
+      },
+    },
+  }
+};
+
 export default function App(props: AppProps ) {
   const { Component, pageProps } = props;
   return (
@@ -178,6 +194,7 @@ export default function App(props: AppProps ) {
             },
             Select: { defaultProps: SelectDefaultProps },
             ScrollArea: { defaultProps: ScrollAreaDefaultProps },
+            Accordion: { defaultProps: AccordionDefaultProps },
           },
           colorScheme: 'dark',
           colors: {

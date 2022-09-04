@@ -1,9 +1,7 @@
 import * as React from 'react';
 import type { Socket } from 'socket.io-client';
 
-import MovieDisplay from './MovieDisplay';
-import ShowDisplay from './ShowDisplay';
-import CustomTorrentPrompt from './CustomTorrentPrompt';
+import TitleDisplay from './TitleDisplay';
 import VirtualList from './VirtualList';
 
 import { 
@@ -38,7 +36,6 @@ const TorrentSelect: React.FC<Props> = ({
   selectedTitle,
   setSelectedTitle,
 }) => {
-  const [openCustomTorrentPrompt, setOpenCustomTorrentPrompt] = React.useState<boolean>(false);
   const [torrentList, setTorrentList] = React.useState<object[]>([]);
   
   React.useEffect(() => {
@@ -101,48 +98,20 @@ const TorrentSelect: React.FC<Props> = ({
       }}
     >
       <Transition
-        mounted={openCustomTorrentPrompt}
+        mounted={selectedTitle}
         transition="slide-up"
         duration={400}
         timingFunction="ease"
       >
         {(styles) => (
-          <CustomTorrentPrompt
+          <TitleDisplay
+            socket={socket}
             styles={styles}
-            setTorrent={(url) => onTorrentStart(url)}
-            close={() => setOpenCustomTorrentPrompt(false)}
-          />
-        )}
-      </Transition>
-      <Transition
-        mounted={selectedTitle && titleCategory == 'movies'}
-        transition="slide-up"
-        duration={400}
-        timingFunction="ease"
-      >
-        {(styles) => (
-          <MovieDisplay
-            styles={styles}
-            title={titleCategory == 'movies' && selectedTitle}
+            title={selectedTitle}
+            type={titleCategory}
             onTitleSelect={(url) => onTorrentStart(url)}
             setGenre={setSelectGenre}
             close={() => setSelectedTitle(null)}
-          />
-        )}
-      </Transition>
-      <Transition
-        mounted={selectedTitle && titleCategory == 'shows'}
-        transition="slide-up"
-        duration={400}
-        timingFunction="ease"
-      >
-        {(styles) => (
-          <ShowDisplay
-            styles={styles}
-            title={titleCategory == 'shows' && selectedTitle}
-            onTitleSelect={(url) => onTorrentStart(url)}
-            close={() => setSelectedTitle(null)}
-            socket={socket}
           />
         )}
       </Transition>

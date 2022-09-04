@@ -1,29 +1,44 @@
 import * as React from 'react';
 
-import { Box, Group, Button, Popover, Text } from '@mantine/core';
+import { Box, Group, Button, Popover } from '@mantine/core';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleDown } from '@fortawesome/free-solid-svg-icons';
 
 type Props = {
   torrents: any,
+  forceLang?: string,
   onTorrentSelect: (url: string) => void,
 }
 
-const DownloadButton: React.FC<Props> = ({ torrents, onTorrentSelect }) => {
+const DownloadButton: React.FC<Props> = ({ torrents, forceLang, onTorrentSelect }) => {
   if (!torrents) return null;
   
-  const hasMultipleLanguages: boolean = Object.keys(torrents).length > 1;
-  const reducedTorrents: any = Object.values(torrents).reduce((acc: any, val: any, index: number) => {
-    const qualities = Object.keys(val).map((key: string) => {
+  const hasMultipleLanguages: boolean = forceLang ? false : Object.keys(torrents).length > 1;
+  let reducedTorrents: any;
+  
+  if (forceLang) {
+    // filter for qualityies ending with p
+    const filteredTorrents = Object.keys(torrents).filter((key: string) => key.endsWith('p'));
+    reducedTorrents = filteredTorrents.map((key: string) => {
       return {
-        language: Object.keys(torrents)[index],
+        language: forceLang,
         quality: key,
-        ...val[key],
+        ...torrents[key],
       };
     });
-    return [...acc, ...qualities];
-  }, []);
+  } else {
+    reducedTorrents = Object.values(torrents).reduce((acc: any, val: any, index: number) => {
+      const qualities = Object.keys(val).map((key: string) => {
+        return {
+          language: Object.keys(torrents)[index],
+          quality: key,
+          ...val[key],
+        };
+      });
+      return [...acc, ...qualities];
+    }, []);
+  }
 
   reducedTorrents.sort((a: any, b: any) => {
     const aQualityParsed = parseInt(a.quality.replace('p', ''));

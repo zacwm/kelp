@@ -133,13 +133,18 @@ class SocketServer {
         }
       });
 
-      socket.on('getShowData', async (showId, callback) => {
+      socket.on('getTitleDetails', async (title, callback) => {
         try {
-          const { data } = await axios.get(`${process.env.POPCORN_TIME_API}show/${showId}`);
-          callback({ show: data });
+          let type;
+          if (title.type === 'movies') type = 'movie';
+          if (title.type === 'shows') type = 'show';
+          if (!type) return callback({ error: 'Invalid title type' });
+
+          const { data } = await axios.get(`${process.env.POPCORN_TIME_API}${type}/${title.id}`);
+          callback(data);
         } catch (err) {
           console.warn(err);
-          callback({ error: 'Internal Server Error' });
+          callback({ error: 'I`nternal Server Error' });
         }
       });
   
