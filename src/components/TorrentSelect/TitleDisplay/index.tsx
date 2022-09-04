@@ -11,7 +11,7 @@ import EpisodeItem from './EpisodeItem';
 import DownloadButton from './DownloadButton';
 
 const FanartBanner: React.FC<any> = ({ imgSrc }) => {
-  const srcSplit = imgSrc.split('/');
+  const srcSplit = (imgSrc || '').split('/');
   const getImagesId = srcSplit[srcSplit.length - 1];
   const sourceUrl = `https://image.tmdb.org/t/p/w1920_and_h1080_multi_faces/${getImagesId}`;
 
@@ -50,11 +50,15 @@ const TitleDisplay: React.FC<Props> = ({
   setGenre,
   close,
 }) => {
-  if (!title) return null;
-
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
+  const [titleOverview, setTitleOverview] = React.useState<any>({});
   const [titleDetailed, setTitleDetailed] = React.useState<any>({});
   const [seasonEpisodesData, setSeasonEpisodesData] = React.useState<any>({});
+  
+  React.useEffect(() => {
+    if (!title) return;
+    setTitleOverview(title);
+  }, [title]);
 
   React.useEffect(() => {
     socket.emit('getTitleDetails', { type, id: title['_id'] }, (response) => {
@@ -85,7 +89,7 @@ const TitleDisplay: React.FC<Props> = ({
   }, [titleDetailed]);
 
   const formatTitleRuntime = () => {
-    const minutes = parseInt(title.runtime);
+    const minutes = parseInt(titleOverview.runtime);
     return `${Math.floor(minutes / 60)}h ${minutes % 60}m`;
   };
 
@@ -102,7 +106,7 @@ const TitleDisplay: React.FC<Props> = ({
         zIndex: 100,
       }}
     >
-      <FanartBanner imgSrc={title?.images?.fanart} />
+      <FanartBanner imgSrc={titleOverview?.images?.fanart} />
       <ActionIcon
         onClick={close}
         size="lg"
@@ -157,8 +161,8 @@ const TitleDisplay: React.FC<Props> = ({
                 spacing={0}
               >
                 <img
-                  src={ title.images?.poster }
-                  alt={ title.title }
+                  src={ titleOverview?.images?.poster }
+                  alt={ titleOverview.title }
                   width="100%"
                   loading="lazy"
                   style={{
@@ -182,7 +186,7 @@ const TitleDisplay: React.FC<Props> = ({
                           color: '#98989a',
                         }}
                       >
-                        { title.year }
+                        { titleOverview.year }
                       </Text>
                     </Group>
                     
@@ -238,7 +242,7 @@ const TitleDisplay: React.FC<Props> = ({
                           color: '#98989a',
                         }}
                       >
-                        { title.rating.percentage / 10 }
+                        { titleOverview.rating.percentage / 10 }
                       </Text>
                     </Group>
                   </Group>
@@ -292,7 +296,7 @@ const TitleDisplay: React.FC<Props> = ({
                       marginBottom: 60,
                     }}
                   >
-                    { title.title }
+                    { titleOverview.title }
                   </Text>
                   <Text
                     size={14}
@@ -303,8 +307,8 @@ const TitleDisplay: React.FC<Props> = ({
                   >
                     { titleDetailed.synopsis }
                   </Text>
-                  <DownloadButton torrents={title.torrents} onTorrentSelect={onTitleSelect} />
-                  {title.trailer && (
+                  <DownloadButton torrents={titleOverview.torrents} onTorrentSelect={onTitleSelect} />
+                  {titleOverview.trailer && (
                     <AspectRatio
                       ratio={16 / 9}
                       sx={{
@@ -318,7 +322,7 @@ const TitleDisplay: React.FC<Props> = ({
                       <iframe
                         width="100%"
                         height="100%"
-                        src={ 'https://www.youtube.com/embed/' + title.trailer.split('watch?v=')[1] }
+                        src={ 'https://www.youtube.com/embed/' + titleOverview.trailer.split('watch?v=')[1] }
                         title="YouTube video player"
                         allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                         allowFullScreen
