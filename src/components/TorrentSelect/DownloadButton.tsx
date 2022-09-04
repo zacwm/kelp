@@ -23,6 +23,17 @@ const DownloadButton: React.FC<Props> = ({ torrents, onTorrentSelect }) => {
     return [...acc, ...qualities];
   }, []);
 
+  reducedTorrents.sort((a: any, b: any) => {
+    const aQualityParsed = parseInt(a.quality.replace('p', ''));
+    const bQualityParsed = parseInt(b.quality.replace('p', ''));
+    // Sort by language then by quality
+    if (a.language < b.language) return -1;
+    if (a.language > b.language) return 1;
+    if (aQualityParsed < bQualityParsed) return 1;
+    if (aQualityParsed > bQualityParsed) return -1;
+    return 0;
+  });
+
   // Find a 1080p en torrent if not find a 1080p torrent in first language
   const defaultTorrent: any = reducedTorrents.find((torrent: any) => torrent.quality === '1080p' && torrent.language === 'en') || reducedTorrents.find((torrent: any) => torrent.quality === '1080p');
 
