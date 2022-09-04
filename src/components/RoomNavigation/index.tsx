@@ -59,6 +59,11 @@ const RoomNavigation: React.FC<Props> = ({
     { label: 'TV Shows', value: 'shows' },
   ];
 
+  const doSearch = () => {
+    if (isTorrentLink) return onTorrentStart(inputKeywords);
+    setSearchKeywords(inputKeywords);
+  };
+
   return (
     <Group
       position="apart"
@@ -183,6 +188,9 @@ const RoomNavigation: React.FC<Props> = ({
             onChange={(e) => {
               setInputKeywords(e.target.value);
             }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') return doSearch();
+            }}
             disabled={loadingTitles}
             placeholder="Search or Torrent/Magnet"
             styles={{
@@ -220,9 +228,7 @@ const RoomNavigation: React.FC<Props> = ({
               borderRadius: '0 12px 12px 0',
               cursor: 'pointer',
             }}
-            onClick={() => {
-              isTorrentLink ? onTorrentStart(inputKeywords) : setSearchKeywords(inputKeywords);
-            }}
+            onClick={doSearch}
           >
             { isTorrentLink ? <img src="/DownloadIcon.svg" /> : <img src="/SearchIcon.svg" /> }
           </Box>

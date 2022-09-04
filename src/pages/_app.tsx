@@ -10,6 +10,7 @@ import {
   PasswordInputProps,
   TextInputProps,
   SelectProps,
+  ScrollAreaProps,
 } from '@mantine/core';
 
 const kelpPalette: any = ['#000000', '#08080f', '#191921', '#2f2f3d', '#3bd4ae', '#98989a', '#ffffff', '#ae95da', '#00bc70', '#00a19b'];
@@ -37,7 +38,6 @@ const ButtonDefaultProps: Partial<ButtonProps> = {
 
 const TextInputDefaultProps: Partial<TextInputProps> = {
   radius: 12,
-  size: 'sm',
   styles: {
     input: {
       backgroundColor: kelpPalette[3],
@@ -108,6 +108,7 @@ const SelectDefaultProps: Partial<SelectProps> = {
       fontWeight: 700,
     },
     dropdown: {
+      marginTop: -3,
       borderRadius: 12,
       backgroundColor: kelpPalette[3],
       border: 'none',
@@ -115,8 +116,34 @@ const SelectDefaultProps: Partial<SelectProps> = {
     },
     item: {
       borderRadius: 12,
-      '&:hover': {
+      height: 36,
+      padding: '7px 12px',
+
+      '&[data-selected]': {
+        '&, &:hover': {
+          backgroundImage: `linear-gradient(135deg, ${kelpPalette[8]} 0%, ${kelpPalette[9]} 100%)`,
+        },
+      },
+
+      '&[data-hovered]': {
         backgroundColor: kelpPalette[2],
+      },
+    },
+  },
+};
+
+const ScrollAreaDefaultProps: Partial<ScrollAreaProps> = {
+  styles: {
+    scrollbar: {
+      backgroundColor: 'transparent',
+      '&:hover': {
+        backgroundColor: 'transparent',
+      },
+    },
+    thumb: {
+      backgroundColor: '#2f2f3d',
+      '&:hover': {
+        backgroundColor: '#2f2f3d !important',
       },
     },
   },
@@ -150,6 +177,7 @@ export default function App(props: AppProps ) {
               },
             },
             Select: { defaultProps: SelectDefaultProps },
+            ScrollArea: { defaultProps: ScrollAreaDefaultProps },
           },
           colorScheme: 'dark',
           colors: {
