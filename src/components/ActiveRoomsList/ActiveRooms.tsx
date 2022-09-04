@@ -53,8 +53,7 @@ const ActiveRooms: React.FC<Props> = ({ socket }) => {
         justifyContent: 'center',
         alignItems: 'center',
         width: 540,
-        height: '100%', 
-      }}    
+      }}
     >
       <Grid container spacing={2}>
         <Grid item xs={12}>
@@ -75,11 +74,11 @@ const ActiveRooms: React.FC<Props> = ({ socket }) => {
             <Paper 
               shadow="xs" 
               radius={12} 
-              p="md" 
               withBorder
               sx={{
                 backgroundColor:'#08080f',
                 border: '1px solid #191921',
+                padding: '30px 30px 0 30px',
               }}
             >
               <Text 
@@ -87,14 +86,18 @@ const ActiveRooms: React.FC<Props> = ({ socket }) => {
                 align="center" 
                 weight={300}
                 color="#98989a"
+                sx={{
+                  lineHeight: 1,
+                }}
               >
                 Active Rooms
               </Text>
               <ScrollArea
                 scrollbarSize={8}
-                style={{
-                  height: 168,
-                  marginTop: '20px',
+                sx={{
+                  paddingBottom: 15,
+                  marginTop: '30px',
+                  maxHeight: '250px',
                 }}
                 styles={{
                   scrollbar: {
@@ -111,7 +114,7 @@ const ActiveRooms: React.FC<Props> = ({ socket }) => {
                   }
                 }}
               >
-                <Stack alignItems="stretch" spacing={2}>
+                <Stack alignItems="stretch" spacing={0}>
                   {
                     activeRooms.map(room => (
                       <RoomItem

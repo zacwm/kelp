@@ -30,6 +30,7 @@ const RoomItem: React.FC<Props> = ({ room }) => {
         width: '100%',
         height: '100%',
         boxSizing: 'border-box',
+        marginBottom: '15px',
       }}    
     >
       <FontAwesomeIcon 

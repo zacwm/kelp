@@ -53,10 +53,9 @@ const CreateRooms: React.FC<Props> = ({ socket }) => {
         justifyContent: 'center',
         alignItems: 'center',
         width: 540,
-        height: '100%',
       }}
     >
-      <Grid container spacing={2}>
+      <Grid container spacing={0}>
         <Grid item xs={12}>
           <Collapse
             in={createRoomErrorMessage} 
@@ -71,10 +70,11 @@ const CreateRooms: React.FC<Props> = ({ socket }) => {
               variant="outline"
               color="kelpPalette.7"
               onClose={() => setCreateRoomErrorMessage(null)}
+              radius={12}
               styles={{
                 root: {
                   backgroundColor: '#191921',
-                  marginBottom: 15
+                  marginBottom: 30,
                 },
                 message: {
                   color: '#98989a',
@@ -87,17 +87,20 @@ const CreateRooms: React.FC<Props> = ({ socket }) => {
           <Paper 
             shadow="xs" 
             radius={12} 
-            p="md" 
+            p={30}
             sx={{
               backgroundColor: '#08080f',
               border: '1px solid #191921',
             }}
           >
-            <Stack alignItems="center" spacing={2}>
+            <Stack alignItems="center" spacing={0}>
               <Text
                 size={25}
                 weight={300}
                 color="#98989a"
+                sx={{
+                  lineHeight: 1,
+                }}
               >
                 Create Room
               </Text>
@@ -106,8 +109,9 @@ const CreateRooms: React.FC<Props> = ({ socket }) => {
                 disabled={createRoomPending}
                 value={inputRoomName}
                 onChange={(e) => setInputRoomName(e.currentTarget.value)}
-                sx={{ 
+                sx={{
                   width: '100%',
+                  marginTop: 30,
                 }}
               />
               <PasswordInput
@@ -115,13 +119,17 @@ const CreateRooms: React.FC<Props> = ({ socket }) => {
                 disabled={createRoomPending}
                 value={inputRoomPassword}
                 onChange={(e) => setInputRoomPassword(e.currentTarget.value)}
-                sx={{ width: '100%', mb: 2 }}
+                sx={{
+                  width: '100%',
+                  marginTop: 15,
+                }}
               />
               <Button
                 onClick={buttonCreateRoom}
                 disabled={createRoomPending}
                 sx={{
                   width: 130,
+                  marginTop: 30,
                 }}
               >
                 Create Room

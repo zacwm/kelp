@@ -34,7 +34,6 @@ const Room: React.FC = () => {
   const [searchKeywords, setSearchKeywords] = React.useState('');
   const [selectGenre, setSelectGenre] = React.useState<string | null>('');
   const [selectSort, setSelectSort] = React.useState<string | null>('trending');
-  // const [openCustomTorrentPrompt, setOpenCustomTorrentPrompt] = React.useState<boolean>(false);
   const [loadingTitles, setLoadingTitles] = React.useState<boolean>(true);
 
   const [selectedTitle, setSelectedTitle] = React.useState<any>(null);

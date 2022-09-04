@@ -6,7 +6,7 @@ import io from 'socket.io-client';
 import Container from '@mui/material/Container';
 import Box from '@mui/material/Box';
 
-import { Image } from '@mantine/core';
+import { Image, Center } from '@mantine/core';
 import ActiveRooms from '../components/ActiveRoomsList/ActiveRooms';
 import CreateRooms from '../components/CreateRoom';
 import HomeFooter from '../components/HomeFooter';
@@ -37,18 +37,21 @@ const Home: NextPage = () => {
           textAlign: 'center',
         }}
       />
-      <Box
-        sx={{
-          display: 'flex',
-          flexDirection: 'row',
-          justifyContent: 'center',
-          alignItems: 'flex-start',
-          height: '100vh',
-        }}
-      >
-        <CreateRooms socket={socket}/>
-        <ActiveRooms socket={socket}/>  
-      </Box>
+      <Center sx={{
+        height: '100vh',
+      }}>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'flex-start',
+          }}
+        >
+          <CreateRooms socket={socket}/>
+          <ActiveRooms socket={socket}/>  
+        </Box>
+      </Center>
       <HomeFooter />
     </Container>
   );
