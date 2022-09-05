@@ -19,6 +19,7 @@
     "isolatedModules": true,
     "jsx": "preserve",
     "sourceMap": true,
+    "baseUrl": "./src",
   },
   "include": [
     "next-env.d.ts",
@@ -26,6 +27,7 @@
     "**/*.tsx"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "next.config.js",
   ]
 }

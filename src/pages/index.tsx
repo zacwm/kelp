@@ -2,15 +2,16 @@ import * as React from 'react';
 import Head from 'next/head';
 import type { NextPage } from 'next';
 
+import { SocketProvider } from 'contexts/socket.context';
+
 import Container from '@mui/material/Container';
 import Box from '@mui/material/Box';
 
 import { Image, Center } from '@mantine/core';
 
-import ActiveRooms from '../components/ActiveRooms';
-import CreateRooms from '../components/CreateRoom';
-import HomeFooter from '../components/HomeFooter';
-import { SocketProvider } from '../contexts/socket.context';
+import ActiveRooms from 'components/ActiveRooms';
+import CreateRooms from 'components/CreateRoom';
+import HomeFooter from 'components/HomeFooter';
 
 const Home: React.FC = () => {
   return (

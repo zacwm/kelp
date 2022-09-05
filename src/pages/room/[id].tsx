@@ -3,14 +3,14 @@ import type { NextPage } from 'next';
 import { CookiesProvider } from 'react-cookie';
 import moment from 'moment';
 
-import { SocketProvider, useSocket } from '../../contexts/socket.context';
-import { RoomProvider, useRoom } from '../../contexts/room.context';
-import { VideoProvider, useVideo } from '../../contexts/video.context';
+import { SocketProvider, useSocket } from 'contexts/socket.context';
+import { RoomProvider, useRoom } from 'contexts/room.context';
+import { VideoProvider, useVideo } from 'contexts/video.context';
 
-import JoinModal from '../../components/JoinModal';
-import RoomNavigation from '../../components/RoomNavigation';
-import Player from '../../components/Player';
-import TorrentSelect from '../../components/TorrentSelect';
+import JoinModal from 'components/JoinModal';
+import RoomNavigation from 'components/RoomNavigation';
+import Player from 'components/Player';
+import TorrentSelect from 'components/TorrentSelect';
 
 import { Box, Text, Paper, Stack, Group, Progress, Center, ActionIcon } from '@mantine/core';
 

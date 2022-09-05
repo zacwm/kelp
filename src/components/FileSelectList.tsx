@@ -1,8 +1,8 @@
 import * as React from 'react';
 
-import { useSocket } from '../contexts/socket.context';
-import { useRoom } from '../contexts/room.context';
-import { useVideo } from '../contexts/video.context';
+import { useSocket } from 'contexts/socket.context';
+import { useRoom } from 'contexts/room.context';
+import { useVideo } from 'contexts/video.context';
 
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';

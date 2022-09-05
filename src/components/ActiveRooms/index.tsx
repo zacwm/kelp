@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { useRouter } from 'next/router';
 
-import { useSocket } from '../../contexts/socket.context';
+import { useSocket } from 'contexts/socket.context';
 
 import RoomItem from './RoomItem';
 

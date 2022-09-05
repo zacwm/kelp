@@ -10,7 +10,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser } from '@fortawesome/free-regular-svg-icons';
 
 import UserList from './UserList';
-import { useRoom } from '../../../../contexts/room.context';
+import { useRoom } from 'contexts/room.context';
 
 type Props = {
   userId: string;

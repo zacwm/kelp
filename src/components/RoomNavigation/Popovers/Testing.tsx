@@ -1,7 +1,7 @@
 import * as React from 'react';
 
-import { useSocket } from '../../../contexts/socket.context';
-import { useRoom } from '../../../contexts/room.context';
+import { useSocket } from 'contexts/socket.context';
+import { useRoom } from 'contexts/room.context';
 
 import {
   Popover,

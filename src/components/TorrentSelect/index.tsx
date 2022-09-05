@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { useSocket } from '../../contexts/socket.context';
+import { useSocket } from 'contexts/socket.context';
 
 import TitleDisplay from './TitleDisplay';
 import VirtualList from './VirtualList';
@@ -36,7 +36,7 @@ const TorrentSelect: React.FC<Props> = ({
   setSelectedTitle,
 }) => {
   const { socket } = useSocket();
-  
+
   const [torrentList, setTorrentList] = React.useState<object[]>([]);
   
   React.useEffect(() => {

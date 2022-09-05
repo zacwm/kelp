@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { useSocket } from '../../../contexts/socket.context';
+import { useSocket } from 'contexts/socket.context';
 
 import { Accordion, Box, Center, Stack, Group, Text, Button, ActionIcon, Badge, AspectRatio, Loader, ScrollArea } from '@mantine/core';
 

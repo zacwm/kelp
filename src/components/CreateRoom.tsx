@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import { useSocket } from '../contexts/socket.context';
+import { useSocket } from 'contexts/socket.context';
 
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';

@@ -2,8 +2,8 @@ import * as React from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 
-import { useSocket } from '../contexts/socket.context';
-import { useRoom } from '../contexts/room.context';
+import { useSocket } from 'contexts/socket.context';
+import { useRoom } from 'contexts/room.context';
 
 import Alert from '@mui/material/Alert';
 import Collapse from '@mui/material/Collapse';
