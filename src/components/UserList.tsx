@@ -4,8 +4,10 @@ import { useRoom } from '../contexts/room.context';
 
 import Stack from '@mui/material/Stack';
 
-import { Box, Divider, Text, TextInput, ActionIcon } from '@mantine/core';
+import { Box, Text, TextInput, ActionIcon } from '@mantine/core';
 import { IconCheck, IconPencil, IconUser, IconX } from '@tabler/icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faUser } from '@fortawesome/free-regular-svg-icons';
 
 type Props = {
   socket: any;
@@ -38,26 +40,40 @@ const UserList: React.FC<Props> = ({ socket, userId }) => {
       direction="column"
       alignItems="stretch"
       justifyContent="flex-start"
-      spacing={1}
+      sx={{
+        gap: '15px',
+      }}
     >
       {
         (room?.users || []).map((user, index) => (
           <React.Fragment key={index}>
-            <Box sx={{ p: 1, overflow: 'clip' }}>
+            <Box sx={{ overflow: 'clip' }}>
               <Stack
                 direction="row"
                 alignItems="center"
                 justifyContent="space-between"
-                spacing={1}
+                sx={{
+                  gap: '15px',
+                }}
               >
-                <IconUser size={20} />
+                <FontAwesomeIcon 
+                  icon={faUser}
+                  style={{ 
+                    fontSize:'15px',
+                  }}
+                />
                 {isEditingName && user.id === userId ? (
                   <TextInput
                     value={inputName}
                     onChange={(e) => setInputName(e.currentTarget.value)}
                   />
                 ) : (
-                  <Text sx={!(user.id === userId) ? { flex: 1 } : {}}>{user.name}</Text>
+                  <Text
+                    size={14}
+                    sx={!(user.id === userId) ? { flex: 1 } : {}}
+                  >
+                    {user.name}
+                  </Text>
                 )}
                 {user.id === userId && (
                   <Stack
@@ -101,7 +117,6 @@ const UserList: React.FC<Props> = ({ socket, userId }) => {
                 )}
               </Stack>
             </Box>
-            { (room?.users || []).length - 1 !== index && <Divider my="sm" /> }
           </React.Fragment>
         ))
       }

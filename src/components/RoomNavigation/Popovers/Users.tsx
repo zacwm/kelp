@@ -22,15 +22,18 @@ const UserPopover: React.FC<Props> = ({ socket, userId }) => {
   const { room } = useRoom();
 
   return (
-    <Popover width={300} position="bottom" shadow="md">
+    <Popover
+      width={300}
+      position="bottom"
+      shadow="md"
+    >
       <Popover.Target>
         <ActionIcon>
           <Indicator inline label={(room?.users || []).length} size={16}>
             <FontAwesomeIcon 
               icon={faUser}
               style={{ 
-                fontSize:'22px', 
-                marginRight: '8px',
+                fontSize:'22px',
               }} 
             />
           </Indicator>
@@ -41,6 +44,7 @@ const UserPopover: React.FC<Props> = ({ socket, userId }) => {
           borderRadius: 12,
           backgroundColor: '#2f2f3d',
           border: 'none',
+          padding: '15px',
         }}
       >
         <UserList socket={socket} userId={userId} />
