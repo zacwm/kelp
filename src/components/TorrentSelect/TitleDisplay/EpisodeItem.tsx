@@ -14,8 +14,11 @@ const EpisodeItem: React.FC<Props> = ({ episodeData, onSelect }) => {
       sx={{
         position: 'relative',
         width: '100%',
-        padding: '8px 16px',
+        padding: '7.5px 0',
         boxSizing: 'border-box',
+        '&:first-of-type': {
+          padding: '0 0 7.5px 0',
+        }
       }}
     >
       <Group>

@@ -151,17 +151,21 @@ const SelectDefaultProps: Partial<SelectProps> = {
 };
 
 const ScrollAreaDefaultProps: Partial<ScrollAreaProps> = {
+  scrollbarSize: 10,
+  offsetScrollbars: true,
   styles: {
     scrollbar: {
       backgroundColor: 'transparent',
+      margin: 15,
+
       '&:hover': {
         backgroundColor: 'transparent',
       },
     },
     thumb: {
-      backgroundColor: '#2f2f3d',
+      backgroundColor: kelpPalette[3],
       '&:hover': {
-        backgroundColor: '#2f2f3d !important',
+        backgroundColor: `${kelpPalette[3]} !important`,
       },
     },
   },
@@ -178,6 +182,9 @@ const AccordionDefaultProps: Partial<AccordionProps> = {
         backgroundColor: 'transparent',
         border: `2px solid ${kelpPalette[3]}`,
       },
+    },
+    content: {
+      padding: '0 30px 30px 30px',
     },
   }
 };

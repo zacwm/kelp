@@ -283,7 +283,9 @@ const TitleDisplay: React.FC<Props> = ({
               >
                 <Stack
                   sx={{
-                    padding: '150px 30% 30px 0',
+                    padding: '150px 30% 0 0',
+                    // TODO: Fix the margin bottom when there is an accordion. Height measurement is not working.
+                    marginBottom: 150,
                   }}
                   spacing={0}
                 >
@@ -303,6 +305,7 @@ const TitleDisplay: React.FC<Props> = ({
                     color="#98989a"
                     sx={{
                       marginBottom: 30,
+                      maxWidth: 930,
                     }}
                   >
                     { titleDetailed.synopsis }
@@ -316,7 +319,7 @@ const TitleDisplay: React.FC<Props> = ({
                         maxWidth: 800,
                         borderRadius: 12,
                         overflow: 'hidden',
-                        marginTop: 30,
+                        marginTop: 60,
                       }}
                     >
                       <iframe
@@ -335,12 +338,21 @@ const TitleDisplay: React.FC<Props> = ({
                       variant="separated"
                       chevronPosition="left"
                       radius={12}
-                      sx={{ maxHeight: 500 }}
+                      sx={{
+                        maxHeight: 500,
+                      }}
                     >
                       {
                         Object.keys(seasonEpisodesData).sort((a, b) => { return parseInt(a) - parseInt(b); }).map((season, sIndex) => (
                           <Accordion.Item value={`season${season}`} key={sIndex}>
-                            <Accordion.Control>Season {season}</Accordion.Control>
+                            <Accordion.Control
+                              sx={{
+                                padding: 30,
+                                lineHeight: 1,
+                              }}
+                            >
+                              Season {season}
+                            </Accordion.Control>
                             <Accordion.Panel>
                               {
                                 seasonEpisodesData[season].map((episode, eIndex) => (
