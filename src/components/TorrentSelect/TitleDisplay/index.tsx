@@ -280,6 +280,23 @@ const TitleDisplay: React.FC<Props> = ({
                   height: '100%',
                   flex: 1,
                 }}
+                offsetScrollbars
+                styles={{
+                  scrollbar: {
+                    backgroundColor: 'transparent',
+                    margin: 15,
+              
+                    '&:hover': {
+                      backgroundColor: 'transparent',
+                    },
+                  },
+                  thumb: {
+                    backgroundColor: '#2f2f3d',
+                    '&:hover': {
+                      backgroundColor: '#2f2f3d !important',
+                    },
+                  },
+                }}
               >
                 <Stack
                   sx={{

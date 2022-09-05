@@ -152,11 +152,9 @@ const SelectDefaultProps: Partial<SelectProps> = {
 
 const ScrollAreaDefaultProps: Partial<ScrollAreaProps> = {
   scrollbarSize: 10,
-  offsetScrollbars: true,
   styles: {
     scrollbar: {
       backgroundColor: 'transparent',
-      margin: 15,
 
       '&:hover': {
         backgroundColor: 'transparent',
