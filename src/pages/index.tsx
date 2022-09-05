@@ -7,7 +7,7 @@ import Box from '@mui/material/Box';
 
 import { Image, Center } from '@mantine/core';
 
-import ActiveRooms from '../components/ActiveRoomsList/ActiveRooms';
+import ActiveRooms from '../components/ActiveRooms';
 import CreateRooms from '../components/CreateRoom';
 import HomeFooter from '../components/HomeFooter';
 import { SocketProvider } from '../contexts/socket.context';
