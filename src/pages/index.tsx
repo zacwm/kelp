@@ -10,8 +10,9 @@ import { Image, Center } from '@mantine/core';
 import ActiveRooms from '../components/ActiveRoomsList/ActiveRooms';
 import CreateRooms from '../components/CreateRoom';
 import HomeFooter from '../components/HomeFooter';
+import { SocketProvider } from '../contexts/socket.context';
 
-const Home: NextPage = () => {
+const Home: React.FC = () => {
   return (
     <Container maxWidth="lg">
       <Head>
@@ -51,4 +52,12 @@ const Home: NextPage = () => {
   );
 };
 
-export default Home;
+const HomeRoot: NextPage = () => {
+  return (
+    <SocketProvider>
+      <Home />
+    </SocketProvider>
+  );
+};
+
+export default HomeRoot;
