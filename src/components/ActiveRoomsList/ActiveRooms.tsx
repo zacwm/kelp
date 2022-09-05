@@ -1,6 +1,8 @@
 import * as React from 'react';
 import { useRouter } from 'next/router';
 
+import { useSocket } from '../../contexts/socket.context';
+
 import RoomItem from './RoomItem';
 
 import Box from '@mui/material/Box';
@@ -11,15 +13,14 @@ import { IconAlertCircle } from '@tabler/icons';
 
 import { Paper, Alert, Text, ScrollArea } from '@mantine/core';
 
-type Props = {
-  socket: any;
-}
-
-const ActiveRooms: React.FC<Props> = ({ socket }) => {
+const ActiveRooms: React.FC = () => {
   const router = useRouter();
+  const { roomclosed } = router.query;
+
+  const { socket } = useSocket();
+  
   const [roomClosedMessage, setRoomClosedMessage] = React.useState(undefined);
   const [activeRooms, setActiveRooms] = React.useState([]);
-  const { roomclosed } = router.query;
 
   React.useEffect((): void => {
     if (roomclosed) {

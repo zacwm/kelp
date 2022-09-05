@@ -1,5 +1,4 @@
 import * as React from 'react';
-import type { Socket } from 'socket.io-client';
 
 import {
   Group,
@@ -15,7 +14,6 @@ import TestingPopover from './Popovers/Testing';
 import RoomsPopover from './Popovers/Users';
 
 type Props = {
-  socket: Socket;
   loadingTitles: boolean;
   titleCategory: string;
   setTitleCategory: React.Dispatch<React.SetStateAction<string>>;
@@ -30,7 +28,6 @@ type Props = {
 }
 
 const RoomNavigation: React.FC<Props> = ({
-  socket,
   loadingTitles,
   titleCategory,
   setTitleCategory,
@@ -239,8 +236,8 @@ const RoomNavigation: React.FC<Props> = ({
             { isTorrentLink ? <img src="/DownloadIcon.svg" /> : <img src="/SearchIcon.svg" /> }
           </Box>
         </Group>
-        <TestingPopover socket={socket} />
-        <RoomsPopover socket={socket} userId={userId} />
+        <TestingPopover />
+        <RoomsPopover userId={userId} />
       </Group>
     </Group>
   );

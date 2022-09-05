@@ -1,5 +1,7 @@
 import * as React from 'react';
 
+import { useSocket } from '../../../contexts/socket.context';
+
 import { Accordion, Box, Center, Stack, Group, Text, Button, ActionIcon, Badge, AspectRatio, Loader, ScrollArea } from '@mantine/core';
 
 import { IconArrowLeft, IconExternalLink } from '@tabler/icons';
@@ -32,7 +34,6 @@ const FanartBanner: React.FC<any> = ({ imgSrc }) => {
 };
 
 type Props = {
-  socket: any,
   styles: any,
   title: any,
   type: string,
@@ -42,7 +43,6 @@ type Props = {
 }
 
 const TitleDisplay: React.FC<Props> = ({
-  socket,
   styles,
   title,
   type,
@@ -50,6 +50,8 @@ const TitleDisplay: React.FC<Props> = ({
   setGenre,
   close,
 }) => {
+  const { socket } = useSocket();
+
   const [isLoading, setIsLoading] = React.useState<boolean>(true);
   const [titleOverview, setTitleOverview] = React.useState<any>({});
   const [titleDetailed, setTitleDetailed] = React.useState<any>({});

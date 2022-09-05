@@ -1,4 +1,5 @@
 import React, { createContext, useReducer, useContext } from 'react';
+import io from 'socket.io-client';
 import type { Socket } from 'socket.io-client';
 
 // Context value types.
@@ -26,12 +27,23 @@ const SocketContext: any = createContext<SocketContextInterface | null>(SocketSt
 export const SocketProvider: any = (props: any) => {
   const [state, dispatch] = useReducer(Reducer, SocketState);
 
+  // On mount, set the socket.
+  React.useEffect((): any => {
+    const newSocket = io();
+    dispatch({ type: 'socket', value: newSocket });
+
+    return () => newSocket.close();
+  }, []);
+
   // Context state functions
   state.setSocket = (data: any) => {
     dispatch({ type: 'room', value: data });
   };
 
   state.resetSocket = () => {
+    if (!state.socket) return;
+    // All that is needed to be sent is the emit...
+    // - the server will know who called it and for what room.
     state.socket.emit('resetRoom');
   };
   

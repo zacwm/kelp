@@ -2,6 +2,7 @@ import * as React from 'react';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 
+import { useSocket } from '../contexts/socket.context';
 import { useRoom } from '../contexts/room.context';
 
 import Alert from '@mui/material/Alert';
@@ -22,15 +23,15 @@ import {
 import HomeFooter from './HomeFooter';
 
 type Props = {
-  socket: any;
   setUserId: (id: any) => void;
   setMenuVisible: () => void; // TODO: This will be gone soon... This is just temporary until the new dropdown menus are implemented
 }
 
-const JoinModal: React.FC<Props> = ({ socket, setUserId, setMenuVisible }) => {
+const JoinModal: React.FC<Props> = ({ setUserId, setMenuVisible }) => {
   const router = useRouter();
   const { id, password } = router.query;
 
+  const { socket } = useSocket();
   const { room, setRoom } = useRoom();
 
   const [inputName, setInputName] = React.useState<string>('');

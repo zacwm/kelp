@@ -1,20 +1,21 @@
 import * as React from 'react';
 
+import { useSocket } from '../contexts/socket.context';
 import { useRoom } from '../contexts/room.context';
 
 import Stack from '@mui/material/Stack';
 
 import { Box, Text, TextInput, ActionIcon } from '@mantine/core';
-import { IconCheck, IconPencil, IconUser, IconX } from '@tabler/icons';
+import { IconCheck, IconPencil, IconX } from '@tabler/icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser } from '@fortawesome/free-regular-svg-icons';
 
 type Props = {
-  socket: any;
   userId: string;
 }
 
-const UserList: React.FC<Props> = ({ socket, userId }) => {
+const UserList: React.FC<Props> = ({ userId }) => {
+  const { socket } = useSocket();
   const { room } = useRoom();
 
   const [isEditingName, setIsEditingName] = React.useState(false);

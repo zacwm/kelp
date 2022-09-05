@@ -1,5 +1,6 @@
 import * as React from 'react';
-import type { Socket } from 'socket.io-client';
+
+import { useSocket } from '../../contexts/socket.context';
 
 import TitleDisplay from './TitleDisplay';
 import VirtualList from './VirtualList';
@@ -10,7 +11,6 @@ import {
 } from '@mantine/core';
 
 type Props = {
-  socket: Socket;
   titleCategory: string;
   searchKeywords: string;
   loadingTitles: boolean;
@@ -24,7 +24,6 @@ type Props = {
 }
 
 const TorrentSelect: React.FC<Props> = ({
-  socket,
   titleCategory,
   searchKeywords,
   loadingTitles,
@@ -36,6 +35,8 @@ const TorrentSelect: React.FC<Props> = ({
   selectedTitle,
   setSelectedTitle,
 }) => {
+  const { socket } = useSocket();
+  
   const [torrentList, setTorrentList] = React.useState<object[]>([]);
   
   React.useEffect(() => {
@@ -105,7 +106,6 @@ const TorrentSelect: React.FC<Props> = ({
       >
         {(styles) => (
           <TitleDisplay
-            socket={socket}
             styles={styles}
             title={selectedTitle}
             type={titleCategory}

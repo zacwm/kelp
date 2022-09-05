@@ -1,9 +1,9 @@
 import * as React from 'react';
-import type { Socket } from 'socket.io-client';
 import ReactPlayer from 'react-player';
 import { SnackbarProvider, useSnackbar } from 'notistack';
 import { useCookies } from 'react-cookie';
 
+import { useSocket } from '../contexts/socket.context';
 import { useRoom } from '../contexts/room.context';
 import { useVideo } from '../contexts/video.context';
 
@@ -22,14 +22,15 @@ import { Box, ActionIcon, Slider } from '@mantine/core';
 import { IconArrowLeft, IconPlayerPlay } from '@tabler/icons';
 
 type Props = {
-  socket: Socket;
   videoState: any;
   setVideoState: any;
   toggleMenu: (forceValue?: boolean) => void;
 }
 
-const Player: React.FC<Props> = ({ socket, videoState, setVideoState, toggleMenu }) => {
+const Player: React.FC<Props> = ({ videoState, setVideoState, toggleMenu }) => {
   const [cookies, setCookie] = useCookies(['kelp-volume']);
+  
+  const { socket } = useSocket();
   const { room } = useRoom();
   const { video } = useVideo();
 

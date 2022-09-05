@@ -1,6 +1,6 @@
 import * as React from 'react';
-import type { Socket } from 'socket.io-client';
 
+import { useSocket } from '../contexts/socket.context';
 import { useRoom } from '../contexts/room.context';
 import { useVideo } from '../contexts/video.context';
 
@@ -14,12 +14,12 @@ import Link from '@mui/material/Link';
 import { Accordion, Button, Paper, Select, NumberInput } from '@mantine/core';
 
 type Props = {
-  socket: Socket;
   userId: string;
   videoState: any;
 }
 
-const SideMenu: React.FC<Props> = ({ socket, videoState }) => {
+const SideMenu: React.FC<Props> = ({ videoState }) => {
+  const { socket } = useSocket();
   const { room, setClosingRoom } = useRoom();
   const { video } = useVideo();
 
@@ -121,7 +121,7 @@ const SideMenu: React.FC<Props> = ({ socket, videoState }) => {
                 <Accordion.Item value="files">
                   <Accordion.Control>Files</Accordion.Control>
                   <Accordion.Panel>
-                    <FileSelectList socket={socket} />
+                    <FileSelectList />
                   </Accordion.Panel>
                 </Accordion.Item>
               ) }

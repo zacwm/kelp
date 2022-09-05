@@ -1,5 +1,6 @@
 import * as React from 'react';
 
+import { useSocket } from '../contexts/socket.context';
 import { useRoom } from '../contexts/room.context';
 import { useVideo } from '../contexts/video.context';
 
@@ -10,11 +11,8 @@ import Paper from '@mui/material/Paper';
 import VideoFileIcon from '@mui/icons-material/VideoFile';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 
-type Props = {
-  socket: any;
-}
-
-const FileSelectList: React.FC<Props> = ({ socket }) => {
+const FileSelectList: React.FC = () => {
+  const { socket } = useSocket();
   const { room } = useRoom();
   const { video } = useVideo();
 

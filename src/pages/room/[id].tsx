@@ -1,9 +1,9 @@
 import * as React from 'react';
 import type { NextPage } from 'next';
-import io from 'socket.io-client';
 import { CookiesProvider } from 'react-cookie';
 import moment from 'moment';
 
+import { SocketProvider, useSocket } from '../../contexts/socket.context';
 import { RoomProvider, useRoom } from '../../contexts/room.context';
 import { VideoProvider, useVideo } from '../../contexts/video.context';
 
@@ -19,10 +19,10 @@ import { faArrowLeft, faDownload } from '@fortawesome/free-solid-svg-icons';
 import { faClock } from '@fortawesome/free-regular-svg-icons';
 
 const Room: React.FC = () => {
+  const { socket } = useSocket();
   const { room, closingRoom, setRoom } = useRoom();
   const { video, setVideo } = useVideo();
 
-  const [socket, setSocket] = React.useState(null);
   const [userId, setUserId] = React.useState(null);
 
   const [videoState, setVideoState] = React.useState(null);
@@ -37,12 +37,6 @@ const Room: React.FC = () => {
   const [loadingTitles, setLoadingTitles] = React.useState<boolean>(true);
 
   const [selectedTitle, setSelectedTitle] = React.useState<any>(null);
-
-  React.useEffect((): any => {
-    const newSocket = io();
-    setSocket(newSocket);
-    return () => newSocket.close();
-  }, []);
 
   React.useEffect(() => {
     if (!room) return;
@@ -110,7 +104,6 @@ const Room: React.FC = () => {
   if (video?.statusCode === 0 && video?.url) {
     return (
       <Player
-        socket={socket}
         toggleMenu={(value?: boolean) => {
           if (value === undefined) return setMenuVisible(!menuVisible);
           setMenuVisible(value);
@@ -124,7 +117,6 @@ const Room: React.FC = () => {
   return (
     <React.Fragment>
       <JoinModal
-        socket={socket}
         setUserId={(id) => setUserId(id)}
         setMenuVisible={() => setMenuVisible(true)}
       />
@@ -143,7 +135,6 @@ const Room: React.FC = () => {
             }}
           >
             <RoomNavigation
-              socket={socket}
               loadingTitles={loadingTitles}
               titleCategory={titleCategory}
               setTitleCategory={setTitleCategory}
@@ -169,7 +160,6 @@ const Room: React.FC = () => {
                 // Torrent select screen
                 video?.statusCode === 1 ? (
                   <TorrentSelect
-                    socket={socket}
                     loadingTitles={loadingTitles}
                     setLoadingTitles={setLoadingTitles}
                     titleCategory={titleCategory}
@@ -396,13 +386,15 @@ const Room: React.FC = () => {
 
 const RoomRoot: NextPage = () => {
   return (
-    <CookiesProvider>
-      <RoomProvider>
-        <VideoProvider>
-          <Room />
-        </VideoProvider>
-      </RoomProvider>
-    </CookiesProvider>
+    <SocketProvider>
+      <CookiesProvider>
+        <RoomProvider>
+          <VideoProvider>
+            <Room />
+          </VideoProvider>
+        </RoomProvider>
+      </CookiesProvider>
+    </SocketProvider>
   );
 };
 

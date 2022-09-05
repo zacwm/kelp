@@ -1,5 +1,7 @@
 import * as React from 'react';
 
+import { useSocket } from '../contexts/socket.context';
+
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import Stack from '@mui/material/Stack';
@@ -8,11 +10,9 @@ import { IconAlertCircle } from '@tabler/icons';
 
 import { Paper, Alert, Text, Collapse, Button, TextInput, PasswordInput } from '@mantine/core';
 
-type Props = {
-  socket: any;
-}
+const CreateRooms: React.FC = () => {
+  const { socket } = useSocket();
 
-const CreateRooms: React.FC<Props> = ({ socket }) => {
   const [createRoomPending, setCreateRoomPending] = React.useState(false);
   const [createRoomErrorMessage, setCreateRoomErrorMessage] = React.useState(null);
   

@@ -1,6 +1,6 @@
 import * as React from 'react';
-import type { Socket } from 'socket.io-client';
 
+import { useSocket } from '../../../contexts/socket.context';
 import { useRoom } from '../../../contexts/room.context';
 
 import {
@@ -15,11 +15,8 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faToilet } from '@fortawesome/free-solid-svg-icons';
 
-type Props = {
-  socket: Socket;
-};
-
-const TestingPopover: React.FC<Props> = ({ socket }) => {
+const TestingPopover: React.FC = () => {
+  const { socket } = useSocket();
   const { room } = useRoom();
 
   const [inputSelect, setInputSelect] = React.useState<number>(0);

@@ -1,7 +1,6 @@
 import * as React from 'react';
 import Head from 'next/head';
 import type { NextPage } from 'next';
-import io from 'socket.io-client';
 
 import Container from '@mui/material/Container';
 import Box from '@mui/material/Box';
@@ -13,14 +12,6 @@ import CreateRooms from '../components/CreateRoom';
 import HomeFooter from '../components/HomeFooter';
 
 const Home: NextPage = () => {
-  const [socket, setSocket] = React.useState(null);
-
-  React.useEffect((): any => {
-    const newSocket = io();
-    setSocket(newSocket);
-    return () => newSocket.close();
-  }, []);
-
   return (
     <Container maxWidth="lg">
       <Head>
@@ -51,8 +42,8 @@ const Home: NextPage = () => {
             alignItems: 'flex-start',
           }}
         >
-          <CreateRooms socket={socket}/>
-          <ActiveRooms socket={socket}/>  
+          <CreateRooms />
+          <ActiveRooms />  
         </Box>
       </Center>
       <HomeFooter />

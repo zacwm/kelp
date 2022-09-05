@@ -1,5 +1,4 @@
 import * as React from 'react';
-import type { Socket } from 'socket.io-client';
 
 import {
   Popover,
@@ -14,11 +13,10 @@ import UserList from '../../UserList';
 import { useRoom } from '../../../contexts/room.context';
 
 type Props = {
-  socket: Socket;
   userId: string;
 };
 
-const UserPopover: React.FC<Props> = ({ socket, userId }) => {
+const UserPopover: React.FC<Props> = ({ userId }) => {
   const { room } = useRoom();
 
   return (
@@ -47,7 +45,7 @@ const UserPopover: React.FC<Props> = ({ socket, userId }) => {
           padding: '15px',
         }}
       >
-        <UserList socket={socket} userId={userId} />
+        <UserList userId={userId} />
       </Popover.Dropdown>
     </Popover>
   );
