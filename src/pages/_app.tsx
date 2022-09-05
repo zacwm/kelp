@@ -109,11 +109,28 @@ const SelectDefaultProps: Partial<SelectProps> = {
       fontWeight: 700,
     },
     dropdown: {
+      padding: 0,
       marginTop: -3,
       borderRadius: 12,
       backgroundColor: kelpPalette[3],
       border: 'none',
       color: kelpPalette[5],
+      overflow: 'hidden',
+
+      '.mantine-ScrollArea-scrollbar': {
+        backgroundColor: 'transparent',
+      },
+      
+      '.mantine-ScrollArea-thumb': {
+        backgroundColor: 'rgba(152, 152, 154, 0.5)',
+        '&:hover': {
+          backgroundColor: 'rgba(152, 152, 154, 0.75) !important',
+        }
+      },
+
+      '.mantine-ScrollArea-viewport *:not(.mantine-Select-item)': {
+        padding: '0 !important',
+      }
     },
     item: {
       borderRadius: 12,

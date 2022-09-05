@@ -73,10 +73,15 @@ const JoinModal: React.FC<Props> = ({ socket, setUserId, setMenuVisible }) => {
 
   const inputs = (
     <React.Fragment>
-      <Stack align="center" spacing={15}>
+      <Stack align="center" spacing={0}>
         <Text
           size={23}
           color="#98989a"
+          weight={300}
+          sx={{
+            lineHeight: 1,
+            marginBottom: 30,
+          }}
         >
           Who&apos;s Watching?
         </Text>
@@ -98,13 +103,17 @@ const JoinModal: React.FC<Props> = ({ socket, setUserId, setMenuVisible }) => {
             value={inputPassword}
             onChange={(e) => setInputPassword(e.currentTarget.value)}
             disabled={isLoadingSubmit}
-            sx={{ width: '100%' }}
+            sx={{
+              width: '100%',
+              marginTop: 15,
+            }}
           />
         ) }
         {/* And the button from the home page. */}
         <Button
           onClick={handleSubmit}
           disabled={isLoadingSubmit}
+          sx={{ marginTop: 30 }}
         >
           Confirm
         </Button>
@@ -181,7 +190,7 @@ const JoinModal: React.FC<Props> = ({ socket, setUserId, setMenuVisible }) => {
                   <Paper
                     shadow="xs" 
                     radius={12} 
-                    p="md" 
+                    p={30}
                     sx={{
                       width: 500,
                       backgroundColor: '#08080f',

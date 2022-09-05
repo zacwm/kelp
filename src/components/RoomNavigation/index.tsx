@@ -197,8 +197,14 @@ const RoomNavigation: React.FC<Props> = ({
               root: {
                 width: 400,
                 '@media (max-width: 1600px)': {
-                  width: 250,
-                }
+                  width: 300,
+                },
+                '@media (max-width: 1500px)': {
+                  width: 200,
+                },
+                '@media (max-width: 1400px)': {
+                  display: 'none',
+                },
               },
               input: {
                 backgroundColor: '#2f2f3d',
