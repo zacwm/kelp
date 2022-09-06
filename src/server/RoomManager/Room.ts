@@ -75,7 +75,7 @@ class Room implements RoomInterface {
     this.playbackTimePositionInterval = null;
     this.ffmpeg = new FFmpeg();
 
-    fs.emptyDir(path.join(__dirname, `../.temp/${this.id}`));
+    fs.emptyDir(path.join(__dirname, `../../.temp/${this.id}`));
   }
 
   setName(name: string): void {
@@ -215,9 +215,9 @@ class Room implements RoomInterface {
     if (this.ffmpeg.process) return callback({ error: 'Already processing video...' });
     if (this.wtClient) return callback({ error: 'Already downloading...' });
     this.setStatus(2, 'Staring download...');
-    await fs.emptyDir(path.join(__dirname, `../.temp/${this.id}`));
+    await fs.emptyDir(path.join(__dirname, `../../.temp/${this.id}`));
     if (!this.wtClient) this.wtClient = new WebTorrent();
-    this.wtClient.add(url, { path: path.join(__dirname, `../.temp/${this.id}`) }, (torrent: any) => {
+    this.wtClient.add(url, { path: path.join(__dirname, `../../.temp/${this.id}`) }, (torrent: any) => {
       this.torrent = torrent;
       this.files = torrent.files.filter(file => {
         return ['.mkv', '.mp4', '.avi', '.mov', '.wmv'].includes(path.extname(file.path));
@@ -259,7 +259,7 @@ class Room implements RoomInterface {
   
   async convertFile(videoPath: string): Promise<void> {
     if (this.ffmpeg.process) return this.ffmpeg.stop();
-    await fs.emptyDir(path.join(__dirname, `../.streams/${this.id}`));
+    await fs.emptyDir(path.join(__dirname, `../../.streams/${this.id}`));
     this.setStatus(4, 'Staring conversion...');
     this.playbackTimePosition = 0;
     this.playbackPlaying = false;
@@ -276,7 +276,7 @@ class Room implements RoomInterface {
             this.ffmpeg.convertVideoToHLS(mp4Path, this.id)
               .then(() => {
                 this.videoURL = `/streams/${this.id}/index.m3u8`;
-                this.videoExtra = { ...this.videoExtra, hlsFileCount: fs.readdirSync(path.join(__dirname, `../.streams/${this.id}`)).length };
+                this.videoExtra = { ...this.videoExtra, hlsFileCount: fs.readdirSync(path.join(__dirname, `../../.streams/${this.id}`)).length };
                 this.setStatus(5, 'Converting - 2/3 files done');
                 this.ffmpeg.extractSubtitles(videoPath, this.id)
                   .then(() => {
@@ -305,7 +305,7 @@ class Room implements RoomInterface {
             this.ffmpeg.convertVideoToHLS(mp4Path, this.id)
               .then(() => {
                 this.videoURL = `/streams/${this.id}/index.m3u8`;
-                this.videoExtra = { ...this.videoExtra, hlsFileCount: fs.readdirSync(path.join(__dirname, `../.streams/${this.id}`)).length };
+                this.videoExtra = { ...this.videoExtra, hlsFileCount: fs.readdirSync(path.join(__dirname, `../../.streams/${this.id}`)).length };
                 this.setStatus(0, `Watching '${this.videoTitle}'`);
               })
               .catch((err) => {
@@ -322,7 +322,7 @@ class Room implements RoomInterface {
         this.ffmpeg.convertVideoToHLS(videoPath, this.id)
           .then(() => {
             this.videoURL = `/streams/${this.id}/index.m3u8`;
-            this.videoExtra = { ...this.videoExtra, hlsFileCount: fs.readdirSync(path.join(__dirname, `../.streams/${this.id}`)).length };
+            this.videoExtra = { ...this.videoExtra, hlsFileCount: fs.readdirSync(path.join(__dirname, `../../.streams/${this.id}`)).length };
             this.setStatus(0, `Watching '${this.videoTitle}'`);
           })
           .catch((err) => {
@@ -351,8 +351,8 @@ class Room implements RoomInterface {
       this.ffmpeg.stop();
     }
 
-    await fs.emptyDir(path.join(__dirname, `../.temp/${this.id}`));
-    await fs.emptyDir(path.join(__dirname, `../.streams/${this.id}`));
+    await fs.emptyDir(path.join(__dirname, `../../.temp/${this.id}`));
+    await fs.emptyDir(path.join(__dirname, `../../.streams/${this.id}`));
 
     this.setStatus(1, 'Looking for something to watch...');
   }

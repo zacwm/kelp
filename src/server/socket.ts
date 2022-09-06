@@ -210,16 +210,16 @@ class SocketServer {
           this.Rooms.getRoomById(id).resetRoom();
           break;
         case 2:
-          this.Rooms.getRoomById(id).convertFile(path.join(__dirname, './test/test.mkv'));
+          this.Rooms.getRoomById(id).convertFile(path.join(__dirname, '../test/test.mkv'));
           break;
         case 3:
-          this.Rooms.getRoomById(id).convertFile(path.join(__dirname, './test/test.mp4'));
+          this.Rooms.getRoomById(id).convertFile(path.join(__dirname, '../test/test.mp4'));
           break;
         case 4:
-          this.Rooms.getRoomById(id).convertFile(path.join(__dirname, './test/test.avi'));
+          this.Rooms.getRoomById(id).convertFile(path.join(__dirname, '../test/test.avi'));
           break;
         case 5:
-          this.Rooms.getRoomById(id).convertFile(path.join(__dirname, './test/test.mov'));
+          this.Rooms.getRoomById(id).convertFile(path.join(__dirname, '../test/test.mov'));
           break;
         }
       });

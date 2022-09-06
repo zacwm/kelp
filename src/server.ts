@@ -6,7 +6,7 @@ import * as http from 'http';
 import next, { NextApiHandler } from 'next';
 import * as SocketIO from 'socket.io';
 import fs from 'fs-extra';
-import SocketServer from './socket';
+import SocketServer from './server/socket';
 import { execSync } from 'child_process';
 
 // Get version and commit.
