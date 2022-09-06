@@ -184,9 +184,9 @@ const Overlay: React.FC<Props> = ({
                     sx={{ width: '100%' }}
                   />
                 </Group>
-                <Typography>
-                  {formatSeconds(videoDuration || 0)}
-                </Typography>
+                <Text color="kelpPalette.5">
+                  {formatSeconds(videoPlayedSeconds || 0)} / {formatSeconds(videoDuration || 0)}
+                </Text>
               </Group>
               <Group>
                 <FontAwesomeIcon 
