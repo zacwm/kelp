@@ -12,6 +12,7 @@ import {
 
 import TestingPopover from './Popovers/Testing';
 import RoomsPopover from './Popovers/Users';
+import ControllerPopover from './Popovers/Controller';
 
 type Props = {
   loadingTitles: boolean;
@@ -237,6 +238,7 @@ const RoomNavigation: React.FC<Props> = ({
           </Box>
         </Group>
         <TestingPopover />
+        <ControllerPopover />
         <RoomsPopover userId={userId} />
       </Group>
     </Group>
