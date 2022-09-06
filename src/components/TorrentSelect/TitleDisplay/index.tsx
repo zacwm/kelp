@@ -7,6 +7,7 @@ import { Accordion, Box, Center, Stack, Group, Text, Button, ActionIcon, Badge, 
 import { IconArrowLeft, IconExternalLink } from '@tabler/icons';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
 import { faCalendar, faStar, faClock, faCircleQuestion } from '@fortawesome/free-regular-svg-icons';
 
 import EpisodeItem from './EpisodeItem';
@@ -109,18 +110,26 @@ const TitleDisplay: React.FC<Props> = ({
       }}
     >
       <FanartBanner imgSrc={titleOverview?.images?.fanart} />
-      <ActionIcon
-        onClick={close}
-        size="lg"
+      <Box
         sx={{
           position: 'absolute',
           top: 30,
           left: 30,
           zIndex: 1000,
+          color: '#fff',
+          fontSize: 20,
+          cursor: 'pointer',
+          '&:hover': {
+            transform: 'scale(1.1)',
+          },
         }}
       >
-        <IconArrowLeft size={30} />
-      </ActionIcon>
+        <FontAwesomeIcon 
+          icon={faArrowLeft}
+          onClick={close}
+        />
+      </Box>
+
       {
         isLoading ? (
           <Center

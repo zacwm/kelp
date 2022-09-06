@@ -7,27 +7,18 @@ import { useSocket } from 'contexts/socket.context';
 import { useRoom } from 'contexts/room.context';
 import { useVideo } from 'contexts/video.context';
 
+import Overlay from './Overlay';
+
 import Stack from '@mui/material/Stack';
-import Typography from '@mui/material/Typography';
-import Fade from '@mui/material/Fade';
 
-import VolumeDown from '@mui/icons-material/VolumeDown';
-import VolumeUp from '@mui/icons-material/VolumeUp';
-import PauseIcon from '@mui/icons-material/Pause';
-import PlayArrowIcon from '@mui/icons-material/PlayArrow';
-import FullscreenIcon from '@mui/icons-material/Fullscreen';
-
-import { Box, ActionIcon, Slider } from '@mantine/core';
-
-import { IconArrowLeft, IconPlayerPlay } from '@tabler/icons';
+import { Box } from '@mantine/core';
 
 type Props = {
   videoState: any;
   setVideoState: any;
-  toggleMenu: (forceValue?: boolean) => void;
 }
 
-const Player: React.FC<Props> = ({ videoState, setVideoState, toggleMenu }) => {
+const Player: React.FC<Props> = ({ videoState, setVideoState }) => {
   const [cookies, setCookie] = useCookies(['kelp-volume']);
   
   const { socket } = useSocket();
@@ -115,10 +106,8 @@ const Player: React.FC<Props> = ({ videoState, setVideoState, toggleMenu }) => {
   React.useEffect(() => {
     if (fullscreenMode && !document.fullscreenElement) {
       document.documentElement.requestFullscreen();
-      toggleMenu(false);
     } else if (document.fullscreenElement) {
       document.exitFullscreen();
-      toggleMenu(true);
     }
   }, [fullscreenMode]);
 
@@ -200,13 +189,6 @@ const Player: React.FC<Props> = ({ videoState, setVideoState, toggleMenu }) => {
   const playerOnDuration = (duration: number) => {
     setVideoDuration(duration);
   };
-
-  // - Play/pause
-  const buttonPlayback = () => {
-    socket.emit('videoChangePlaybackPlaying', {
-      id: room.id,
-    }, !videoState.playing);
-  };
   
   return (
     <Box sx={{
@@ -239,133 +221,19 @@ const Player: React.FC<Props> = ({ videoState, setVideoState, toggleMenu }) => {
               cursor: showVideoOverlay ? 'default' : 'none',
             }}
           >
-            <Fade in={showVideoOverlay ? true : false}>
-              <Box>
-                <Box sx={{
-                  position: 'absolute',
-                  zIndex: 100,
-                  top: 0,
-                  left: 0,
-                  width: '100%',
-                  background: 'linear-gradient(to bottom, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.0) 100%)',
-                  padding: '16px',
-                  boxSizing: 'border-box',
-                }}
-                onMouseEnter={() => setMouseOverControls(true) }
-                onMouseLeave={() => setMouseOverControls(false) }
-                >
-                  <Stack
-                    direction="row"
-                    alignItems="center"
-                    justifyContent="flex-start"
-                    spacing={2}
-                  >
-                    <ActionIcon
-                      size="lg"
-                      onClick={() => {
-                        // TODO: Display some confirmation dialog first
-                        socket.emit('resetRoom', room.id);
-                      }}
-                      sx={{ zIndex: 1000 }}
-                    >
-                      <IconArrowLeft />
-                    </ActionIcon>
-                    <Typography color={!video.title ? 'primary' : 'default'}>
-                      {video.title || 'kelp'}
-                    </Typography>
-                  </Stack>
-                </Box>
-                <Fade in={!videoState?.playing}>
-                  <Stack
-                    direction="row"
-                    alignItems="center"
-                    justifyContent="center"
-                    sx={{
-                      position: 'absolute',
-                      zIndex: 1,
-                      top: 0,
-                      height: '100%',
-                      width: '100%',
-                      boxSizing: 'border-box',
-                    }}
-                  >
-                    <ActionIcon size={120} onClick={buttonPlayback}>
-                      <IconPlayerPlay size={100} />
-                    </ActionIcon>
-                  </Stack>
-                </Fade>
-                <Box sx={{
-                  position: 'absolute',
-                  zIndex: 100,
-                  bottom: 0,
-                  left: 0,
-                  width: '100%',
-                  background: 'linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.0) 100%)',
-                  padding: '16px',
-                  boxSizing: 'border-box',
-                }}
-                onMouseEnter={() => setMouseOverControls(true) }
-                onMouseLeave={() => setMouseOverControls(false) }
-                >
-                  <Stack
-                    direction="row"
-                    alignItems="center"
-                    justifyContent="space-between"
-                    spacing={2}
-                  >
-                    {
-                      videoState && (
-                        videoState.playing ? (
-                          <PauseIcon
-                            onClick={buttonPlayback}
-                            sx={{
-                              cursor: 'pointer',
-                            }}
-                          />
-                        ) : (
-                          <PlayArrowIcon
-                            onClick={buttonPlayback}
-                            sx={{
-                              cursor: 'pointer',
-                            }}
-                          />
-                        )
-                      )
-                    }
-                    <Stack spacing={2} direction="row" sx={{ mb: 1, flex: 1 }} alignItems="center">
-                      <Slider
-                        aria-label="time-indicator"
-                        value={videoPlayedSeconds}
-                        min={0}
-                        max={videoDuration || 0}
-                        step={1}
-                        sx={{ width: '100%' }}
-                        label={formatSeconds(videoPlayedSeconds || 0)}
-                        onChange={setVideoPlayedSeconds}
-                        onChangeEnd={setSliderEndPosition}
-                      />
-                    </Stack>
-                    <Typography>
-                      {formatSeconds(videoDuration || 0)}
-                    </Typography>
-                    <Stack spacing={2} direction="row" sx={{ mb: 1, minWidth: 200 }} alignItems="center">
-                      <VolumeDown />
-                      <Slider
-                        aria-label="Volume"
-                        value={inputVolumeSlider}
-                        onChange={setInputVolumeSlider}
-                        sx={{ width: '100%' }}
-                      />
-                      <VolumeUp />
-                    </Stack>
-                    <FullscreenIcon 
-                      onClick={() => setFullscreenMode(!fullscreenMode)}
-                      sx={{ cursor: 'pointer' }}
-                    />
-                  </Stack>
-                </Box>
-              </Box>
-            </Fade>
+            <Overlay
+              show={showVideoOverlay}
+              setMouseOverControls={setMouseOverControls}
+              videoState={videoState}
+              setFullscreenMode={setFullscreenMode}
+              fullscreenMode={fullscreenMode}
+              videoPlayedSeconds={videoPlayedSeconds}
+              videoDuration={videoDuration}
+              setVideoPlayedSeconds={setVideoPlayedSeconds}
+              inputVolumeSlider={inputVolumeSlider}
+              setInputVolumeSlider={setInputVolumeSlider}
+              setSliderEndPosition={setSliderEndPosition}
+            />
             <ReactPlayer
               ref={refPlayer}
               url={video.url}
@@ -416,18 +284,3 @@ const NotistackIntegration: React.FC<Props> = (props) => {
 };
 
 export default NotistackIntegration;
-
-function formatSeconds(seconds) {
-  const date = new Date(seconds * 1000);
-  const hh = date.getUTCHours();
-  const mm = date.getUTCMinutes();
-  const ss = pad(date.getUTCSeconds());
-  if (hh) {
-    return `${hh}:${pad(mm)}:${ss}`;
-  }
-  return `${mm}:${ss}`;
-}
-
-function pad(string) {
-  return ('0' + string).slice(-2);
-}

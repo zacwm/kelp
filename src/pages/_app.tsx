@@ -12,6 +12,7 @@ import {
   SelectProps,
   ScrollAreaProps,
   AccordionProps,
+  SliderProps,
 } from '@mantine/core';
 
 const kelpPalette: any = ['#000000', '#08080f', '#191921', '#2f2f3d', '#3bd4ae', '#98989a', '#ffffff', '#ae95da', '#00bc70', '#00a19b'];
@@ -187,6 +188,24 @@ const AccordionDefaultProps: Partial<AccordionProps> = {
   }
 };
 
+const SliderDefaultProps: Partial<SliderProps> = {
+  size: 5,
+  styles: {
+    bar: {
+      backgroundImage: `linear-gradient(135deg, ${kelpPalette[8]} 0%, ${kelpPalette[9]} 100%)`,
+      backgroundAttachment: 'fixed',
+      backgroundSize: 'cover',
+    },
+    thumb: {
+      border: 'none',
+      backgroundColor: 'none',
+      backgroundImage: `linear-gradient(135deg, ${kelpPalette[8]} 0%, ${kelpPalette[9]} 100%)`,
+      backgroundAttachment: 'fixed',
+      backgroundSize: 'cover',
+    }
+  }
+};
+
 export default function App(props: AppProps ) {
   const { Component, pageProps } = props;
   return (
@@ -217,6 +236,7 @@ export default function App(props: AppProps ) {
             Select: { defaultProps: SelectDefaultProps },
             ScrollArea: { defaultProps: ScrollAreaDefaultProps },
             Accordion: { defaultProps: AccordionDefaultProps },
+            Slider: { defaultProps: SliderDefaultProps },
           },
           colorScheme: 'dark',
           colors: {

@@ -104,10 +104,6 @@ const Room: React.FC = () => {
   if (video?.statusCode === 0 && video?.url) {
     return (
       <Player
-        toggleMenu={(value?: boolean) => {
-          if (value === undefined) return setMenuVisible(!menuVisible);
-          setMenuVisible(value);
-        }}
         videoState={videoState}
         setVideoState={setVideoState}
       />
