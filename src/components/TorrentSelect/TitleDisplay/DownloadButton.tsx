@@ -62,6 +62,9 @@ const DownloadButton: React.FC<Props> = ({ torrents, forceLang, onTorrentSelect 
         borderRadius: 12,
         backgroundImage: 'linear-gradient(135deg, #00bc70 0%, #00a19b 100%)',
         transition: 'transform 0.2s ease-in-out',
+        '&:hover': {
+          transform: 'scale(1.05)',
+        }
       }}
     >
       <Group spacing={0}>
@@ -70,6 +73,9 @@ const DownloadButton: React.FC<Props> = ({ torrents, forceLang, onTorrentSelect 
             backgroundImage: 'none',
             borderRadius: '12px 0 0 12px',
             fontSize: 16,
+            '&:hover': {
+              transform: 'none !important',
+            }
           }}
           onClick={() => onTorrentSelect(defaultTorrent.url)}
         >
@@ -86,7 +92,7 @@ const DownloadButton: React.FC<Props> = ({ torrents, forceLang, onTorrentSelect 
                 padding: '0 12px',
                 color: '#3bd4ae',
                 '&:hover': {
-                  fontSize: 20,
+                  transform: 'none !important',
                 }
               }}
             >

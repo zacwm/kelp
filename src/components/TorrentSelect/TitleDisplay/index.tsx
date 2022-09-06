@@ -2,9 +2,21 @@ import * as React from 'react';
 
 import { useSocket } from 'contexts/socket.context';
 
-import { Accordion, Box, Center, Stack, Group, Text, Button, ActionIcon, Badge, AspectRatio, Loader, ScrollArea } from '@mantine/core';
+import {
+  Accordion,
+  Box,
+  Center,
+  Stack,
+  Group,
+  Text,
+  Button,
+  Badge,
+  AspectRatio,
+  Loader,
+  ScrollArea,
+} from '@mantine/core';
 
-import { IconArrowLeft, IconExternalLink } from '@tabler/icons';
+import { IconExternalLink } from '@tabler/icons';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft } from '@fortawesome/free-solid-svg-icons';
@@ -117,8 +129,9 @@ const TitleDisplay: React.FC<Props> = ({
           left: 30,
           zIndex: 1000,
           color: '#fff',
-          fontSize: 20,
+          fontSize: 24,
           cursor: 'pointer',
+          transition: 'transform 0.2s ease',
           '&:hover': {
             transform: 'scale(1.1)',
           },
@@ -166,7 +179,7 @@ const TitleDisplay: React.FC<Props> = ({
                 sx={{
                   width: 320,
                   position: 'relative',
-                  margin: '90px 60px 0 90px',
+                  margin: '90px 0 0 90px',
                   boxSizing: 'border-box',
                 }}
                 spacing={0}
@@ -264,7 +277,9 @@ const TitleDisplay: React.FC<Props> = ({
                         setGenre(genre);
                         close();
                       }}
-                      sx={{ cursor: 'pointer' }}
+                      sx={{
+                        cursor: 'pointer',
+                      }}
                     >
                       { genre }
                     </Badge>)}
@@ -278,6 +293,9 @@ const TitleDisplay: React.FC<Props> = ({
                         root: {
                           backgroundImage: 'none',
                           color: '#3bd4ae',
+                        },
+                        label: {
+                          fontSize: 14,
                         }
                       }}
                     >
@@ -289,6 +307,7 @@ const TitleDisplay: React.FC<Props> = ({
               <ScrollArea
                 sx={{
                   height: '100%',
+                  paddingLeft: '60px',
                   flex: 1,
                 }}
                 offsetScrollbars
@@ -334,6 +353,7 @@ const TitleDisplay: React.FC<Props> = ({
                     sx={{
                       marginBottom: 30,
                       maxWidth: 930,
+                      lineHeight: 1.75,
                     }}
                   >
                     { titleDetailed.synopsis }

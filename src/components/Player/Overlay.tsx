@@ -74,8 +74,9 @@ const Overlay: React.FC<Props> = ({
               sx={{
                 zIndex: 1000,
                 color: '#fff',
-                fontSize: 20,
+                fontSize: 24,
                 cursor: 'pointer',
+                transition: 'transform 0.2s ease',
                 '&:hover': {
                   transform: 'scale(1.1)',
                 },
