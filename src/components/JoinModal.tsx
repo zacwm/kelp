@@ -24,10 +24,9 @@ import HomeFooter from './HomeFooter';
 
 type Props = {
   setUserId: (id: any) => void;
-  setMenuVisible: () => void; // TODO: This will be gone soon... This is just temporary until the new dropdown menus are implemented
-}
+};
 
-const JoinModal: React.FC<Props> = ({ setUserId, setMenuVisible }) => {
+const JoinModal: React.FC<Props> = ({ setUserId }) => {
   const router = useRouter();
   const { id, password } = router.query;
 
@@ -68,7 +67,6 @@ const JoinModal: React.FC<Props> = ({ setUserId, setMenuVisible }) => {
       if (res.userError) return setSubmitError(res.userError);
       setUserId(res.user);
       setRoom(res.room);
-      setMenuVisible();
     });
   };
 

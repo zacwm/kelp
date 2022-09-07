@@ -15,28 +15,18 @@ import RoomsPopover from './Popovers/Users';
 import ControllerPopover from './Popovers/Controller';
 
 type Props = {
+  search: any;
+  searchDispatch: React.Dispatch<any>;
   loadingTitles: boolean;
-  titleCategory: string;
-  setTitleCategory: React.Dispatch<React.SetStateAction<string>>;
-  setSearchKeywords: (e: string) => void;
-  selectGenre: string | null;
-  setSelectGenre: React.Dispatch<React.SetStateAction<string | null>>;
-  selectSort: string | null;
-  setSelectSort: React.Dispatch<React.SetStateAction<string | null>>;
   userId: string;
   onTorrentStart: (torrent: string) => void;
   setSelectedTitle: React.Dispatch<React.SetStateAction<any>>;
 }
 
 const RoomNavigation: React.FC<Props> = ({
+  search,
+  searchDispatch,
   loadingTitles,
-  titleCategory,
-  setTitleCategory,
-  setSearchKeywords,
-  selectGenre,
-  setSelectGenre,
-  selectSort,
-  setSelectSort,
   userId,
   onTorrentStart,
   setSelectedTitle,
@@ -59,7 +49,7 @@ const RoomNavigation: React.FC<Props> = ({
 
   const doSearch = () => {
     if (isTorrentLink) return onTorrentStart(inputKeywords);
-    setSearchKeywords(inputKeywords);
+    searchDispatch({ type: 'search', value: inputKeywords });
   };
 
   return (
@@ -82,11 +72,7 @@ const RoomNavigation: React.FC<Props> = ({
               cursor: 'pointer',
             }}
             onClick={() => {
-              setTitleCategory('movies');
-              setInputKeywords('');
-              setSearchKeywords('');
-              setSelectGenre('');
-              setSelectSort('trending');
+              searchDispatch({ type: 'reset' });
               setSelectedTitle(null);
             }}
           />
@@ -96,9 +82,9 @@ const RoomNavigation: React.FC<Props> = ({
             key={index}
             onClick={() => {
               if (loadingTitles) return;
-              setTitleCategory(category.value);
+              searchDispatch({ type: 'category', value: category.value });
             }}
-            weight={titleCategory === category.value ? 700 : 400}
+            weight={search.category === category.value ? 700 : 400}
             sx={{
               display: 'block',
               textAlign: 'center',
@@ -131,8 +117,10 @@ const RoomNavigation: React.FC<Props> = ({
             Genre
           </Text>
           <Select
-            value={selectGenre}
-            onChange={setSelectGenre}
+            value={search.genre}
+            onChange={(genre: any) => {
+              searchDispatch({ type: 'genre', value: genre });
+            }}
             data={[
               { value: '', label: 'All'  },
               { value: 'action', label: 'Action' },
@@ -168,8 +156,10 @@ const RoomNavigation: React.FC<Props> = ({
             Sort by
           </Text>
           <Select
-            value={selectSort}
-            onChange={setSelectSort}
+            value={search.sort}
+            onChange={(sort: string) => {
+              searchDispatch({ type: 'sort', value: sort });
+            }}
             data={[
               { value: 'trending', label: 'Trending' },
               { value: 'rating', label: 'Rating' },

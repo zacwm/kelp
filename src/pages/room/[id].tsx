@@ -18,6 +18,24 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faDownload } from '@fortawesome/free-solid-svg-icons';
 import { faClock } from '@fortawesome/free-regular-svg-icons';
 
+// Reducer for search
+const initialSearchState = {
+  category: 'movies',
+  genre: '',
+  sort: 'trending',
+  keywords: '',
+};
+
+const searchReducer = (state, action) => {
+  if (action.type === 'reset') {
+    return initialSearchState;
+  }
+
+  const newState = { ...state };
+  newState[action.type] = action.value;
+  return newState;
+};
+
 const Room: React.FC = () => {
   const { socket } = useSocket();
   const { room, closingRoom, setRoom } = useRoom();
@@ -27,13 +45,8 @@ const Room: React.FC = () => {
 
   const [videoState, setVideoState] = React.useState(null);
 
-  const [menuVisible, setMenuVisible] = React.useState(false);
-
   // States that are shared between RoomNavigation and TorrentSelect.
-  const [titleCategory, setTitleCategory] = React.useState('movies');
-  const [searchKeywords, setSearchKeywords] = React.useState('');
-  const [selectGenre, setSelectGenre] = React.useState<string | null>('');
-  const [selectSort, setSelectSort] = React.useState<string | null>('trending');
+  const [search, searchDispatch] = React.useReducer(searchReducer, initialSearchState);
   const [loadingTitles, setLoadingTitles] = React.useState<boolean>(true);
 
   const [selectedTitle, setSelectedTitle] = React.useState<any>(null);
@@ -112,10 +125,7 @@ const Room: React.FC = () => {
   
   return (
     <React.Fragment>
-      <JoinModal
-        setUserId={(id) => setUserId(id)}
-        setMenuVisible={() => setMenuVisible(true)}
-      />
+      <JoinModal setUserId={(id) => setUserId(id)} />
       {
         room && (
           <Box
@@ -131,14 +141,9 @@ const Room: React.FC = () => {
             }}
           >
             <RoomNavigation
+              search={search}
+              searchDispatch={searchDispatch}
               loadingTitles={loadingTitles}
-              titleCategory={titleCategory}
-              setTitleCategory={setTitleCategory}
-              setSearchKeywords={setSearchKeywords}
-              selectGenre={selectGenre}
-              setSelectGenre={setSelectGenre}
-              selectSort={selectSort}
-              setSelectSort={setSelectSort}
               userId={userId}
               onTorrentStart={onTorrentStart}
               setSelectedTitle={setSelectedTitle}
@@ -156,13 +161,10 @@ const Room: React.FC = () => {
                 // Torrent select screen
                 video?.statusCode === 1 ? (
                   <TorrentSelect
+                    search={search}
+                    searchDispatch={searchDispatch}
                     loadingTitles={loadingTitles}
                     setLoadingTitles={setLoadingTitles}
-                    titleCategory={titleCategory}
-                    searchKeywords={searchKeywords}
-                    selectGenre={selectGenre}
-                    setSelectGenre={setSelectGenre}
-                    selectSort={selectSort}
                     onTorrentStart={onTorrentStart}
                     selectedTitle={selectedTitle}
                     setSelectedTitle={setSelectedTitle}

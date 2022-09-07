@@ -11,26 +11,20 @@ import {
 } from '@mantine/core';
 
 type Props = {
-  titleCategory: string;
-  searchKeywords: string;
+  search: any;
+  searchDispatch: React.Dispatch<any>;
   loadingTitles: boolean;
   setLoadingTitles: React.Dispatch<React.SetStateAction<boolean>>;
-  selectGenre: string | null;
-  setSelectGenre: React.Dispatch<React.SetStateAction<string | null>>;
-  selectSort: string | null;
   onTorrentStart: (torrent: string) => void;
   selectedTitle: any;
   setSelectedTitle: React.Dispatch<React.SetStateAction<any>>;
 }
 
 const TorrentSelect: React.FC<Props> = ({
-  titleCategory,
-  searchKeywords,
+  search,
+  searchDispatch,
   loadingTitles,
   setLoadingTitles,
-  selectGenre,
-  setSelectGenre,
-  selectSort,
   onTorrentStart,
   selectedTitle,
   setSelectedTitle,
@@ -41,7 +35,7 @@ const TorrentSelect: React.FC<Props> = ({
   
   React.useEffect(() => {
     loadTorrentList(1, false, true);
-  }, [titleCategory, searchKeywords, selectGenre, selectSort]);
+  }, [search]);
 
   React.useEffect(() => {
     setSelectedTitle(null);
@@ -59,10 +53,10 @@ const TorrentSelect: React.FC<Props> = ({
 
     socket.emit('getTitles', {
       page: page || 1,
-      category: titleCategory,
-      keywords: searchKeywords,
-      genre: selectGenre,
-      sort: selectSort,
+      category: search.category,
+      keywords: search.keywords,
+      genre: search.genre,
+      sort: search.sort,
     }, (response: any) => {
       setLoadingTitles(false);
 
@@ -108,15 +102,15 @@ const TorrentSelect: React.FC<Props> = ({
           <TitleDisplay
             styles={styles}
             title={selectedTitle}
-            type={titleCategory}
+            type={search.category}
             onTitleSelect={(url) => onTorrentStart(url)}
-            setGenre={setSelectGenre}
+            setGenre={(genre) => searchDispatch({ type: 'genre', value: genre })}
             close={() => setSelectedTitle(null)}
           />
         )}
       </Transition>
       <VirtualList
-        titleCategory={titleCategory}
+        titleCategory={search.category}
         itemData={torrentList}
         isLoading={loadingTitles}
         setSelectedTitle={setSelectedTitle}
