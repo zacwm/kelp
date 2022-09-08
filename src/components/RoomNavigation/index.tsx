@@ -49,7 +49,7 @@ const RoomNavigation: React.FC<Props> = ({
 
   const doSearch = () => {
     if (isTorrentLink) return onTorrentStart(inputKeywords);
-    searchDispatch({ type: 'search', value: inputKeywords });
+    searchDispatch({ type: 'keywords', value: inputKeywords });
   };
 
   return (
