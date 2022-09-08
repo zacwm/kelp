@@ -7,7 +7,7 @@ import VirtualList from './VirtualList';
 
 import { 
   Paper,
-  Transition 
+  Transition,
 } from '@mantine/core';
 
 type Props = {

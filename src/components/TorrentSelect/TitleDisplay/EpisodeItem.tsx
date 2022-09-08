@@ -18,7 +18,7 @@ const EpisodeItem: React.FC<Props> = ({ episodeData, onSelect }) => {
         boxSizing: 'border-box',
         '&:first-of-type': {
           padding: '0 0 7.5px 0',
-        }
+        },
       }}
     >
       <Group>

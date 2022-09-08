@@ -248,7 +248,7 @@ const Player: React.FC<Props> = ({ videoState, setVideoState }) => {
                       default: true,
                     },
                   ],
-                }
+                },
               }}
               playing={videoState?.playing}
               volume={inputVolumeSlider / 100}

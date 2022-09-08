@@ -64,7 +64,7 @@ const DownloadButton: React.FC<Props> = ({ torrents, forceLang, onTorrentSelect 
         transition: 'transform 0.2s ease-in-out',
         '&:hover': {
           transform: 'scale(1.05)',
-        }
+        },
       }}
     >
       <Group spacing={0}>
@@ -75,7 +75,7 @@ const DownloadButton: React.FC<Props> = ({ torrents, forceLang, onTorrentSelect 
             fontSize: 16,
             '&:hover': {
               transform: 'none !important',
-            }
+            },
           }}
           onClick={() => onTorrentSelect(defaultTorrent.url)}
         >
@@ -93,7 +93,7 @@ const DownloadButton: React.FC<Props> = ({ torrents, forceLang, onTorrentSelect 
                 color: '#3bd4ae',
                 '&:hover': {
                   transform: 'none !important',
-                }
+                },
               }}
             >
               <FontAwesomeIcon icon={faAngleDown} />
@@ -121,7 +121,7 @@ const DownloadButton: React.FC<Props> = ({ torrents, forceLang, onTorrentSelect 
                       transform: 'scale(1) !important',
                       '&:hover': {
                         backgroundImage: 'linear-gradient(135deg, #00bc70 0%, #00a19b 100%)',
-                      }
+                      },
                     }}
                     onClick={() => onTorrentSelect(torrent.url)}
                   >

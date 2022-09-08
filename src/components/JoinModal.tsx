@@ -174,7 +174,7 @@ const JoinModal: React.FC<Props> = ({ setUserId }) => {
             justify="center"
             sx={{
               width: '100%',
-              height: '100%'
+              height: '100%',
             }}
           >
             {

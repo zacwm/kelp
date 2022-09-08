@@ -8,7 +8,15 @@ import Stack from '@mui/material/Stack';
 
 import { IconAlertCircle } from '@tabler/icons';
 
-import { Paper, Alert, Text, Collapse, Button, TextInput, PasswordInput } from '@mantine/core';
+import {
+  Paper,
+  Alert,
+  Text,
+  Collapse,
+  Button,
+  TextInput,
+  PasswordInput,
+} from '@mantine/core';
 
 const CreateRooms: React.FC = () => {
   const { socket } = useSocket();
@@ -78,7 +86,7 @@ const CreateRooms: React.FC = () => {
                 },
                 message: {
                   color: '#98989a',
-                }
+                },
               }}
             >
               {createRoomErrorMessage}

@@ -88,7 +88,7 @@ const Torrent = (props: Props) => {
         transition: 'all 0.3s ease',
         '&:hover': {
           transform: 'scale(1.05)',
-        }
+        },
       }}
       title={props.title.title}
     >

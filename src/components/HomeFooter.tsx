@@ -21,7 +21,7 @@ const HomeFooter: React.FC = () => {
         left: 0,
         right: 0,
         textAlign: 'center',
-        backgroundColor: '#08080f'
+        backgroundColor: '#08080f',
       }}
     >
       <Group

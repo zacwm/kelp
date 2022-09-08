@@ -36,7 +36,7 @@ const VirtualList = ({
   itemData,
   isLoading,
   setSelectedTitle,
-  fetchTorrentList
+  fetchTorrentList,
 }: Props): React.ReactElement => {
   const { classes } = useStyles();
 
@@ -95,7 +95,7 @@ const VirtualList = ({
 
     return {
       List: List,
-      Item: ItemContainer
+      Item: ItemContainer,
     };
   }, [itemData, isLoading]);
 
@@ -106,7 +106,7 @@ const VirtualList = ({
         width: '100%',
         display: 'flex',
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
       }}>
         <Loader />
       </Box>

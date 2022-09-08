@@ -97,7 +97,9 @@ const TitleDisplay: React.FC<Props> = ({
       } else {
         seasonObj[ep.season] = [ep];
       }
-      seasonObj[ep.season].sort((a, b) => { return a.episode - b.episode; });
+      seasonObj[ep.season].sort((a, b) => {
+        return a.episode - b.episode;
+      });
     });
 
     setSeasonEpisodesData(seasonObj);
@@ -296,7 +298,7 @@ const TitleDisplay: React.FC<Props> = ({
                         },
                         label: {
                           fontSize: 14,
-                        }
+                        },
                       }}
                     >
                       IMDb
@@ -391,7 +393,9 @@ const TitleDisplay: React.FC<Props> = ({
                       }}
                     >
                       {
-                        Object.keys(seasonEpisodesData).sort((a, b) => { return parseInt(a) - parseInt(b); }).map((season, sIndex) => (
+                        Object.keys(seasonEpisodesData).sort((a, b) => {
+                          return parseInt(a) - parseInt(b);
+                        }).map((season, sIndex) => (
                           <Accordion.Item value={`season${season}`} key={sIndex}>
                             <Accordion.Control
                               sx={{

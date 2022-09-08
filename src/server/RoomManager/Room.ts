@@ -138,7 +138,9 @@ class Room implements RoomInterface {
         url: this.videoURL,
         title: this.videoTitle,
         subtitle: this.videoSubtitle,
-        files: (this.files || []).map(file => { return { id: file.id, name: file.name }; }),
+        files: (this.files || []).map(file => {
+          return { id: file.id, name: file.name };
+        }),
         extra: this.videoExtra,
       };
     } else {
@@ -220,7 +222,13 @@ class Room implements RoomInterface {
     this.wtClient.add(url, { path: path.join(__dirname, `../../.temp/${this.id}`) }, (torrent: any) => {
       this.torrent = torrent;
       this.files = torrent.files.filter(file => {
-        return ['.mkv', '.mp4', '.avi', '.mov', '.wmv'].includes(path.extname(file.path));
+        return [
+          '.mkv',
+          '.mp4',
+          '.avi',
+          '.mov',
+          '.wmv',
+        ].includes(path.extname(file.path));
       }).map((file, index) => {
         return { id: makeid(16), name: file.name, path: file.path, selected: index === 0 };
       });
@@ -383,7 +391,11 @@ function formatBytes(bytes, decimals = 2) {
 
   const k = 1024;
   const dm = decimals < 0 ? 0 : decimals;
-  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+  const sizes = ['Bytes',
+    'KB',
+    'MB',
+    'GB',
+    'TB'];
 
   const i = Math.floor(Math.log(bytes) / Math.log(k));
 

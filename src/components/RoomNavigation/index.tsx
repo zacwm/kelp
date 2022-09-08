@@ -1,3 +1,4 @@
+/* eslint-disable array-element-newline */
 import * as React from 'react';
 
 import {
@@ -43,8 +44,7 @@ const RoomNavigation: React.FC<Props> = ({
   }, [inputKeywords]);
 
   const titleCategories = [
-    { label: 'Movies', value: 'movies' },
-    { label: 'TV Shows', value: 'shows' },
+    { label: 'Movies', value: 'movies' }, { label: 'TV Shows', value: 'shows' },
   ];
 
   const doSearch = () => {
@@ -94,7 +94,7 @@ const RoomNavigation: React.FC<Props> = ({
               marginRight: 30,
               '&:hover': {
                 color: '#bfbfbf',
-              }
+              },
             }}
           >
             { category.label }

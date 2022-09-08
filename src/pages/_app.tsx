@@ -15,7 +15,18 @@ import {
   SliderProps,
 } from '@mantine/core';
 
-const kelpPalette: any = ['#000000', '#08080f', '#191921', '#2f2f3d', '#3bd4ae', '#98989a', '#ffffff', '#ae95da', '#00bc70', '#00a19b'];
+const kelpPalette: any = [
+  '#000000',
+  '#08080f',
+  '#191921',
+  '#2f2f3d',
+  '#3bd4ae',
+  '#98989a',
+  '#ffffff',
+  '#ae95da',
+  '#00bc70',
+  '#00a19b',
+];
 
 const ButtonDefaultProps: Partial<ButtonProps> = {
   radius: 12,
@@ -56,7 +67,7 @@ const TextInputDefaultProps: Partial<TextInputProps> = {
         border: `1px solid ${kelpPalette[2]}`,
       },
     },
-  }
+  },
 };
 
 const PasswordInputDefaultProps: Partial<PasswordInputProps> = {
@@ -95,8 +106,8 @@ const PasswordInputDefaultProps: Partial<PasswordInputProps> = {
     disabled: {
       backgroundColor: kelpPalette[2],
       border: `1px solid ${kelpPalette[2]}`,
-    }
-  }
+    },
+  },
 };
 
 const SelectDefaultProps: Partial<SelectProps> = {
@@ -126,12 +137,12 @@ const SelectDefaultProps: Partial<SelectProps> = {
         backgroundColor: 'rgba(152, 152, 154, 0.5)',
         '&:hover': {
           backgroundColor: 'rgba(152, 152, 154, 0.75) !important',
-        }
+        },
       },
 
       '.mantine-ScrollArea-viewport *:not(.mantine-Select-item)': {
         padding: '0 !important',
-      }
+      },
     },
     item: {
       borderRadius: 12,
@@ -185,7 +196,7 @@ const AccordionDefaultProps: Partial<AccordionProps> = {
     content: {
       padding: '0 30px 30px 30px',
     },
-  }
+  },
 };
 
 const SliderDefaultProps: Partial<SliderProps> = {
@@ -202,8 +213,8 @@ const SliderDefaultProps: Partial<SliderProps> = {
       backgroundImage: `linear-gradient(135deg, ${kelpPalette[8]} 0%, ${kelpPalette[9]} 100%)`,
       backgroundAttachment: 'fixed',
       backgroundSize: 'cover',
-    }
-  }
+    },
+  },
 };
 
 export default function App(props: AppProps ) {
@@ -240,7 +251,16 @@ export default function App(props: AppProps ) {
           },
           colorScheme: 'dark',
           colors: {
-            brand: ['#3bd4ae', '#3bd4ae', '#3bd4ae', '#3bd4ae', '#3bd4ae', '#3bd4ae', '#3bd4ae', '#3bd4ae', '#3bd4ae','#3bd4ae'],
+            brand: ['#3bd4ae',
+              '#3bd4ae',
+              '#3bd4ae',
+              '#3bd4ae',
+              '#3bd4ae',
+              '#3bd4ae',
+              '#3bd4ae',
+              '#3bd4ae',
+              '#3bd4ae',
+              '#3bd4ae'],
             kelpPalette: kelpPalette,
           },
           primaryColor: 'brand',

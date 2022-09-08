@@ -112,7 +112,7 @@ const ActiveRooms: React.FC = () => {
                     '&:hover': {
                       backgroundColor: '#2f2f3d !important',
                     },
-                  }
+                  },
                 }}
               >
                 <Stack alignItems="stretch" spacing={0}>

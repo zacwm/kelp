@@ -51,7 +51,9 @@ const FileSelectList: React.FC = () => {
                 maxWidth: '200px',
               }}>{ videoFile.name }</Typography>
               <ArrowForwardIcon
-                onClick={() => { onFileSelect(videoFile.id); }}
+                onClick={() => {
+                  onFileSelect(videoFile.id);
+                }}
                 sx={{ cursor: 'pointer' }}
               />
             </Stack>

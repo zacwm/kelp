@@ -100,7 +100,7 @@ class SocketServer {
   
         callback({
           user: user.id,
-          room: roomDataToSend
+          room: roomDataToSend,
         });
   
         this.io.to(room.id).emit('updateRoom', roomDataToSend);
