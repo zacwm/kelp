@@ -1,5 +1,4 @@
 import * as React from 'react';
-import Head from 'next/head';
 import { useRouter } from 'next/router';
 
 import { useSocket } from 'contexts/socket.context';
@@ -138,83 +137,78 @@ const JoinModal: React.FC<Props> = ({ setUserId }) => {
   );
 
   return (
-    <React.Fragment>
-      <Head>
-        <title>kelp - room</title>
-      </Head>
-      <Transition
-        mounted={!room}
-        transition="fade"
-        duration={400}
-        timingFunction="ease"
-      >
-        {(styles) => (
-          <Box
-            style={styles}
+    <Transition
+      mounted={!room}
+      transition="fade"
+      duration={400}
+      timingFunction="ease"
+    >
+      {(styles) => (
+        <Box
+          style={styles}
+          sx={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            color: '#fff',
+            zIndex: 9999,
+            background: '#08080f',
+          }}
+        >
+          <Image 
+            src='/kelp-gradient-text.svg'
+            height={70}
+            fit='contain'
             sx={{
-              position: 'fixed',
-              top: 0,
+              position: 'absolute',
+              top: '18%',
               left: 0,
+              right: 0,
+              textAlign: 'center',
+            }}
+          />
+          <Stack
+            align="center"
+            justify="center"
+            sx={{
               width: '100%',
-              height: '100%',
-              color: '#fff',
-              zIndex: 9999,
-              background: '#08080f',
+              height: '100%'
             }}
           >
-            <Image 
-              src='/kelp-gradient-text.svg'
-              height={70}
-              fit='contain'
-              sx={{
-                position: 'absolute',
-                top: '18%',
-                left: 0,
-                right: 0,
-                textAlign: 'center',
-              }}
-            />
-            <Stack
-              align="center"
-              justify="center"
-              sx={{
-                width: '100%',
-                height: '100%'
-              }}
-            >
-              {
-                isWaitingForSummary ? (
-                  <Loader size="xl" />
-                ) : (
-                  <Paper
-                    shadow="xs" 
-                    radius={12} 
-                    p={30}
-                    sx={{
-                      width: 500,
-                      backgroundColor: '#08080f',
-                      border: '1px solid #191921',
-                    }}
-                  >
-                    {
-                      roomSummary.error ? (
-                        <Stack align="center">
-                          <Text size={23}>{roomSummary.error}</Text>
-                          <Button onClick={() => router.push('/')} >
-                            Go back
-                          </Button>
-                        </Stack>
-                      ) : inputs
-                    }
-                  </Paper>
-                )
-              }
-            </Stack>
-            <HomeFooter />
-          </Box>
-        )}
-      </Transition>
-    </React.Fragment>
+            {
+              isWaitingForSummary ? (
+                <Loader size="xl" />
+              ) : (
+                <Paper
+                  shadow="xs" 
+                  radius={12} 
+                  p={30}
+                  sx={{
+                    width: 500,
+                    backgroundColor: '#08080f',
+                    border: '1px solid #191921',
+                  }}
+                >
+                  {
+                    roomSummary.error ? (
+                      <Stack align="center">
+                        <Text size={23}>{roomSummary.error}</Text>
+                        <Button onClick={() => router.push('/')} >
+                          Go back
+                        </Button>
+                      </Stack>
+                    ) : inputs
+                  }
+                </Paper>
+              )
+            }
+          </Stack>
+          <HomeFooter />
+        </Box>
+      )}
+    </Transition>
   );
 };
 

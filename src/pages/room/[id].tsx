@@ -1,4 +1,5 @@
 import * as React from 'react';
+import Head from 'next/head';
 import type { NextPage } from 'next';
 import { CookiesProvider } from 'react-cookie';
 import moment from 'moment';
@@ -125,6 +126,9 @@ const Room: React.FC = () => {
   
   return (
     <React.Fragment>
+      <Head>
+        <title>kelp - { room?.name || 'room' }</title>
+      </Head>
       <JoinModal setUserId={(id) => setUserId(id)} />
       {
         room && (
