@@ -2,13 +2,11 @@ import * as React from 'react';
 
 import { useSocket } from 'contexts/socket.context';
 
-import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
-import Stack from '@mui/material/Stack';
-
 import { IconAlertCircle } from '@tabler/icons';
 
 import {
+  Box,
+  Stack,
   Paper,
   Alert,
   Text,
@@ -55,7 +53,7 @@ const CreateRooms: React.FC = () => {
   return(
     <Box
       sx={{
-        mx: '15px',
+        margin: '15px',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
@@ -63,89 +61,90 @@ const CreateRooms: React.FC = () => {
         width: 540,
       }}
     >
-      <Grid container spacing={0}>
-        <Grid item xs={12}>
-          <Collapse
-            in={createRoomErrorMessage} 
+      <Collapse
+        in={createRoomErrorMessage} 
+        sx={{
+          width: '100%',
+        }}
+      >
+        <Alert
+          icon={<IconAlertCircle size={16} />}
+          title="Oh, uhh..."
+          withCloseButton
+          variant="outline"
+          color="kelpPalette.7"
+          onClose={() => setCreateRoomErrorMessage(null)}
+          radius={12}
+          styles={{
+            root: {
+              backgroundColor: '#191921',
+              marginBottom: 30,
+            },
+            message: {
+              color: '#98989a',
+            },
+          }}
+        >
+          {createRoomErrorMessage}
+        </Alert>
+      </Collapse>
+      <Paper 
+        shadow="xs" 
+        radius={12} 
+        p={30}
+        sx={{
+          backgroundColor: '#08080f',
+          border: '1px solid #191921',
+          width: '100%',
+        }}
+      >
+        <Stack
+          align="center"
+          justify="center"
+          spacing={0}
+        >
+          <Text
+            size={25}
+            weight={300}
+            color="#98989a"
+            sx={{
+              lineHeight: 1,
+            }}
+          >
+            Create Room
+          </Text>
+          <TextInput
+            placeholder="Room name"
+            disabled={createRoomPending}
+            value={inputRoomName}
+            onChange={(e) => setInputRoomName(e.currentTarget.value)}
             sx={{
               width: '100%',
+              marginTop: 30,
             }}
-          >
-            <Alert
-              icon={<IconAlertCircle size={16} />}
-              title="Oh, uhh..."
-              withCloseButton
-              variant="outline"
-              color="kelpPalette.7"
-              onClose={() => setCreateRoomErrorMessage(null)}
-              radius={12}
-              styles={{
-                root: {
-                  backgroundColor: '#191921',
-                  marginBottom: 30,
-                },
-                message: {
-                  color: '#98989a',
-                },
-              }}
-            >
-              {createRoomErrorMessage}
-            </Alert>
-          </Collapse>
-          <Paper 
-            shadow="xs" 
-            radius={12} 
-            p={30}
+          />
+          <PasswordInput
+            placeholder="Room password (optional)"
+            disabled={createRoomPending}
+            value={inputRoomPassword}
+            onChange={(e) => setInputRoomPassword(e.currentTarget.value)}
             sx={{
-              backgroundColor: '#08080f',
-              border: '1px solid #191921',
+              width: '100%',
+              marginTop: 15,
+            }}
+          />
+          <Button
+            onClick={buttonCreateRoom}
+            disabled={createRoomPending}
+            sx={{
+              width: 130,
+              marginTop: 30,
             }}
           >
-            <Stack alignItems="center" spacing={0}>
-              <Text
-                size={25}
-                weight={300}
-                color="#98989a"
-                sx={{
-                  lineHeight: 1,
-                }}
-              >
-                Create Room
-              </Text>
-              <TextInput
-                placeholder="Room name"
-                disabled={createRoomPending}
-                value={inputRoomName}
-                onChange={(e) => setInputRoomName(e.currentTarget.value)}
-                sx={{
-                  width: '100%',
-                  marginTop: 30,
-                }}
-              />
-              <PasswordInput
-                placeholder="Room password (optional)"
-                disabled={createRoomPending}
-                value={inputRoomPassword}
-                onChange={(e) => setInputRoomPassword(e.currentTarget.value)}
-                sx={{
-                  width: '100%',
-                  marginTop: 15,
-                }}
-              />
-              <Button
-                onClick={buttonCreateRoom}
-                disabled={createRoomPending}
-                sx={{
-                  width: 130,
-                  marginTop: 30,
-                }}
-              >
-                Create Room
-              </Button>
-            </Stack>
-          </Paper>
-        </Grid>
-      </Grid>
+            Create Room
+          </Button>
+        </Stack>
+      </Paper>
     </Box>
   );
 };

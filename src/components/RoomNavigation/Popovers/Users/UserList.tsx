@@ -3,10 +3,10 @@ import * as React from 'react';
 import { useSocket } from 'contexts/socket.context';
 import { useRoom } from 'contexts/room.context';
 
-import Stack from '@mui/material/Stack';
+import { Box, Text, TextInput, ActionIcon, Stack, Group } from '@mantine/core';
 
-import { Box, Text, TextInput, ActionIcon } from '@mantine/core';
 import { IconCheck, IconPencil, IconX } from '@tabler/icons';
+
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser } from '@fortawesome/free-regular-svg-icons';
 
@@ -38,9 +38,8 @@ const UserList: React.FC<Props> = ({ userId }) => {
 
   return (
     <Stack
-      direction="column"
-      alignItems="stretch"
-      justifyContent="flex-start"
+      align="stretch"
+      justify="flex-start"
       sx={{
         gap: '15px',
       }}
@@ -49,10 +48,9 @@ const UserList: React.FC<Props> = ({ userId }) => {
         (room?.users || []).map((user, index) => (
           <React.Fragment key={index}>
             <Box sx={{ overflow: 'clip' }}>
-              <Stack
-                direction="row"
-                alignItems="center"
-                justifyContent="space-between"
+              <Group
+                align="center"
+                position="apart"
                 sx={{
                   gap: '15px',
                 }}
@@ -77,10 +75,9 @@ const UserList: React.FC<Props> = ({ userId }) => {
                   </Text>
                 )}
                 {user.id === userId && (
-                  <Stack
-                    direction="row"
-                    alignItems="center"
-                    justifyContent="space-between"
+                  <Group
+                    align="center"
+                    position="apart"
                     spacing={1}
                     sx={{ flex: 1 }}
                   >
@@ -114,9 +111,9 @@ const UserList: React.FC<Props> = ({ userId }) => {
                         </React.Fragment>
                       )
                     }
-                  </Stack>
+                  </Group>
                 )}
-              </Stack>
+              </Group>
             </Box>
           </React.Fragment>
         ))

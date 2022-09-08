@@ -1,13 +1,10 @@
 import * as React from 'react';
 import { useRouter } from 'next/router';
 
-import Box from '@mui/material/Box';
-import Stack from '@mui/material/Stack';
+import { Box, UnstyledButton, Text, Stack } from '@mantine/core';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLock, faUnlock } from '@fortawesome/free-solid-svg-icons';
-
-import { UnstyledButton, Text } from '@mantine/core';
 
 type Props = {
   room: any;
@@ -42,9 +39,8 @@ const RoomItem: React.FC<Props> = ({ room }) => {
         }} 
       />
       <Stack
-        direction="column"
-        justifyContent="center"
-        alignItems="flex-start" 
+        align="flex-start" 
+        justify="center"
         spacing={0}
         sx={{ flex: 1 }}
       >

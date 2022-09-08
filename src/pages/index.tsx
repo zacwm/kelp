@@ -4,10 +4,12 @@ import type { NextPage } from 'next';
 
 import { SocketProvider } from 'contexts/socket.context';
 
-import Container from '@mui/material/Container';
-import Box from '@mui/material/Box';
-
-import { Image, Center } from '@mantine/core';
+import {
+  Container,
+  Image,
+  Center,
+  Box,
+} from '@mantine/core';
 
 import ActiveRooms from 'components/ActiveRooms';
 import CreateRooms from 'components/CreateRoom';
@@ -15,7 +17,7 @@ import HomeFooter from 'components/HomeFooter';
 
 const Home: React.FC = () => {
   return (
-    <Container maxWidth="lg">
+    <Container size="lg">
       <Head>
         <title>kelp - menu</title>
       </Head>

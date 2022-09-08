@@ -4,10 +4,10 @@ import { useRouter } from 'next/router';
 import { useSocket } from 'contexts/socket.context';
 import { useRoom } from 'contexts/room.context';
 
-import Alert from '@mui/material/Alert';
 import Collapse from '@mui/material/Collapse';
 
 import {
+  Alert,
   Box,
   Text,
   Paper,
@@ -123,8 +123,8 @@ const JoinModal: React.FC<Props> = ({ setUserId }) => {
         }}
       >
         <Alert
-          severity="error"
-          variant="filled"
+          color="red"
+          variant="outline"
           sx={{
             mt: 2,
             width: '100%',

@@ -5,13 +5,16 @@ import { useSocket } from 'contexts/socket.context';
 
 import RoomItem from './RoomItem';
 
-import Box from '@mui/material/Box';
-import Grid from '@mui/material/Grid';
-import Stack from '@mui/material/Stack';
-
 import { IconAlertCircle } from '@tabler/icons';
 
-import { Paper, Alert, Text, ScrollArea } from '@mantine/core';
+import {
+  Stack,
+  Box,
+  Paper,
+  Alert,
+  Text,
+  ScrollArea,
+} from '@mantine/core';
 
 const ActiveRooms: React.FC = () => {
   const router = useRouter();
@@ -48,7 +51,7 @@ const ActiveRooms: React.FC = () => {
   return(
     <Box
       sx={{
-        mx: '15px',
+        margin: '15px',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
@@ -56,80 +59,77 @@ const ActiveRooms: React.FC = () => {
         width: 540,
       }}
     >
-      <Grid container spacing={2}>
-        <Grid item xs={12}>
-          {roomClosedMessage && (
-            <Alert
-              icon={<IconAlertCircle size={16} />}
-              title="So about the room you were in..."
-              withCloseButton
-              variant="outline"
-              onClose={() => setRoomClosedMessage(false)}
-              sx={{ marginBottom: 15 }}
-            >
-              { roomClosedMessage == 1 && 'It was closed by the host. Maybe it\'s time to create your own!' }
-              { roomClosedMessage == 2 && 'Room was closed successfully.' }
-            </Alert>
-          )}
-          {activeRooms.length > 0 && (
-            <Paper 
-              shadow="xs" 
-              radius={12} 
-              withBorder
-              sx={{
-                backgroundColor:'#08080f',
-                border: '1px solid #191921',
-                padding: '30px 30px 0 30px',
-              }}
-            >
-              <Text 
-                size={25}
-                align="center" 
-                weight={300}
-                color="#98989a"
-                sx={{
-                  lineHeight: 1,
-                }}
-              >
-                Active Rooms
-              </Text>
-              <ScrollArea
-                scrollbarSize={8}
-                sx={{
-                  paddingBottom: 15,
-                  marginTop: '30px',
-                  maxHeight: '250px',
-                }}
-                styles={{
-                  scrollbar: {
-                    backgroundColor: 'transparent',
-                    '&:hover': {
-                      backgroundColor: 'transparent',
-                    },
-                  },
-                  thumb: {
-                    backgroundColor: '#2f2f3d',
-                    '&:hover': {
-                      backgroundColor: '#2f2f3d !important',
-                    },
-                  },
-                }}
-              >
-                <Stack alignItems="stretch" spacing={0}>
-                  {
-                    activeRooms.map(room => (
-                      <RoomItem
-                        key={room.id}
-                        room={room}
-                      />
-                    ))
-                  }
-                </Stack>
-              </ScrollArea>
-            </Paper>
-          )}
-        </Grid>
-      </Grid>
+      {roomClosedMessage && (
+        <Alert
+          icon={<IconAlertCircle size={16} />}
+          title="So about the room you were in..."
+          withCloseButton
+          variant="outline"
+          onClose={() => setRoomClosedMessage(false)}
+          sx={{ marginBottom: 15 }}
+        >
+          { roomClosedMessage == 1 && 'It was closed by the host. Maybe it\'s time to create your own!' }
+          { roomClosedMessage == 2 && 'Room was closed successfully.' }
+        </Alert>
+      )}
+      {activeRooms.length > 0 && (
+        <Paper 
+          shadow="xs" 
+          radius={12} 
+          withBorder
+          sx={{
+            backgroundColor:'#08080f',
+            border: '1px solid #191921',
+            padding: '30px 30px 0 30px',
+            width: '100%',
+          }}
+        >
+          <Text 
+            size={25}
+            align="center" 
+            weight={300}
+            color="#98989a"
+            sx={{
+              lineHeight: 1,
+            }}
+          >
+            Active Rooms
+          </Text>
+          <ScrollArea
+            scrollbarSize={8}
+            sx={{
+              paddingBottom: 15,
+              marginTop: '30px',
+              maxHeight: '250px',
+            }}
+            styles={{
+              scrollbar: {
+                backgroundColor: 'transparent',
+                '&:hover': {
+                  backgroundColor: 'transparent',
+                },
+              },
+              thumb: {
+                backgroundColor: '#2f2f3d',
+                '&:hover': {
+                  backgroundColor: '#2f2f3d !important',
+                },
+              },
+            }}
+          >
+            <Stack align="stretch" spacing={0}>
+              {
+                activeRooms.map(room => (
+                  <RoomItem
+                    key={room.id}
+                    room={room}
+                  />
+                ))
+              }
+            </Stack>
+          </ScrollArea>
+        </Paper>
+      )}
     </Box>
   );
 };

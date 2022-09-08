@@ -9,9 +9,7 @@ import { useVideo } from 'contexts/video.context';
 
 import Overlay from './Overlay';
 
-import Stack from '@mui/material/Stack';
-
-import { Box } from '@mantine/core';
+import { Box, Stack } from '@mantine/core';
 
 type Props = {
   videoState: any;
@@ -205,9 +203,8 @@ const Player: React.FC<Props> = ({ videoState, setVideoState }) => {
         color: '#fff',
       }}>
         <Stack
-          direction="column"
-          alignItems="stretch"
-          justifyContent="center"
+          align="stretch"
+          justify="center"
           sx={{
             height: '100vh',
           }}
