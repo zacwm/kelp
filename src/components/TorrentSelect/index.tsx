@@ -33,51 +33,32 @@ const TorrentSelect: React.FC<Props> = ({
 
   const [torrentList, setTorrentList] = React.useState<object[]>([]);
   
-  React.useEffect(() => {
-    loadTorrentList(1, false, true);
-  }, [search]);
+  React.useEffect((): any => {
+    // 'isSubscribed' is used to prevent overfetching when search reducer is changed during a search.
+    let isSubscribed = true;
 
-  React.useEffect(() => {
-    setSelectedTitle(null);
-  }, [loadingTitles]);
-
-  const loadTorrentList = async (
-    page: number,
-    concat: boolean,
-    forceLoad: boolean,
-    callback?: () => void,
-  ): Promise<void> => {
-    if (forceLoad) {
-      setLoadingTitles(true);
-    }
+    setLoadingTitles(true);
 
     socket.emit('getTitles', {
-      page: page || 1,
+      page: 1,
       category: search.category,
       keywords: search.keywords,
       genre: search.genre,
       sort: search.sort,
     }, (response: any) => {
-      setLoadingTitles(false);
-
-      if (typeof callback === 'function') {
-        callback();
-      }
-
-      if (response.error) {
-        setTorrentList([]);
-        console.error(response.error);
-        return;
-      }
-
-      if (concat) {
-        const newTorrentList = [...torrentList, ...response.titles];
-        setTorrentList(newTorrentList);
-      } else {
+      if (isSubscribed) {
+        setLoadingTitles(false);
+  
         setTorrentList(response.titles || []); 
       }
     });
-  };
+
+    return () => isSubscribed = false;
+  }, [search]);
+
+  React.useEffect(() => {
+    setSelectedTitle(null);
+  }, [loadingTitles]);
 
   return (
     <Paper
@@ -114,7 +95,10 @@ const TorrentSelect: React.FC<Props> = ({
         itemData={torrentList}
         isLoading={loadingTitles}
         setSelectedTitle={setSelectedTitle}
-        fetchTorrentList={loadTorrentList}
+        search={search}
+        setLoadingTitles={setLoadingTitles}
+        torrentList={torrentList}
+        setTorrentList={setTorrentList}
       />
     </Paper>
   );

@@ -1,5 +1,8 @@
 import React, { useState, useRef, useMemo, useEffect } from 'react';
 import { VirtuosoGrid, GridComponents, GridItemContent } from 'react-virtuoso';
+
+import { useSocket } from 'contexts/socket.context';
+
 import { Box, Loader, createStyles, LoadingOverlay } from '@mantine/core';
 
 import MemoizedTorrent from './TorrentCell';
@@ -9,7 +12,10 @@ interface Props {
   itemData: object[];
   isLoading: boolean;
   setSelectedTitle: React.Dispatch<React.SetStateAction<any>>;
-  fetchTorrentList: (page: number, concat: boolean, forceLoad: boolean, callback?: () => void) => void;
+  search: any;
+  setLoadingTitles: React.Dispatch<React.SetStateAction<boolean>>;
+  torrentList: any;
+  setTorrentList: React.Dispatch<React.SetStateAction<any>>;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -36,8 +42,12 @@ const VirtualList = ({
   itemData,
   isLoading,
   setSelectedTitle,
-  fetchTorrentList,
+  search,
+  setLoadingTitles,
+  torrentList,
+  setTorrentList,
 }: Props): React.ReactElement => {
+  const { socket } = useSocket();
   const { classes } = useStyles();
 
   const [shallowFetch, setShallowFetch] = useState(false);
@@ -60,8 +70,18 @@ const VirtualList = ({
 
     setShallowFetch(true);
     lastPage.current += 1;
-    fetchTorrentList(lastPage.current, true, false, () => {
+
+    socket.emit('getTitles', {
+      page: lastPage.current,
+      category: search.category,
+      keywords: search.keywords,
+      genre: search.genre,
+      sort: search.sort,
+    }, (response: any) => {
       setShallowFetch(false);
+
+      const newTorrentList = [...torrentList, ...response.titles];
+      setTorrentList(newTorrentList);
     });
   };
 
