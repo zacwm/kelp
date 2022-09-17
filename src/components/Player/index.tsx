@@ -133,7 +133,16 @@ const Player: React.FC<Props> = ({ videoState, setVideoState }) => {
     }, 2000);
   }, [videoState]);
 
+  // Ignore first sliderEndPosition useEffect call.
+  const firstSliderEndPositionChange = React.useRef(true);
+
   React.useEffect(() => {
+    if (firstSliderEndPositionChange) {
+      firstSliderEndPositionChange.current = false;
+      return;
+    }
+
+    if (!videoState) return;
     socket.emit('videoChangePlaybackTime', {
       id: room.id,
     }, sliderEndPosition);
