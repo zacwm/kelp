@@ -1,9 +1,9 @@
 import fs from 'fs-extra';
 import path from 'path';
-import User from '../User';
+import User from './User';
 import * as SocketIO from 'socket.io';
 import WebTorrent from 'webtorrent';
-import FFmpeg from '../ffmpeg';
+import FFmpeg from './ffmpeg';
 
 interface RoomInterface {
   setName(name: string): void;
@@ -69,7 +69,7 @@ class Room implements RoomInterface {
     this.statusTimeRemaining = 0;
     this.statusSpeed = '';
     this.videoTitle = '';
-    this.videoURL = 'https://kelp.sneeze.xyz/streams/test/output.m3u8';
+    this.videoURL = '';
     this.playbackPlaying = false;
     this.playbackTimePosition = 0;
     this.playbackTimePositionInterval = null;
@@ -119,12 +119,7 @@ class Room implements RoomInterface {
     this.SocketServer.emit('updateRoom', {
       id: this.id,
       name: this.name,
-      users: this.getUsers().map(userItem => {
-        return {
-          id: userItem.id,
-          name: userItem.name,
-        };
-      }),
+      users: this.getUsers(),
       videoData: this.getVideoData(),
       videoState: this.statusCode === 0 ? this.getPlaybackState() : null,
     });

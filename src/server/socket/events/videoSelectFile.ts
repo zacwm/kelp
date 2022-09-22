@@ -4,7 +4,7 @@
 // TODO| into a selection to only download the file they need from a torrent.
 
 import { SocketManagerProps } from '../SocketManagerProps';
-import Room from '../../RoomManager/Room';
+import Room from '../../Room';
 
 export default function videoSelectFile(socketManager: SocketManagerProps, ...args: any[]): void {
   const {

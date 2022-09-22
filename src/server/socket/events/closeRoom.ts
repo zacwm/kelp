@@ -2,7 +2,7 @@
 // Bye bye room...
 
 import { SocketManagerProps } from '../SocketManagerProps';
-import Room from '../../RoomManager/Room';
+import Room from '../../Room';
 
 export default function closeRoom(socketManager: SocketManagerProps, ...args: any[]): void {
   const { Rooms }: SocketManagerProps = socketManager;

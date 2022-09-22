@@ -2,7 +2,7 @@
 // Updates the user's name.
 
 import { SocketManagerProps } from '../SocketManagerProps';
-import Room from '../../RoomManager/Room';
+import Room from '../../Room';
 
 export default function updateUserName(socketManager: SocketManagerProps, ...args: any[]): void {
   const {

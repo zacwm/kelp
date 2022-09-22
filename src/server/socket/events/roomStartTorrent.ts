@@ -2,7 +2,7 @@
 // Starts the torrent download for the room.
 
 import { SocketManagerProps } from '../SocketManagerProps';
-import Room from '../../RoomManager/Room';
+import Room from '../../Room';
 
 export default function roomStartTorrent(socketManager: SocketManagerProps, ...args: any[]): void {
   const { Rooms, currentRoom }: SocketManagerProps = socketManager;

@@ -2,7 +2,7 @@
 // It just resets the room...
 
 import { SocketManagerProps } from '../SocketManagerProps';
-import Room from '../../RoomManager/Room';
+import Room from '../../Room';
 
 export default function resetRoom(socketManager: SocketManagerProps, ...args: any[]): void {
   const { Rooms }: SocketManagerProps = socketManager;

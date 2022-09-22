@@ -4,6 +4,7 @@ import disconnect from './events/disconnect';
 import getRoomSummary from './events/getRoomSummary';
 import getTitleDetails from './events/getTitleDetails';
 import getTitles from './events/getTitles';
+import hostToggleController from './events/hostToggleController';
 import joinRoom from './events/joinRoom';
 import playerTest from './events/playerTest';
 import resetRoom from './events/resetRoom';
@@ -22,6 +23,7 @@ export default {
   getRoomSummary,
   getTitleDetails,
   getTitles,
+  hostToggleController,
   joinRoom,
   playerTest,
   resetRoom,

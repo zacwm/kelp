@@ -3,7 +3,7 @@
 // We use this to remove the user from the room they were in.
 
 import { SocketManagerProps } from '../SocketManagerProps';
-import Room from '../../RoomManager/Room';
+import Room from '../../Room';
 
 export default function createRoom(socketManager: SocketManagerProps, ...args: any[]): void {
   const { io, Rooms }: SocketManagerProps = socketManager;

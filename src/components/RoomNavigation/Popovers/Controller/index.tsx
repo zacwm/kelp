@@ -1,6 +1,6 @@
 import * as React from 'react';
 
-import RemoteIcon from './remoteIcon';
+import RemoteIcon from '../remoteIcon';
 
 import { useSocket } from 'contexts/socket.context';
 import { useRoom } from 'contexts/room.context';

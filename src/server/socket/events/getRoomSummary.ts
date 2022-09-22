@@ -3,7 +3,7 @@
 // But could be used for other things later on, idk.
 
 import { SocketManagerProps } from '../SocketManagerProps';
-import Room from '../../RoomManager/Room';
+import Room from '../../Room';
 
 export default function getRoomSummary(socketManager: SocketManagerProps, ...args: any[]): void {
   const { Rooms }: SocketManagerProps = socketManager;

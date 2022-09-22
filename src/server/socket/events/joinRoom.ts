@@ -4,7 +4,7 @@
 
 import { SocketManagerProps } from '../SocketManagerProps';
 import User from '../../User';
-import Room from '../../RoomManager/Room';
+import Room from '../../Room';
 
 export default function joinRoom(socketManager: SocketManagerProps, ...args: any[]): void {
   const { 
@@ -40,18 +40,17 @@ export default function joinRoom(socketManager: SocketManagerProps, ...args: any
   setUser(newUser);
   room.addUser(newUser);
 
+  // If only user in room, set permission to host.
+  if (room.getUsers().length === 1) {
+    newUser.setPermission('host');
+  }
+
   // Send data to clients about the new user joining and provide the user with the room data.
   const roomDataToSend: any = {
     id: room.id,
     name: room.name,
-    users: room.getUsers().map(userItem => {
-      return {
-        id: userItem.id,
-        name: userItem.name,
-      };
-    }),
+    users: room.getUsers(),
     videoData: room.getVideoData(),
-    // TODO: WARN: ERROR: AAAAAAA: This below line is a possible cause of a bug where the video resets when any new user joins.
     videoState: room.statusCode === 0 ? room.getPlaybackState() : null,
   };
 
