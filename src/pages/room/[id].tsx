@@ -6,6 +6,7 @@ import moment from 'moment';
 
 import { SocketProvider, useSocket } from 'contexts/socket.context';
 import { RoomProvider, useRoom } from 'contexts/room.context';
+import { UserProvider } from 'contexts/user.context';
 import { VideoProvider, useVideo } from 'contexts/video.context';
 
 import JoinModal from 'components/JoinModal';
@@ -41,8 +42,6 @@ const Room: React.FC = () => {
   const { socket } = useSocket();
   const { room, closingRoom, setRoom } = useRoom();
   const { video, setVideo } = useVideo();
-
-  const [userId, setUserId] = React.useState(null);
 
   const [videoState, setVideoState] = React.useState(null);
 
@@ -129,7 +128,7 @@ const Room: React.FC = () => {
       <Head>
         <title>kelp - { room?.name || 'room' }</title>
       </Head>
-      <JoinModal setUserId={(id) => setUserId(id)} />
+      <JoinModal />
       {
         room && (
           <Box
@@ -148,7 +147,6 @@ const Room: React.FC = () => {
               search={search}
               searchDispatch={searchDispatch}
               loadingTitles={loadingTitles}
-              userId={userId}
               onTorrentStart={onTorrentStart}
               setSelectedTitle={setSelectedTitle}
             />
@@ -391,9 +389,11 @@ const RoomRoot: NextPage = () => {
     <SocketProvider>
       <CookiesProvider>
         <RoomProvider>
-          <VideoProvider>
-            <Room />
-          </VideoProvider>
+          <UserProvider>
+            <VideoProvider>
+              <Room />
+            </VideoProvider>
+          </UserProvider>
         </RoomProvider>
       </CookiesProvider>
     </SocketProvider>

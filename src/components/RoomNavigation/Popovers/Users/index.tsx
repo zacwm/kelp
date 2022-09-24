@@ -12,11 +12,7 @@ import { faUser } from '@fortawesome/free-regular-svg-icons';
 import UserList from './UserList';
 import { useRoom } from 'contexts/room.context';
 
-type Props = {
-  userId: string;
-};
-
-const UserPopover: React.FC<Props> = ({ userId }) => {
+const UserPopover: React.FC<any> = () => {
   const { room } = useRoom();
 
   return (
@@ -45,7 +41,7 @@ const UserPopover: React.FC<Props> = ({ userId }) => {
           padding: '15px',
         }}
       >
-        <UserList userId={userId} />
+        <UserList />
       </Popover.Dropdown>
     </Popover>
   );

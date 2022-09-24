@@ -2,6 +2,7 @@ import * as React from 'react';
 
 import { useSocket } from 'contexts/socket.context';
 import { useRoom } from 'contexts/room.context';
+import { useUser } from 'contexts/user.context';
 
 import { Box, Text, TextInput, ActionIcon, Stack, Group } from '@mantine/core';
 
@@ -13,20 +14,17 @@ import { faCrown } from '@fortawesome/free-solid-svg-icons';
 
 import RemoteIcon from '../remoteIcon';
 
-type Props = {
-  userId: string;
-}
-
-const UserList: React.FC<Props> = ({ userId }) => {
+const UserList: React.FC<any> = () => {
   const { socket } = useSocket();
   const { room } = useRoom();
+  const { user } = useUser();
 
   const [isEditingName, setIsEditingName] = React.useState(false);
   const [inputName, setInputName] = React.useState('');
 
   React.useEffect(() => {
     if (!room) return;
-    setInputName(room.users.find(user => user.id === userId).name);
+    setInputName(room.users.find(u => u.id === user.id).name);
 
     console.dir(room.users);
   }, [room]);
@@ -50,7 +48,7 @@ const UserList: React.FC<Props> = ({ userId }) => {
       }}
     >
       {
-        (room?.users || []).map((user, index) => (
+        (room?.users || []).map((u, index) => (
           <React.Fragment key={index}>
             <Box sx={{ overflow: 'clip' }}>
               <Group
@@ -62,13 +60,13 @@ const UserList: React.FC<Props> = ({ userId }) => {
                 }}
               >
                 <FontAwesomeIcon 
-                  icon={user.permission == 'host' ? faCrown : faUser}
+                  icon={u.permission == 'host' ? faCrown : faUser}
                   style={{ 
                     fontSize:'15px',
                   }}
                 />
                 {
-                  isEditingName && user.id === userId ? (
+                  isEditingName && u.id === user.id ? (
                     <TextInput
                       value={inputName}
                       onChange={(e) => setInputName(e.currentTarget.value)}
@@ -76,20 +74,20 @@ const UserList: React.FC<Props> = ({ userId }) => {
                   ) : (
                     <Text
                       size={14}
-                      sx={user.id !== userId ? { flex: 1 } : {}}
+                      sx={u.id !== user.id ? { flex: 1 } : {}}
                     >
-                      {user.name}
+                      {u.name}
                     </Text>
                   )
                 }
                 {
-                  (user.permission !== 'host' && user.id !== userId) && (
-                    <ActionIcon onClick={() => socket.emit('hostToggleController', user.id)}>
-                      <RemoteIcon fill={user.permission == 'controller' ? '#3bd4ae' : '#fff'} />
+                  (u.permission !== 'host' && u.id !== user.id) && (
+                    <ActionIcon onClick={() => socket.emit('hostToggleController', u.id)}>
+                      <RemoteIcon fill={u.permission == 'controller' ? '#3bd4ae' : '#fff'} />
                     </ActionIcon>
                   )
                 }
-                {user.id === userId && (
+                {u.id === user.id && (
                   <Group
                     align="center"
                     position="apart"
@@ -117,7 +115,7 @@ const UserList: React.FC<Props> = ({ userId }) => {
                             gap: '5px',
                           }}
                         >
-                          { user.permission == 'controller' && <RemoteIcon fill="#3bd4ae" /> }
+                          { u.permission == 'controller' && <RemoteIcon fill="#3bd4ae" /> }
                           <ActionIcon onClick={() => setIsEditingName(true)}>
                             <IconPencil size={20} />
                           </ActionIcon>
@@ -126,7 +124,7 @@ const UserList: React.FC<Props> = ({ userId }) => {
                         <React.Fragment>
                           <ActionIcon
                             onClick={() => {
-                              setInputName(room.users.find(user => user.id === userId).name);
+                              setInputName(room.users.find(us => us.id === user.id).name);
                               setIsEditingName(false);
                             }}
                           >

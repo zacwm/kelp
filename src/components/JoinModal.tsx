@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 
 import { useSocket } from 'contexts/socket.context';
 import { useRoom } from 'contexts/room.context';
+import { useUser } from 'contexts/user.context';
 
 import Collapse from '@mui/material/Collapse';
 
@@ -21,16 +22,14 @@ import {
 } from '@mantine/core';
 import HomeFooter from './HomeFooter';
 
-type Props = {
-  setUserId: (id: any) => void;
-};
 
-const JoinModal: React.FC<Props> = ({ setUserId }) => {
+const JoinModal: React.FC<any> = () => {
   const router = useRouter();
   const { id, password } = router.query;
 
   const { socket } = useSocket();
   const { room, setRoom } = useRoom();
+  const { setUser } = useUser();
 
   const [inputName, setInputName] = React.useState<string>('');
   const [inputPassword, setInputPassword] = React.useState<string>('');
@@ -64,7 +63,7 @@ const JoinModal: React.FC<Props> = ({ setUserId }) => {
       setIsLoadingSubmit(false);
       if (res.error) return setRoomSummary({ error: 'Room does not exist' });
       if (res.userError) return setSubmitError(res.userError);
-      setUserId(res.user);
+      setUser(res.user);
       setRoom(res.room);
     });
   };
@@ -83,10 +82,6 @@ const JoinModal: React.FC<Props> = ({ setUserId }) => {
         >
           Who&apos;s Watching?
         </Text>
-        {/*
-          TODO: Need to change to use the style of the inputs on the home page.
-          Best to turn them into it's own component once pushed though.
-        */}
         <TextInput
           placeholder="Name"
           value={inputName}
@@ -94,7 +89,6 @@ const JoinModal: React.FC<Props> = ({ setUserId }) => {
           disabled={isLoadingSubmit}
           sx={{ width: '100%' }}
         />
-        {/* Same for password input... */}
         { (!alreadyProvidedPassword && roomSummary?.hasPassword) && (
           <PasswordInput
             placeholder="Room Password"
@@ -107,7 +101,6 @@ const JoinModal: React.FC<Props> = ({ setUserId }) => {
             }}
           />
         ) }
-        {/* And the button from the home page. */}
         <Button
           onClick={handleSubmit}
           disabled={isLoadingSubmit}

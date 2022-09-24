@@ -55,7 +55,7 @@ export default function joinRoom(socketManager: SocketManagerProps, ...args: any
   };
 
   callback({
-    user: newUser.id,
+    user: newUser,
     room: roomDataToSend,
   });
 

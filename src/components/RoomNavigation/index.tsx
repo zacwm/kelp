@@ -19,7 +19,6 @@ type Props = {
   search: any;
   searchDispatch: React.Dispatch<any>;
   loadingTitles: boolean;
-  userId: string;
   onTorrentStart: (torrent: string) => void;
   setSelectedTitle: React.Dispatch<React.SetStateAction<any>>;
 }
@@ -28,7 +27,6 @@ const RoomNavigation: React.FC<Props> = ({
   search,
   searchDispatch,
   loadingTitles,
-  userId,
   onTorrentStart,
   setSelectedTitle,
 }) => {
@@ -229,7 +227,7 @@ const RoomNavigation: React.FC<Props> = ({
         </Group>
         <TestingPopover />
         <ControllerPopover />
-        <RoomsPopover userId={userId} />
+        <RoomsPopover />
       </Group>
     </Group>
   );
