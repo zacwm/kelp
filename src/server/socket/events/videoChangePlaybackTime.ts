@@ -8,9 +8,13 @@ export default function videoChangePlaybackTime(socketManager: SocketManagerProp
   const {
     io,
     Rooms,
+    user,
     currentRoom,
   }: SocketManagerProps = socketManager;
   const [roomData, time] = args;
+
+  if (!user) return;
+  if (!['host', 'controller'].includes(user.permission)) return;
 
   if (currentRoom !== roomData.id) return;
   

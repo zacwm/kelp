@@ -1,5 +1,7 @@
 import * as React from 'react';
 
+import { useUser } from '../../../contexts/user.context';
+
 import { Box, Group, Button, Popover } from '@mantine/core';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -12,6 +14,7 @@ type Props = {
 }
 
 const DownloadButton: React.FC<Props> = ({ torrents, forceLang, onTorrentSelect }) => {
+  const { user } = useUser();
   if (!torrents) return null;
   
   const hasMultipleLanguages: boolean = forceLang ? false : Object.keys(torrents).length > 1;
@@ -54,6 +57,9 @@ const DownloadButton: React.FC<Props> = ({ torrents, forceLang, onTorrentSelect 
   // Find a 1080p en torrent if not find a 1080p torrent in first language
   const defaultTorrent: any = reducedTorrents.find((torrent: any) => torrent.quality === '1080p' && torrent.language === 'en') || reducedTorrents.find((torrent: any) => torrent.quality === '1080p');
 
+  const hasPermission: boolean = user && ['host', 'controller'].includes(user.permission) || false;
+  if (!hasPermission) return null;
+
   return (
     <Box
       sx={{
@@ -62,6 +68,7 @@ const DownloadButton: React.FC<Props> = ({ torrents, forceLang, onTorrentSelect 
         borderRadius: 12,
         backgroundImage: 'linear-gradient(135deg, #00bc70 0%, #00a19b 100%)',
         transition: 'transform 0.2s ease-in-out',
+        cursor: 'pointer',
         '&:hover': {
           transform: 'scale(1.05)',
         },

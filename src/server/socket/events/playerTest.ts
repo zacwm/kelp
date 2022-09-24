@@ -5,8 +5,11 @@ import { SocketManagerProps } from '../SocketManagerProps';
 import path from 'path';
 
 export default function playerTest(socketManager: SocketManagerProps, ...args: any[]): void {
-  const { Rooms }: SocketManagerProps = socketManager;
+  const { Rooms, user }: SocketManagerProps = socketManager;
   const [id, type] = args;
+
+  if (!user) return;
+  if (!['host', 'controller'].includes(user.permission)) return;
 
   switch (type) {
   case 1:

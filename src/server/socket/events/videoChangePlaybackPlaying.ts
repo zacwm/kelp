@@ -13,6 +13,9 @@ export default function videoChangePlaybackPlaying(socketManager: SocketManagerP
   }: SocketManagerProps = socketManager;
   const [roomData, playing] = args;
 
+  if (!user) return;
+  if (!['host', 'controller'].includes(user.permission)) return;
+
   if (currentRoom !== roomData.id) return;
   
   Rooms.getRoomById(currentRoom).setPlaying(playing, user.name);

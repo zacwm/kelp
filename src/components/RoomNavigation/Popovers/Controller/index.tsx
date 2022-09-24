@@ -4,6 +4,7 @@ import RemoteIcon from '../remoteIcon';
 
 import { useSocket } from 'contexts/socket.context';
 import { useRoom } from 'contexts/room.context';
+import { useUser } from 'contexts/user.context';
 
 import {
   ActionIcon,
@@ -17,6 +18,7 @@ import ActivityList from './ActivityList';
 const ControllerPopover: React.FC = () => {
   const { socket } = useSocket();
   const { room } = useRoom();
+  const { user } = useUser();
 
   return (
     <Popover width={300} position="bottom" shadow="md">
@@ -35,9 +37,11 @@ const ControllerPopover: React.FC = () => {
         <Stack>
           <Text>Controller Activity</Text>
           <ActivityList />
-          <Button onClick={() => socket.emit('closeRoom', room.id) }>
-            Close room
-          </Button>
+          { user && ['host', 'controller'].includes(user.permission) && (
+            <Button onClick={() => socket.emit('closeRoom', room.id) }>
+              Close room
+            </Button>
+          ) }
         </Stack>
       </Popover.Dropdown>
     </Popover>

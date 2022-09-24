@@ -5,8 +5,11 @@ import { SocketManagerProps } from '../SocketManagerProps';
 import Room from '../../Room';
 
 export default function roomStartTorrent(socketManager: SocketManagerProps, ...args: any[]): void {
-  const { Rooms, currentRoom }: SocketManagerProps = socketManager;
+  const { Rooms, user, currentRoom}: SocketManagerProps = socketManager;
   const [data, callback] = args;
+
+  if (!user) return;
+  if (!['host', 'controller'].includes(user.permission)) return;
 
   if (currentRoom !== data.id) return;
   

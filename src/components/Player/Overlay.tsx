@@ -3,6 +3,7 @@ import * as React from 'react';
 import { useSocket } from 'contexts/socket.context';
 import { useRoom } from 'contexts/room.context';
 import { useVideo } from 'contexts/video.context';
+import { useUser } from 'contexts/user.context';
 
 import { Box, Slider, Group, Stack, Text, Transition } from '@mantine/core';
 
@@ -39,12 +40,15 @@ const Overlay: React.FC<Props> = ({
   const { socket } = useSocket();
   const { room } = useRoom();
   const { video } = useVideo();
+  const { user } = useUser();
 
   const buttonPlayback = () => {
     socket.emit('videoChangePlaybackPlaying', {
       id: room.id,
     }, !videoState.playing);
   };
+
+  const hasPermission: boolean = user && ['host', 'controller'].includes(user.permission) || false;
 
   return (
     <Transition mounted={show} transition="fade" duration={400} timingFunction="ease">
@@ -122,7 +126,7 @@ const Overlay: React.FC<Props> = ({
                   icon={faPlay} 
                   style={{ 
                     fontSize: 50,
-                    cursor: 'pointer',
+                    cursor: hasPermission ? 'pointer' : 'not-allowed',
                   }}
                   onClick={buttonPlayback}
                 />
@@ -170,7 +174,7 @@ const Overlay: React.FC<Props> = ({
                         icon={videoState.playing ? faPause : faPlay} 
                         style={{ 
                           fontSize: 23,
-                          cursor: 'pointer',
+                          cursor: hasPermission ? 'pointer' : 'not-allowed',
                         }}
                         onClick={buttonPlayback}
                       />

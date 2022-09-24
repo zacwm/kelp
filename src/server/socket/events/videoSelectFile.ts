@@ -9,11 +9,13 @@ import Room from '../../Room';
 export default function videoSelectFile(socketManager: SocketManagerProps, ...args: any[]): void {
   const {
     Rooms,
+    user,
     currentRoom,
   }: SocketManagerProps = socketManager;
   const [data] = args;
 
-  // TODO: Permission check.
+  if (!user) return;
+  if (!['host', 'controller'].includes(user.permission)) return;
 
   if (currentRoom !== data.roomId) return;
 

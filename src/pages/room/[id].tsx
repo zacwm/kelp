@@ -6,7 +6,7 @@ import moment from 'moment';
 
 import { SocketProvider, useSocket } from 'contexts/socket.context';
 import { RoomProvider, useRoom } from 'contexts/room.context';
-import { UserProvider } from 'contexts/user.context';
+import { UserProvider, useUser } from 'contexts/user.context';
 import { VideoProvider, useVideo } from 'contexts/video.context';
 
 import JoinModal from 'components/JoinModal';
@@ -42,6 +42,7 @@ const Room: React.FC = () => {
   const { socket } = useSocket();
   const { room, closingRoom, setRoom } = useRoom();
   const { video, setVideo } = useVideo();
+  const { user, setUser } = useUser();
 
   const [videoState, setVideoState] = React.useState(null);
 
@@ -81,6 +82,12 @@ const Room: React.FC = () => {
       // TODO: WHY DID I DO THIS, WHY DID I NOT USE SOCKET ROOMS?! THIS HURTS.
       if (room.id !== data.id) return;
       setRoom(data);
+
+      // Find self based on user id and update user context
+      const self = data.users.find((u) => u.id === user.id);
+      if (self) {
+        setUser(self);
+      }
     };
 
     const onRoomClosed = (roomId: string) => {
@@ -100,7 +107,12 @@ const Room: React.FC = () => {
       socket.off('updateRoom', onUpdateRoom);
       socket.off('roomClosed', onRoomClosed);
     };
-  }, [room, closingRoom, socket]);
+  }, [
+    room,
+    user,
+    closingRoom,
+    socket,
+  ]);
 
   const onTorrentStart = (torrentURL: string) => {
     if (!socket) return;
