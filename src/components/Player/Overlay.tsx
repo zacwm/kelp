@@ -6,6 +6,9 @@ import { useVideo } from 'contexts/video.context';
 import { useUser } from 'contexts/user.context';
 
 import { Box, Slider, Group, Stack, Text, Transition } from '@mantine/core';
+import TestingPopover from '../RoomNavigation/Popovers/Testing';
+import RoomsPopover from '../RoomNavigation/Popovers/Users';
+import ControllerPopover from '../RoomNavigation/Popovers/Controller';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faArrowLeft, faPlay, faPause, faExpand, faCompress } from '@fortawesome/free-solid-svg-icons';
@@ -103,6 +106,16 @@ const Overlay: React.FC<Props> = ({
               >
                 {video.title || 'kelp'}
               </Text>
+              <Group
+                align="center"
+                position="right"
+                spacing={0}
+                sx={{ flex: 1 }}
+              >
+                <TestingPopover />
+                <ControllerPopover />
+                <RoomsPopover />
+              </Group>
             </Group>
           </Box>
 
@@ -146,7 +159,7 @@ const Overlay: React.FC<Props> = ({
             boxSizing: 'border-box',
           }}
           onMouseEnter={() => setMouseOverControls(true) }
-          onMouseLeave={() => setMouseOverControls(true) }
+          onMouseLeave={() => setMouseOverControls(false) }
           >
             <Stack spacing={0}>
               <Slider
