@@ -96,16 +96,22 @@ const Room: React.FC = () => {
       window.location.href = '/?roomclosed=1';
     };
 
+    const onDisconnect = () => {
+      window.location.href = '/?connectionLost=1';
+    };
+
     socket.on('videoUpdateData', videoUpdateData);
     socket.on('videoUpdateState', videoUpdateState);
     socket.on('updateRoom', onUpdateRoom);
     socket.on('roomClosed', onRoomClosed);
+    socket.on('disconnect', onDisconnect);
 
     return () => {
       socket.off('videoUpdateData', videoUpdateData);
       socket.off('videoUpdateState', videoUpdateState);
       socket.off('updateRoom', onUpdateRoom);
       socket.off('roomClosed', onRoomClosed);
+      socket.off('disconnect', onDisconnect);
     };
   }, [
     room,

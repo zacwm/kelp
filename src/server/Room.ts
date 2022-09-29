@@ -13,6 +13,7 @@ interface RoomInterface {
   getAuthToken(): string;
   addUser(user: User): void;
   getUsers(): User[];
+  createEvent(eventType: string, name?: string): void;
   removeUser(userId: string): void;
   updateUserName(id: any, newName: string): void;
   getVideoData(forceVideoData?: boolean): any
@@ -34,6 +35,7 @@ class Room implements RoomInterface {
   private password: string;
   private authToken: string;
   private users: User[];
+  eventHistory: any[];
   // Room statuses
   statusCode: number;
   status: string;
@@ -63,11 +65,14 @@ class Room implements RoomInterface {
     this.password = password || '';
     this.authToken = makeid(32);
     this.users = [];
+    this.eventHistory = [];
+
     this.statusCode = 1;
     this.status = 'Looking for something to watch...';
     this.statusPercentage = 0;
     this.statusTimeRemaining = 0;
     this.statusSpeed = '';
+
     this.videoTitle = '';
     this.videoURL = '';
     this.playbackPlaying = false;
@@ -104,6 +109,20 @@ class Room implements RoomInterface {
 
   getUsers(): User[] {
     return this.users;
+  }
+
+  createEvent(eventType: string, name?: string): void {
+    this.eventHistory.push({
+      name: name || 'Kelp',
+      value: eventType,
+    });
+
+    // Limit to 50 last events
+    if (this.eventHistory.length > 50) {
+      this.eventHistory.shift();
+    }
+
+    this.SocketServer.emit('updateEvents', this.eventHistory);
   }
 
   removeUser(userId: string): void {
@@ -181,12 +200,8 @@ class Room implements RoomInterface {
       roomId: this.id,
       newState: this.getPlaybackState(),
     });
-    if (username) this.SocketServer.emit('notify', {
-      roomId: this.id,
-      message: `Video ${playing ? 'resumed' : 'paused'} by ${username}`,
-      variant: 'success',
-      autoHideDuration: 1000,
-    });
+
+    this.createEvent(playing ? 'pressed play.' : 'pressed pause.', username);
   }
 
   setTimePosition(time: number): void {

@@ -2,37 +2,11 @@ import React from 'react';
 
 import { Box, ScrollArea, Stack, Group, Text } from '@mantine/core';
 
-const ActivityList: React.FC = () => {
+type props = {
+  logData: any[];
+}
 
-  // Test log data
-  const [logData, setLogData] = React.useState<any>([
-    { name: 'Bill', value: 'pressed pause.' },
-    { name: 'Alex', value: 'pressed play.' },
-    { name: 'Alex', value: 'had enough.' },
-    { name: 'Bill', value: 'found something to watch.' },
-    { name: 'Bill', value: 'pressed play.' },
-    { name: 'Bill', value: 'pressed pause.' },
-    { name: 'Alex', value: 'pressed play.' },
-    { name: 'Alex', value: 'had enough.' },
-    { name: 'Bill', value: 'found something to watch.' },
-    { name: 'Bill', value: 'pressed play.' },
-    { name: 'Bill', value: 'pressed pause.' },
-    { name: 'Alex', value: 'pressed play.' },
-    { name: 'Alex', value: 'had enough.' },
-    { name: 'Bill', value: 'found something to watch.' },
-    { name: 'Bill', value: 'pressed play.' },
-    { name: 'Bill', value: 'pressed pause.' },
-    { name: 'Alex', value: 'pressed play.' },
-    { name: 'Alex', value: 'had enough.' },
-    { name: 'Bill', value: 'found something to watch.' },
-    { name: 'Bill', value: 'pressed play.' },
-    { name: 'Bill', value: 'pressed pause.' },
-    { name: 'Alex', value: 'pressed play.' },
-    { name: 'Alex', value: 'had enough.' },
-    { name: 'Bill', value: 'found something to watch.' },
-    { name: 'Bill', value: 'pressed play.' },
-  ]);
-
+const ActivityList: React.FC<props> = ({ logData }) => {
   return (
     <ScrollArea
       sx={{
