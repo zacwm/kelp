@@ -133,14 +133,9 @@ const Player: React.FC<Props> = ({ videoState, setVideoState }) => {
     }, 2000);
   }, [videoState]);
 
-  // Ignore first sliderEndPosition useEffect call.
-  const firstSliderEndPositionChange = React.useRef(true);
-
   React.useEffect(() => {
-    if (firstSliderEndPositionChange) {
-      firstSliderEndPositionChange.current = false;
-      return;
-    }
+    // TODO: Fix the useEffect being called when first loading the playback slider.
+    if (videoPlayedSeconds === 0) return;
 
     if (!videoState) return;
     socket.emit('videoChangePlaybackTime', {
