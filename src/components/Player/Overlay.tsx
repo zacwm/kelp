@@ -109,8 +109,10 @@ const Overlay: React.FC<Props> = ({
               <Group
                 align="center"
                 position="right"
-                spacing={0}
-                sx={{ flex: 1 }}
+                sx={{
+                  flex: 1,
+                  gap: '30px',
+                }}
               >
                 <TestingPopover />
                 <ControllerPopover />
