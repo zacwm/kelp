@@ -20,5 +20,5 @@ export default function roomStartTorrent(socketManager: SocketManagerProps, ...a
   if (![0, 1].includes(videoData.statusCode)) return;
 
   room.startTorrent(data.url, callback);
-  room.createEvent(`started a torrent download.`, user.name);
+  room.createEvent('started a torrent download.', user.name);
 }

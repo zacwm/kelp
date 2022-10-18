@@ -24,5 +24,5 @@ export default function videoChangePlaybackTime(socketManager: SocketManagerProp
   // TODO: Change this so it only sends to the room.
   io.emit('videoUpdateTimePosition', { roomId: roomData.id, newTimePosition: time });
 
-  room.createEvent(`seeked through the video.`, user.name);
+  room.createEvent('seeked through the video.', user.name);
 }
