@@ -60,6 +60,7 @@ export default function joinRoom(socketManager: SocketManagerProps, ...args: any
   });
 
   io.to(room.id).emit('updateRoom', roomDataToSend);
+  io.to(room.id).emit('updateEvents', room.eventHistory);
 
   socket.join(room.id);
   setCurrentRoom(room.id);

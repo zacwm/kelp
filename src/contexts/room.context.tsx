@@ -6,6 +6,8 @@ interface RoomContextInterface {
   setRoom: (data: any) => void;
   closingRoom: boolean,
   setClosingRoom: () => void;
+  eventLog: any[];
+  setEventLog: (data: any) => void;
 }
 
 // Original context state values.
@@ -14,6 +16,8 @@ const RoomState: RoomContextInterface = {
   setRoom: () => undefined,
   closingRoom: false,
   setClosingRoom: () => undefined,
+  eventLog: [],
+  setEventLog: () => undefined,
 };
 
 const Reducer = (state, action) => {
@@ -38,6 +42,10 @@ export const RoomProvider: any = (props: any) => {
 
   state.setClosingRoom = () => {
     dispatch({ type: 'closingRoom', value: true });
+  };
+
+  state.setEventLog = (data: any) => {
+    dispatch({ type: 'eventLog', value: data });
   };
   
   return (

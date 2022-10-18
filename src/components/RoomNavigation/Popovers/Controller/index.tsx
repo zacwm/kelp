@@ -20,22 +20,6 @@ const ControllerPopover: React.FC = () => {
   const { room } = useRoom();
   const { user } = useUser();
 
-  const [logData, setLogData] = React.useState<any>([]);
-
-  React.useEffect((): any => {
-    if (!socket) return;
-    
-    const Event_updateEvents = (events) => {
-      setLogData(events);
-    };
-
-    socket.on('updateEvents', Event_updateEvents);
-
-    return () => {
-      socket.off('updateEvents', Event_updateEvents);
-    };
-  }, [socket]);
-
   return (
     <Popover width={300} position="bottom" shadow="md">
       <Popover.Target>
@@ -52,7 +36,7 @@ const ControllerPopover: React.FC = () => {
       >
         <Stack>
           <Text>Controller Activity</Text>
-          <ActivityList logData={logData} />
+          <ActivityList />
           { user && ['host', 'controller'].includes(user.permission) && (
             <Button onClick={() => socket.emit('closeRoom', room.id) }>
               Close room

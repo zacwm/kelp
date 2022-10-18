@@ -40,7 +40,7 @@ const searchReducer = (state, action) => {
 
 const Room: React.FC = () => {
   const { socket } = useSocket();
-  const { room, closingRoom, setRoom } = useRoom();
+  const { room, closingRoom, setRoom, setEventLog } = useRoom();
   const { video, setVideo } = useVideo();
   const { user, setUser } = useUser();
 
@@ -78,6 +78,10 @@ const Room: React.FC = () => {
       });
     };
 
+    const updateEvents = (events) => {
+      setEventLog(events);
+    };
+
     const onUpdateRoom = (data: any) => {
       // TODO: WHY DID I DO THIS, WHY DID I NOT USE SOCKET ROOMS?! THIS HURTS.
       if (room.id !== data.id) return;
@@ -102,6 +106,7 @@ const Room: React.FC = () => {
 
     socket.on('videoUpdateData', videoUpdateData);
     socket.on('videoUpdateState', videoUpdateState);
+    socket.on('updateEvents', updateEvents);
     socket.on('updateRoom', onUpdateRoom);
     socket.on('roomClosed', onRoomClosed);
     socket.on('disconnect', onDisconnect);
@@ -109,6 +114,7 @@ const Room: React.FC = () => {
     return () => {
       socket.off('videoUpdateData', videoUpdateData);
       socket.off('videoUpdateState', videoUpdateState);
+      socket.off('updateEvents', updateEvents);
       socket.off('updateRoom', onUpdateRoom);
       socket.off('roomClosed', onRoomClosed);
       socket.off('disconnect', onDisconnect);

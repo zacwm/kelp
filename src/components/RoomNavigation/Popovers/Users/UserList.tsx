@@ -25,8 +25,6 @@ const UserList: React.FC<any> = () => {
   React.useEffect(() => {
     if (!room) return;
     setInputName(room.users.find(u => u.id === user.id).name);
-
-    console.dir(room.users);
   }, [room]);
 
   const onNameSubmit = () => {

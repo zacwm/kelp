@@ -1,12 +1,12 @@
 import React from 'react';
 
+import { useRoom } from 'contexts/room.context';
+
 import { Box, ScrollArea, Stack, Group, Text } from '@mantine/core';
 
-type props = {
-  logData: any[];
-}
+const ActivityList: React.FC<any> = () => {
+  const { eventLog } = useRoom();
 
-const ActivityList: React.FC<props> = ({ logData }) => {
   return (
     <ScrollArea
       sx={{
@@ -23,7 +23,7 @@ const ActivityList: React.FC<props> = ({ logData }) => {
           padding: '15px',
         }}
       >
-        {logData.map((item: any, index: number) => (
+        {eventLog.map((item: any, index: number) => (
           <Box key={index}>
             <Group
               spacing={4}

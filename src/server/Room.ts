@@ -124,8 +124,6 @@ class Room implements RoomInterface {
     }
 
     this.eventHistory = updatedEventHistory;
-
-    console.dir(updatedEventHistory);
     this.SocketServer.emit('updateEvents', updatedEventHistory);
   }
 
