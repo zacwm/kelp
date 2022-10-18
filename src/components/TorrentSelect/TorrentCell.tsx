@@ -1,41 +1,23 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
-import { Box, Text, Paper, Group, Transition, Loader, Image, createStyles } from '@mantine/core';
+import { Box, Text, Paper, Group, Loader, Image, Stack, Center } from '@mantine/core';
 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faStar } from '@fortawesome/free-solid-svg-icons';
 interface Props {
-    title: any;
-    delayIndex: number;
-    onSelect(): void;
+  title: any;
+  delayIndex: number;
+  onSelect(): void;
 }
 
 interface ImageProps {
-    src: string;
-    alt: string;
+  src: string;
+  alt: string;
 }
-
-const useClasses = createStyles((theme) => ({
-  image: {
-    height: '100%',
-    width: '100%',
-    display: 'flex',
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: theme.colors.dark[8],
-  },
-  loading: {
-    position: 'absolute',
-    zIndex: 2,
-  },
-  error: {
-    color: theme.colors.red[7],
-  }
-}));
 
 const PosterImage = React.memo(function PosterImage(props: ImageProps) {
   const [isLoading, setLoading] = useState(true);
   const [hasError, setError] = useState(!props.src);
-
-  const { cx, classes } = useClasses();
 
   const onLoad = () => {
     setLoading(false);
@@ -48,19 +30,36 @@ const PosterImage = React.memo(function PosterImage(props: ImageProps) {
 
   if (hasError) {
     return (
-      <Paper className={cx(classes.image, classes.error)}>
+      <Paper
+        sx={{
+          width: 170,
+          height: 250,
+        }}
+      >
         <Text>Failed to load image poster</Text>
       </Paper>
     );
   }
 
   return (
-    <React.Fragment>
+    <Box
+      sx={{
+        position: 'relative',
+        width: 170,
+        height: 250,
+      }}
+    >
       {
         isLoading && (
-          <Paper className={cx(classes.image, classes.loading)}
+          <Paper
+            sx={{
+              width: 170,
+              height: 250,
+            }}
           >
-            <Loader variant="bars" size="md"/>
+            <Center sx={{ height: 250 }}>
+              <Loader size="lg" />
+            </Center>
           </Paper>
         )
       }
@@ -68,99 +67,88 @@ const PosterImage = React.memo(function PosterImage(props: ImageProps) {
         src={props.src}
         alt={props.alt}
         onLoad={onLoad}
-        onError={onError} 
+        onError={onError}
+        width={170}
+        height={250}
+        fit="cover"
+        radius={12}
       /> 
-    </React.Fragment>
+    </Box>
   );
 });
 
 const Torrent = (props: Props) => {
-  // TODO: Add fade in effect with `mounted`
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [mounted, isMounted] = useState(false);
-
-  let timeout = null;
-
-  // I believe this causes a memory leak
-  // be careful when using this
-  useEffect(() => {
-    timeout = setTimeout(() => {
-      isMounted(true);
-    }, props.delayIndex * 5);
-
-    return () => {
-      clearTimeout(timeout);
-      isMounted(false);
-    };
-  }, [props.delayIndex]);
-
   return (
     <Box
       sx={{
         position: 'relative',
         width: '100%',
-        height: '280px',
-        margin: 12,
+        height: 330,
+        padding: '30px 15px 0 15px',
+        transition: 'all 0.3s ease',
+        '&:hover': {
+          transform: 'scale(1.05)',
+        },
       }}
       title={props.title.title}
     >
-      <Transition
-        mounted
-        duration={300}
-        transition="fade"
+      <Stack
+        sx={{
+          position: 'relative',
+          cursor: 'pointer',
+          userSelect: 'none',
+          overflow: 'hidden',
+          height: '100%',
+          width: '100%',
+        }}
+        onClick={props.onSelect}
+        spacing={1}
       >
-        {(styles) => (
-          <Paper 
-            shadow="md"
-            radius="sm"
-            sx={{
-              position: 'relative',
-              background: '#2C2E33',
-              cursor: 'pointer',
-              userSelect: 'none',
+        <PosterImage 
+          src={props.title.images?.poster} 
+          alt={props.title.title}
+        />
+        <Stack
+          sx={{
+            width: '100%',
+            paddingTop: 6,
+          }}
+          spacing={1}
+        >
+          <Text
+            weight={600}
+            style={{
+              width: 170,
               overflow: 'hidden',
-              '&:hover': {
-                background: 'rgba(57, 59, 66)',
-              },
-              display: 'flex',
-              flexDirection: 'column',
-              height: '100% '
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap',
             }}
-            onClick={props.onSelect}
-            style={styles}
+            size="sm"
+            color="#fff"
           >
-            <Box sx={{
-              height: '100%',
-              position: 'relative',
-              overflow: 'hidden',
-            }}>
-              <PosterImage 
-                src={props.title.images?.poster} 
-                alt={props.title.title}
+            { props.title.title }
+          </Text>
+          <Group position="apart">
+            <Text size={12}>{ props.title.year }</Text>
+            <Group spacing={3}>
+              <FontAwesomeIcon 
+                icon={faStar} 
+                style={{ 
+                  fontSize:'12px', 
+                  color: '#3bd4ae', 
+                }} 
               />
-            </Box>
-            <Box
-              sx={{
-                position: 'absolute',
-                bottom: 0,
-                left: 0,
-                width: '100%',
-                height: 'fit-content',
-                padding: '4px 6px',
-                background: 'rgba(26, 27, 30, 0.85)'
-              }}
-            >
-              <Text weight={600} style={{
-                whiteSpace: 'pre-wrap',
-              }}>{ props.title.title }</Text>
-              <Group spacing="xs">
-                <Text size={12}>{ props.title.year }</Text>
-                <Text size={12}>{ props.title.certification }</Text>
-              </Group>
-            </Box>
-          </Paper>
-        )}
-      </Transition>
+              <Text
+                color="kelpPalette.4"
+                size={12}
+                weight={700}
+              >
+                { props.title.rating.percentage/10 }
+              </Text>
+            </Group>
+          </Group>
+        </Stack>
+      </Stack>
     </Box>
   );
 };

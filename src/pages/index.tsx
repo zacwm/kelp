@@ -1,53 +1,66 @@
 import * as React from 'react';
 import Head from 'next/head';
 import type { NextPage } from 'next';
-import io from 'socket.io-client';
 
-import Container from '@mui/material/Container';
-import Box from '@mui/material/Box';
+import { SocketProvider } from 'contexts/socket.context';
 
-import {Text} from '@mantine/core';
-import ActiveRooms from '../components/ActiveRooms';
-import CreateRooms from '../components/CreateRoom';
+import {
+  Container,
+  Image,
+  Center,
+  Box,
+} from '@mantine/core';
 
-const Home: NextPage = () => {
-  const [socket, setSocket] = React.useState(null);
+import ActiveRooms from 'components/ActiveRooms';
+import CreateRooms from 'components/CreateRoom';
+import HomeFooter from 'components/HomeFooter';
 
-  React.useEffect((): any => {
-    const newSocket = io();
-    setSocket(newSocket);
-    return () => newSocket.close();
-  }, []);
-
+const Home: React.FC = () => {
   return (
-    <Container maxWidth="lg">
+    <Container size="lg">
       <Head>
         <title>kelp - menu</title>
       </Head>
-      <Text size={60} sx={(theme) => ({
-        position: 'absolute',
-        top: '8%',
-        left: 0,
-        right: 0,
-        textAlign: 'center',
-        color: theme.colors.brand[7],
-      })}>
-        kelp
-      </Text>
-      <Box
+      
+      <Image 
+        src='/kelp-gradient-text.svg'
+        height={70}
+        fit='contain'
         sx={{
-          display: 'flex',
-          flexDirection: 'row',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: '100vh',
+          position: 'absolute',
+          top: '18vh',
+          left: 0,
+          right: 0,
+          textAlign: 'center',
+          transition: 'top 0.3s ease',
         }}
-      >
-        <CreateRooms socket={socket}/>
-        <ActiveRooms socket={socket}/>
-      </Box>
+      />
+      <Center sx={{
+        height: '100vh',
+      }}>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'row',
+            justifyContent: 'center',
+            alignItems: 'flex-start',
+          }}
+        >
+          <CreateRooms />
+          <ActiveRooms />  
+        </Box>
+      </Center>
+      <HomeFooter />
     </Container>
   );
 };
 
-export default Home;
+const HomeRoot: NextPage = () => {
+  return (
+    <SocketProvider>
+      <Home />
+    </SocketProvider>
+  );
+};
+
+export default HomeRoot;

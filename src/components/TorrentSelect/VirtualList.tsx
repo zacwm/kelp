@@ -1,5 +1,8 @@
 import React, { useState, useRef, useMemo, useEffect } from 'react';
 import { VirtuosoGrid, GridComponents, GridItemContent } from 'react-virtuoso';
+
+import { useSocket } from 'contexts/socket.context';
+
 import { Box, Loader, createStyles, LoadingOverlay } from '@mantine/core';
 
 import MemoizedTorrent from './TorrentCell';
@@ -9,7 +12,10 @@ interface Props {
   itemData: object[];
   isLoading: boolean;
   setSelectedTitle: React.Dispatch<React.SetStateAction<any>>;
-  fetchTorrentList: (page: number, concat: boolean, forceLoad: boolean, callback?: () => void) => void;
+  search: any;
+  setLoadingTitles: React.Dispatch<React.SetStateAction<boolean>>;
+  torrentList: any;
+  setTorrentList: React.Dispatch<React.SetStateAction<any>>;
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -17,20 +23,17 @@ const useStyles = createStyles((theme) => ({
   list: {
     display: 'flex',
     flexWrap: 'wrap',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    paddingLeft: 15,
+    paddingRight: 5,
   },
   itemContainer: {
-    width: '15%',
+    width: '200px',
+    height: '330px',
     display: 'flex',
     flex: 'none',
     alignContent: 'stretch',
     boxSizing: 'border-box',
-    // [`@media (max-width: ${theme.breakpoints.lg}px)`]: {
-    //     width: "33%"
-    // },
-    // [`@media (max-width: ${theme.breakpoints.sm}px)`]: {
-    //     width: "50%"
-    // }
   },
 }));
 
@@ -39,8 +42,12 @@ const VirtualList = ({
   itemData,
   isLoading,
   setSelectedTitle,
-  fetchTorrentList
+  search,
+  setLoadingTitles,
+  torrentList,
+  setTorrentList,
 }: Props): React.ReactElement => {
+  const { socket } = useSocket();
   const { classes } = useStyles();
 
   const [shallowFetch, setShallowFetch] = useState(false);
@@ -63,8 +70,18 @@ const VirtualList = ({
 
     setShallowFetch(true);
     lastPage.current += 1;
-    fetchTorrentList(lastPage.current, true, false, () => {
+
+    socket.emit('getTitles', {
+      page: lastPage.current,
+      category: search.category,
+      keywords: search.keywords,
+      genre: search.genre,
+      sort: search.sort,
+    }, (response: any) => {
       setShallowFetch(false);
+
+      const newTorrentList = [...torrentList, ...response.titles];
+      setTorrentList(newTorrentList);
     });
   };
 
@@ -98,7 +115,7 @@ const VirtualList = ({
 
     return {
       List: List,
-      Item: ItemContainer
+      Item: ItemContainer,
     };
   }, [itemData, isLoading]);
 
@@ -109,7 +126,7 @@ const VirtualList = ({
         width: '100%',
         display: 'flex',
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
       }}>
         <Loader />
       </Box>
@@ -117,22 +134,28 @@ const VirtualList = ({
   }
 
   return (
-    <div style={{
-      height: '100%',
-      width: '100%',
-    }}>
+    <Box
+      sx={{
+        position: 'relative',
+        height: '100%',
+        width: '100%',
+        boxSizing: 'border-box',
+      }}
+    >
       <LoadingOverlay visible={shallowFetch} />
       <VirtuosoGrid
         style={{
           height: '100%',
+          width: '100%',
+          boxSizing: 'border-box',
         }}
         totalCount={itemData.length}
-        overscan={250}
+        overscan={360}
         components={Components}
         itemContent={itemContent}
         endReached={onEndReached}
       />
-    </div>
+    </Box>
   );
 };
 

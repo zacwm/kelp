@@ -1,58 +1,56 @@
 import * as React from 'react';
 import Head from 'next/head';
 import type { NextPage } from 'next';
-import { useRouter } from 'next/router';
-import io from 'socket.io-client';
 import { CookiesProvider } from 'react-cookie';
 import moment from 'moment';
 
-import { RoomProvider, useRoom } from '../../contexts/room.context';
-import { VideoProvider, useVideo } from '../../contexts/video.context';
+import { SocketProvider, useSocket } from 'contexts/socket.context';
+import { RoomProvider, useRoom } from 'contexts/room.context';
+import { UserProvider, useUser } from 'contexts/user.context';
+import { VideoProvider, useVideo } from 'contexts/video.context';
 
-import PasswordRequestWindow from '../../components/PasswordRequestWindow';
-import Player from '../../components/Player';
-import SideMenu from '../../components/SideMenu';
-import TorrentSelect from '../../components/TorrentSelect';
+import JoinModal from 'components/JoinModal';
+import RoomNavigation from 'components/RoomNavigation';
+import Player from 'components/Player';
+import TorrentSelect from 'components/TorrentSelect';
 
-import { Grid } from '@mui/material';
+import { Box, Text, Paper, Stack, Group, Progress, Center, ActionIcon } from '@mantine/core';
 
-import { Box, Button, Text, Paper, Stack, Group, Progress } from '@mantine/core';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faArrowLeft, faDownload } from '@fortawesome/free-solid-svg-icons';
+import { faClock } from '@fortawesome/free-regular-svg-icons';
 
-function LinearProgressWithLabel(props: any & { value: number }) {
-  return (
-    <Box sx={{ display: 'flex', alignItems: 'center' }}>
-      <Box sx={{ width: '100%', mr: 1 }}>
-        <Progress {...props} max={100} sx={{ width: '100%' }} />
-      </Box>
-      <Box sx={{ marginLeft: '10px' }}>
-        <Text>{`${Math.round(props.value)}%`}</Text>
-      </Box>
-    </Box>
-  );
-}
+// Reducer for search
+const initialSearchState = {
+  category: 'movies',
+  genre: '',
+  sort: 'trending',
+  keywords: '',
+};
+
+const searchReducer = (state, action) => {
+  if (action.type === 'reset') {
+    return initialSearchState;
+  }
+
+  const newState = { ...state };
+  newState[action.type] = action.value;
+  return newState;
+};
 
 const Room: React.FC = () => {
-  const { room, closingRoom, setRoom } = useRoom();
+  const { socket } = useSocket();
+  const { room, closingRoom, setRoom, setEventLog } = useRoom();
   const { video, setVideo } = useVideo();
-
-  const router = useRouter();
-  const { id, password } = router.query;
-
-  const [socket, setSocket] = React.useState(null);
-  const [loadingRoomData, setLoadingRoomData] = React.useState(true);
-  const [userId, setUserId] = React.useState(null);
-  const [roomNotFound, setRoomNotFound] = React.useState(false);
-  const [openPRW, setOpenPRW] = React.useState(false);
+  const { user, setUser } = useUser();
 
   const [videoState, setVideoState] = React.useState(null);
 
-  const [menuVisible, setMenuVisible] = React.useState(false);
+  // States that are shared between RoomNavigation and TorrentSelect.
+  const [search, searchDispatch] = React.useReducer(searchReducer, initialSearchState);
+  const [loadingTitles, setLoadingTitles] = React.useState<boolean>(true);
 
-  React.useEffect((): any => {
-    const newSocket = io();
-    setSocket(newSocket);
-    return () => newSocket.close();
-  }, []);
+  const [selectedTitle, setSelectedTitle] = React.useState<any>(null);
 
   React.useEffect(() => {
     if (!room) return;
@@ -80,10 +78,20 @@ const Room: React.FC = () => {
       });
     };
 
+    const updateEvents = (events) => {
+      setEventLog(events);
+    };
+
     const onUpdateRoom = (data: any) => {
       // TODO: WHY DID I DO THIS, WHY DID I NOT USE SOCKET ROOMS?! THIS HURTS.
       if (room.id !== data.id) return;
       setRoom(data);
+
+      // Find self based on user id and update user context
+      const self = data.users.find((u) => u.id === user.id);
+      if (self) {
+        setUser(self);
+      }
     };
 
     const onRoomClosed = (roomId: string) => {
@@ -92,190 +100,191 @@ const Room: React.FC = () => {
       window.location.href = '/?roomclosed=1';
     };
 
+    const onDisconnect = () => {
+      window.location.href = '/?connectionLost=1';
+    };
+
     socket.on('videoUpdateData', videoUpdateData);
     socket.on('videoUpdateState', videoUpdateState);
+    socket.on('updateEvents', updateEvents);
     socket.on('updateRoom', onUpdateRoom);
     socket.on('roomClosed', onRoomClosed);
+    socket.on('disconnect', onDisconnect);
 
     return () => {
       socket.off('videoUpdateData', videoUpdateData);
       socket.off('videoUpdateState', videoUpdateState);
+      socket.off('updateEvents', updateEvents);
       socket.off('updateRoom', onUpdateRoom);
       socket.off('roomClosed', onRoomClosed);
+      socket.off('disconnect', onDisconnect);
     };
-  }, [room, closingRoom, socket]);
+  }, [
+    room,
+    user,
+    closingRoom,
+    socket,
+  ]);
 
-  React.useEffect((): any => {
+  const onTorrentStart = (torrentURL: string) => {
     if (!socket) return;
-    if (!id) return;
-    if (room) return;
-    setLoadingRoomData(true);
-    if (password) {
-      router.push(`/room/${id}`, undefined, { shallow: true });
-    }
-    socket.emit('joinRoom', { id, password }, (res) => {
-      setLoadingRoomData(false);
-      if (res.roomNotFound) return setRoomNotFound(true);
-      if (res.passwordRequest) return setOpenPRW(true);
-      if (res.error) return;
-      setUserId(res.user);
-      setRoom(res.room);
-      setMenuVisible(true);
-    });
-  }, [socket, id]);
-
-  const passwordSubmit = (password: string, callback: any): void => {
-    if (!socket) return;
-    if (!id) return;
-    setLoadingRoomData(true);
-    socket.emit('joinRoom', { id, password }, (res) => {
-      setLoadingRoomData(false);
-      if (res.roomNotFound) return setRoomNotFound(true);
-      if (res.error) return callback(res);
-      setOpenPRW(false);
-      setUserId(res.user);
-      setRoom(res.room);
-      setMenuVisible(true);
+    if (!room) return;
+    if (!torrentURL) return;
+    socket.emit('roomStartTorrent', {
+      id: room.id,
+      url: torrentURL,
+    }, (res) => {
+      if (res.error) alert(res.error);
     });
   };
+
+  if (video?.statusCode === 0 && video?.url) {
+    return (
+      <Player
+        videoState={videoState}
+        setVideoState={setVideoState}
+      />
+    );
+  }
   
   return (
     <React.Fragment>
       <Head>
-        <title>kelp - room</title>
+        <title>kelp - { room?.name || 'room' }</title>
       </Head>
-      {roomNotFound && (
-        <Box
-          sx={{
-            zIndex: 9999,
-            position: 'fixed',
-            top: 0,
-            height: '100vh',
-            width: '100vw',
-            boxSizing: 'border-box',
-          }}
-        >
-          <Stack align="center" sx={{ height: '100vh' }}>
-            <Paper p="md">
-              <Stack align="center">
-                <Text size={30}>Room not found</Text>
-                <Button variant="filled" onClick={() => {
-                  router.push('/');
-                }}>
-                  Go back to menu
-                </Button>
-              </Stack>
-            </Paper>
-          </Stack>
-        </Box>
-      )}
-      <PasswordRequestWindow
-        open={openPRW}
-        isLoading={loadingRoomData}
-        passwordSubmit={passwordSubmit}
-      />
-      <Box
-        sx={{
-          position: 'fixed',
-          top: 0,
-          height: '100vh',
-          width: '100vw',
-          display: 'flex',
-          flexDirection: 'column',
-        }}
-      >
-        <Grid
-          container
-          direction="row"
-          justifyContent="space-between"
-          alignItems="stretch"
-          sx={{
-            height: '100%',
-          }}
-        >
-          <Grid item xs={menuVisible ? 9.5 : 12}>
-            <Box>
-              <Box sx={{
-                background: 'black',
-                position: 'relative',
-              }}>
-                <Stack
-                  sx={{
-                    height: '100vh',
-                  }}
-                >
-                  { video?.statusCode === 0 && video?.url ? (
-                    <Player
-                      socket={socket}
-                      menuVisible={menuVisible}
-                      toggleMenu={(value?: boolean) => {
-                        if (value === undefined) return setMenuVisible(!menuVisible);
-                        setMenuVisible(value);
-                      }}
-                      videoState={videoState}
-                      setVideoState={setVideoState}
-                    />
-                  ) : (
+      <JoinModal />
+      {
+        room && (
+          <Box
+            sx={{
+              position: 'fixed',
+              top: 0,
+              height: '100vh',
+              width: '100vw',
+              display: 'flex',
+              flexDirection: 'column',
+              padding: '30px',
+              boxSizing: 'border-box',
+            }}
+          >
+            <RoomNavigation
+              search={search}
+              searchDispatch={searchDispatch}
+              loadingTitles={loadingTitles}
+              onTorrentStart={onTorrentStart}
+              setSelectedTitle={setSelectedTitle}
+            />
+            {/* "The screen" parent */}
+            <Box sx={{
+              position: 'relative',
+              marginTop: 30,
+              height: '100%',
+              flex: 1,
+              borderRadius: 12,
+              overflow: 'hidden',
+            }}>
+              {
+                // Torrent select screen
+                video?.statusCode === 1 ? (
+                  <TorrentSelect
+                    search={search}
+                    searchDispatch={searchDispatch}
+                    loadingTitles={loadingTitles}
+                    setLoadingTitles={setLoadingTitles}
+                    onTorrentStart={onTorrentStart}
+                    selectedTitle={selectedTitle}
+                    setSelectedTitle={setSelectedTitle}
+                  />
+                )
+                  // Starting download screen
+                  : video?.statusCode === 2 ? (
                     <Box
                       sx={{
-                        backgroundImage: 'linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)),url(/novideo.gif)',
-                        backgroundSize: 'cover',
-                        height: '100vh',
+                        height: '100%',
                         width: '100%',
+                        backgroundColor: '#000',
                       }}
                     >
-                      <Stack
-                        align="center"
-                        justify="center"
+                      <ActionIcon
                         sx={{
-                          height: '100vh',
+                          position: 'absolute',
+                          top: 30,
+                          left: 30,
                         }}
-                        spacing={0}
+                        onClick={() => {
+                          socket.emit('resetRoom', room.id);
+                        }}
                       >
-                        {video?.statusCode === -1 && (
-                          <Paper
-                            shadow="md"
-                            radius="sm"
-                            p="md"
+                        <FontAwesomeIcon 
+                          icon={faArrowLeft} 
+                          style={{ 
+                            color: '#fff',
+                            fontSize: 20,
+                          }} 
+                        />
+                      </ActionIcon>
+                      <Center sx={{ height: '100%' }}>
+                        <Paper
+                          style={{
+                            position: 'relative',
+                            boxSizing: 'border-box',
+                            padding: 30,
+                            width: 465,
+                            borderRadius: 12,
+                            backgroundColor: '#191921',
+                          }}
+                        >
+                          <Stack
                             sx={{
-                              minWidth: '400px',
-                              maxWidth: '600px',
+                              minWidth: 400,
+                              maxWidth: 500,
                             }}
+                            spacing={30}
                           >
-                            <Text>
-                              There was an error...
-                            </Text>
-                            <Text>
-                              {video.status}
-                            </Text>
-                          </Paper>
-                        )}
-                        {video?.statusCode === 1 && (
-                          <TorrentSelect socket={socket} />
-                        )}
-                        {video?.statusCode === 2 && (
-                          <Paper
-                            shadow="md"
-                            radius="sm"
-                            p="md"
-                            sx={{
-                              minWidth: '400px',
-                              maxWidth: '600px',
-                            }}
-                          >
-                            <Text>
+                            <Text sx={{ fontSize: 18, color: '#98989a' }}>
                               Starting download...
                             </Text>
-                          </Paper>
-                        )}
-                        {video?.statusCode >= 3 && (
+                          </Stack>
+                        </Paper>
+                      </Center>
+                    </Box>
+                  )
+                  // Downloading screen
+                    : video?.statusCode >= 3 ? (
+                      <Box
+                        sx={{
+                          height: '100%',
+                          width: '100%',
+                          backgroundColor: '#000',
+                        }}
+                      >
+                        <ActionIcon
+                          sx={{
+                            position: 'absolute',
+                            top: 30,
+                            left: 30,
+                          }}
+                          onClick={() => {
+                            socket.emit('resetRoom', room.id);
+                          }}
+                        >
+                          <FontAwesomeIcon 
+                            icon={faArrowLeft} 
+                            style={{ 
+                              color: '#fff',
+                              fontSize: 20,
+                            }} 
+                          />
+                        </ActionIcon>
+                        <Center sx={{ height: '100%' }}>
                           <Paper
-                            shadow="md"
-                            radius="sm"
-                            p="md"
-                            sx={{
-                              minWidth: '400px',
-                              maxWidth: '600px',
+                            style={{
+                              position: 'relative',
+                              boxSizing: 'border-box',
+                              padding: 30,
+                              width: 465,
+                              borderRadius: 12,
+                              backgroundColor: '#191921',
                             }}
                           >
                             <Stack
@@ -283,63 +292,135 @@ const Room: React.FC = () => {
                                 minWidth: 400,
                                 maxWidth: 500,
                               }}
+                              spacing={30}
                             >
-                              <Text size={30}>{ video.status }</Text>
-                              { video.percentage !== 0 && ( <LinearProgressWithLabel value={video.percentage}  /> ) }
+                              <Text sx={{ fontSize: 18, color: '#98989a' }}>
+                                { video.status }
+                              </Text>
+                              { video.percentage !== 0 && (
+                                <Progress
+                                  value={video.percentage}
+                                  sx={{ width: '100%' }}
+                                  size={5}
+                                />
+                              )}
                               {
                                 (video.percentage !== 0 || video.downloadSpeed) && (
-                                  <Group position="center" grow>
+                                  <Group spacing={20}>
                                     { video.timeRemaining && (
-                                      <Text sx={{ textAlign: 'center' }}>
-                                        {moment().to(moment().add(video.timeRemaining, 'ms'), true)} remaining
-                                      </Text>
+                                      <Group spacing={10}>
+                                        <FontAwesomeIcon 
+                                          icon={faDownload} 
+                                          style={{ 
+                                            color: '#98989a',
+                                            fontSize: 18,
+                                          }} 
+                                        />
+                                        <Text sx={{ fontSize: 14, color: '#98989a' }}>
+                                          {video.downloadSpeed}
+                                        </Text>
+                                      </Group>
                                     ) }
                                     { video.downloadSpeed && (
-                                      <Text sx={{ textAlign: 'center' }}>
-                                        {video.downloadSpeed}
-                                      </Text>
+                                      <Group spacing={10}>
+                                        <FontAwesomeIcon 
+                                          icon={faClock} 
+                                          style={{ 
+                                            color: '#98989a',
+                                            fontSize: 18,
+                                          }} 
+                                        />
+                                        <Text sx={{ fontSize: 14, color: '#98989a' }}>
+                                          {moment().to(moment().add(video.timeRemaining, 'ms'), true)} remaining
+                                        </Text>
+                                      </Group>
                                     ) }
                                   </Group>
                                 )
                               }
                             </Stack>
                           </Paper>
-                        )}
-                      </Stack>
-                    </Box>
-                  )}
-                </Stack>
-              </Box>
+                        </Center>
+                      </Box>
+                    )
+                    // Error screen
+                      : video?.statusCode === -1 ? (
+                        <Box
+                          sx={{
+                            height: '100%',
+                            width: '100%',
+                            backgroundColor: '#000',
+                          }}
+                        >
+                          <ActionIcon
+                            sx={{
+                              position: 'absolute',
+                              top: 30,
+                              left: 30,
+                            }}
+                            onClick={() => {
+                              socket.emit('resetRoom', room.id);
+                            }}
+                          >
+                            <FontAwesomeIcon 
+                              icon={faArrowLeft} 
+                              style={{ 
+                                color: '#fff',
+                                fontSize: 20,
+                              }} 
+                            />
+                          </ActionIcon>
+                          <Center sx={{ height: '100%' }}>
+                            <Paper
+                              style={{
+                                position: 'relative',
+                                boxSizing: 'border-box',
+                                padding: 30,
+                                width: 465,
+                                borderRadius: 12,
+                                backgroundColor: '#191921',
+                              }}
+                            >
+                              <Stack
+                                sx={{
+                                  minWidth: 400,
+                                  maxWidth: 500,
+                                }}
+                                spacing={30}
+                              >
+                                <Text sx={{ fontSize: 18, color: '#98989a' }}>
+                                  There was an error...
+                                </Text>
+                                <Text sx={{ fontSize: 14, color: '#98989a' }}>
+                                  {video.status}
+                                </Text>
+                              </Stack>
+                            </Paper>
+                          </Center>
+                        </Box>
+                      ) : null
+              }
             </Box>
-          </Grid>
-          <Grid 
-            item 
-            xs={2.5} 
-            sx={{
-              height: '100%',
-            }}
-          >
-            <SideMenu
-              socket={socket}
-              userId={userId}
-              videoState={videoState}
-            />
-          </Grid>
-        </Grid>
-      </Box>
+          </Box>
+        )
+      }
     </React.Fragment>
   );
 };
 
 const RoomRoot: NextPage = () => {
   return (
-    <CookiesProvider>
-      <RoomProvider>
-        <VideoProvider>
-          <Room />
-        </VideoProvider>
-      </RoomProvider>
-    </CookiesProvider>
+    <SocketProvider>
+      <CookiesProvider>
+        <RoomProvider>
+          <UserProvider>
+            <VideoProvider>
+              <Room />
+            </VideoProvider>
+          </UserProvider>
+        </RoomProvider>
+      </CookiesProvider>
+    </SocketProvider>
   );
 };
 

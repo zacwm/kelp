@@ -9,6 +9,7 @@
       "request": "launch",
       "name": "Launch server.ts",
       "runtimeArgs": [
+        "--inspect",
         "-r",
         "ts-node/register"
       ],

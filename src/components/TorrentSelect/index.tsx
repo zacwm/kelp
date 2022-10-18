@@ -1,210 +1,105 @@
 import * as React from 'react';
-import type { Socket } from 'socket.io-client';
-import { useDebouncedValue } from '@mantine/hooks';
 
-import { useRoom } from '../../contexts/room.context';
+import { useSocket } from 'contexts/socket.context';
 
-import MovieDisplay from './MovieDisplay';
-import ShowDisplay from './ShowDisplay';
-import CustomTorrentPrompt from './CustomTorrentPrompt';
+import TitleDisplay from './TitleDisplay';
 import VirtualList from './VirtualList';
 
-import { Box, Button, Paper, Stack, Group, Loader, TextInput, Transition } from '@mantine/core';
+import { 
+  Paper,
+  Transition,
+} from '@mantine/core';
 
 type Props = {
-  socket: Socket;
+  search: any;
+  searchDispatch: React.Dispatch<any>;
+  loadingTitles: boolean;
+  setLoadingTitles: React.Dispatch<React.SetStateAction<boolean>>;
+  onTorrentStart: (torrent: string) => void;
+  selectedTitle: any;
+  setSelectedTitle: React.Dispatch<React.SetStateAction<any>>;
 }
 
-const TorrentSelect: React.FC<Props> = ({ socket }) => {
-  const { room } = useRoom();
+const TorrentSelect: React.FC<Props> = ({
+  search,
+  searchDispatch,
+  loadingTitles,
+  setLoadingTitles,
+  onTorrentStart,
+  selectedTitle,
+  setSelectedTitle,
+}) => {
+  const { socket } = useSocket();
 
-  const [titleCategory, setTitleCategory] = React.useState('movies');
-
-  const [inputKeywords, setInputKeywords] = React.useState('');
-  const [debouncedKeywords] = useDebouncedValue(inputKeywords, 1000);
-
-  const [openCustomTorrentPrompt, setOpenCustomTorrentPrompt] = React.useState<boolean>(false);
-  const [loadingTitles, setLoadingTitles] = React.useState<boolean>(true);
   const [torrentList, setTorrentList] = React.useState<object[]>([]);
-  const [selectedTitle, setSelectedTitle] = React.useState<any>(null);
   
-  React.useEffect(() => {
-    loadTorrentList(1, false, true);
-  }, [titleCategory, debouncedKeywords]);
+  React.useEffect((): any => {
+    // 'isSubscribed' is used to prevent overfetching when search reducer is changed during a search.
+    let isSubscribed = true;
 
-  const loadTorrentList = async (
-    page: number,
-    concat: boolean,
-    forceLoad: boolean,
-    callback?: () => void,
-  ): Promise<void> => {
-    if (forceLoad) {
-      setLoadingTitles(true);
-    }
-
-    console.dir(page);
+    setLoadingTitles(true);
 
     socket.emit('getTitles', {
-      page: page || 1,
-      category: titleCategory,
-      keywords: debouncedKeywords
+      page: 1,
+      category: search.category,
+      keywords: search.keywords,
+      genre: search.genre,
+      sort: search.sort,
     }, (response: any) => {
-      setLoadingTitles(false);
-
-      if (typeof callback === 'function') {
-        callback();
-      }
-
-      if (response.error) {
-        setTorrentList([]);
-        console.error(response.error);
-        return;
-      }
-
-      if (concat) {
-        const newTorrentList = [...torrentList, ...response.titles];
-        setTorrentList(newTorrentList);
-      } else {
+      if (isSubscribed) {
+        setLoadingTitles(false);
+  
         setTorrentList(response.titles || []); 
       }
     });
-  };
 
-  const onTorrentStart = (torrentURL: string) => {
-    if (!socket) return;
-    if (!room) return;
-    if (!torrentURL) return;
-    socket.emit('roomStartTorrent', {
-      id: room.id,
-      url: torrentURL,
-    }, (res) => {
-      if (res.error) alert(res.error);
-      close();
-    });
-  };
+    return () => isSubscribed = false;
+  }, [search]);
 
-  const onSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-
-    setInputKeywords(value);
-  };
+  React.useEffect(() => {
+    setSelectedTitle(null);
+  }, [loadingTitles]);
 
   return (
     <Paper
       shadow="md"
-      radius="sm"
       sx={{
         position: 'relative',
-        height: 'calc(100% - 100px)',
-        width: 'calc(100% - 60px)',
-        maxWidth: 1400,
+        height: '100%',
+        flex: 1,
+        width: '100%',
         boxSizing: 'border-box',
-        background: 'rgba(26, 27, 30)',
+        background: '#191921',
         overflow: 'hidden',
       }}
     >
       <Transition
-        mounted={openCustomTorrentPrompt}
+        mounted={selectedTitle}
         transition="slide-up"
         duration={400}
         timingFunction="ease"
       >
         {(styles) => (
-          <CustomTorrentPrompt
+          <TitleDisplay
             styles={styles}
-            setTorrent={(url) => onTorrentStart(url)}
-            close={() => setOpenCustomTorrentPrompt(false)}
-          />
-        )}
-      </Transition>
-      <Transition
-        mounted={selectedTitle && titleCategory == 'movies'}
-        transition="slide-up"
-        duration={400}
-        timingFunction="ease"
-      >
-        {(styles) => (
-          <MovieDisplay
-            styles={styles}
-            title={titleCategory == 'movies' && selectedTitle}
+            title={selectedTitle}
+            type={search.category}
             onTitleSelect={(url) => onTorrentStart(url)}
+            setGenre={(genre) => searchDispatch({ type: 'genre', value: genre })}
             close={() => setSelectedTitle(null)}
           />
         )}
       </Transition>
-      <Transition
-        mounted={selectedTitle && titleCategory == 'shows'}
-        transition="slide-up"
-        duration={400}
-        timingFunction="ease"
-      >
-        {(styles) => (
-          <ShowDisplay
-            styles={styles}
-            title={titleCategory == 'shows' && selectedTitle}
-            onTitleSelect={(url) => onTorrentStart(url)}
-            close={() => setSelectedTitle(null)}
-            socket={socket}
-          />
-        )}
-      </Transition>
-      <Stack sx={{ height: '100%' }} spacing={0}>
-        <Group
-          position="apart"
-          sx={{
-            width: '100%',
-            borderBottom: 'solid 1px #2C2E33',
-            padding: '12px 12px 0 12px'
-          }}
-        >
-          <Group>
-            {['Movies', 'Shows'].map((type, index) => (
-              <Box
-                key={index}
-                sx={{
-                  height: '100%',
-                  padding: '6px 12px',
-                  borderRadius: '4px 4px 0 0',
-                  cursor: 'pointer',
-                  color: '#fff',
-                  background: type.toLowerCase() == titleCategory ? '#2f9e44' : '#2C2E33',
-                }}
-                onClick={() => {
-                  if (loadingTitles) return;
-                  setTitleCategory(type.toLowerCase());
-                }}
-              >
-                { type }
-              </Box>
-            ))}
-          </Group>
-          <TextInput
-            value={inputKeywords}
-            onChange={onSearchChange}
-            disabled={loadingTitles}
-            placeholder="Search"
-            sx={{ width: '500px' }}
-            variant="filled"
-          />
-          <Group>
-            { loadingTitles && <Loader size="sm" /> }
-            <Button
-              variant="filled"
-              color={openCustomTorrentPrompt && 'red'}
-              onClick={() => setOpenCustomTorrentPrompt(!openCustomTorrentPrompt)}
-            >
-              { !openCustomTorrentPrompt ? 'Enter Torrent/Magnet URI' : 'Close' }
-            </Button>
-          </Group>
-        </Group>
-        <VirtualList 
-          titleCategory={titleCategory}
-          itemData={torrentList}
-          isLoading={loadingTitles}
-          setSelectedTitle={setSelectedTitle}
-          fetchTorrentList={loadTorrentList}
-        />
-      </Stack>
+      <VirtualList
+        titleCategory={search.category}
+        itemData={torrentList}
+        isLoading={loadingTitles}
+        setSelectedTitle={setSelectedTitle}
+        search={search}
+        setLoadingTitles={setLoadingTitles}
+        torrentList={torrentList}
+        setTorrentList={setTorrentList}
+      />
     </Paper>
   );
 };
