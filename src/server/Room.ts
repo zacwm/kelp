@@ -402,7 +402,13 @@ export default Room;
 // Helper functions
 function readableBytesPerSecond(fileSizeInBytes) {
   let i = -1;
-  const byteUnits = [" kbps", " Mbps", " Gbps", " Tbps", " Pbps"];
+  const byteUnits = [
+    ' kbps',
+    ' Mbps',
+    ' Gbps',
+    ' Tbps',
+    ' Pbps',
+  ];
   do {
     fileSizeInBytes = fileSizeInBytes / 1024;
     i++;

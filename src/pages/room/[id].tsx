@@ -325,7 +325,7 @@ const Room: React.FC = () => {
                                           }} 
                                         />
                                         <Text sx={{ fontSize: 14, color: '#98989a' }}>
-                                        {moment().to(moment().add(video.timeRemaining, 'ms'), true)} remaining
+                                          {moment().to(moment().add(video.timeRemaining, 'ms'), true)} remaining
                                         </Text>
                                       </Group>
                                     ) }
