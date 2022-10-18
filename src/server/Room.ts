@@ -112,17 +112,21 @@ class Room implements RoomInterface {
   }
 
   createEvent(eventType: string, name?: string): void {
-    this.eventHistory.push({
+    const updatedEventHistory = this.eventHistory;
+    updatedEventHistory.push({
       name: name || 'Kelp',
       value: eventType,
     });
 
-    // Limit to 50 last events
-    if (this.eventHistory.length > 50) {
-      this.eventHistory.shift();
+    // If over 50, remove x amount to only keep last 50
+    if (updatedEventHistory.length > 50) {
+      updatedEventHistory.splice(0, updatedEventHistory.length - 50);
     }
 
-    this.SocketServer.emit('updateEvents', this.eventHistory);
+    this.eventHistory = updatedEventHistory;
+
+    console.dir(updatedEventHistory);
+    this.SocketServer.emit('updateEvents', updatedEventHistory);
   }
 
   removeUser(userId: string): void {
@@ -255,11 +259,11 @@ class Room implements RoomInterface {
           maxDownloadSpeed: this.videoExtra?.maxDownloadSpeed || 0 < torrent.downloadSpeed ? torrent.downloadSpeed : this.videoExtra?.maxDownloadSpeed || 0,
           lowDownloadSpeed: this.videoExtra?.lowDownloadSpeed || 0 > torrent.downloadSpeed ? torrent.downloadSpeed : this.videoExtra?.lowDownloadSpeed || 0,
           torrentFiles: torrent.files.length,
-          torrentSize: formatBytes(torrent.length),
+          torrentSize: readableBytesPerSecond(torrent.length),
         };
 
-        console.log(`Room: ${this.id} | Files: ${torrent.files.length} | ${(torrent.progress * 100).toFixed(2)}% @ ${formatBytes(torrent.downloadSpeed)}/sec`);
-        this.setStatus(3, 'Downloading...', torrent.progress * 100, torrent.timeRemaining, `${formatBytes(torrent.downloadSpeed)}/s`);
+        console.log(`Room: ${this.id} | Files: ${torrent.files.length} | ${(torrent.progress * 100).toFixed(2)}% @ ${readableBytesPerSecond(torrent.downloadSpeed)}`);
+        this.setStatus(3, 'Downloading...', torrent.progress * 100, torrent.timeRemaining, readableBytesPerSecond(torrent.downloadSpeed));
       }, 500);
 
       torrent.on('done', () => {
@@ -396,25 +400,20 @@ class Room implements RoomInterface {
 export default Room;
 
 // Helper functions
-function formatBytes(bytes, decimals = 2) {
-  if (bytes === 0) return '0 Bytes';
+function readableBytesPerSecond(fileSizeInBytes) {
+  let i = -1;
+  const byteUnits = [" kbps", " Mbps", " Gbps", " Tbps", " Pbps"];
+  do {
+    fileSizeInBytes = fileSizeInBytes / 1024;
+    i++;
+  } while (fileSizeInBytes > 1024);
 
-  const k = 1024;
-  const dm = decimals < 0 ? 0 : decimals;
-  const sizes = ['Bytes',
-    'KB',
-    'MB',
-    'GB',
-    'TB'];
-
-  const i = Math.floor(Math.log(bytes) / Math.log(k));
-
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i];
+  return Math.max(fileSizeInBytes, 0.1).toFixed(1) + byteUnits[i];
 }
 
 function makeid(length) {
-  let result           = '';
-  const characters       = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let result = '';
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
   const charactersLength = characters.length;
   for ( let i = 0; i < length; i++ ) {
     result += characters.charAt(Math.floor(Math.random() * charactersLength));
