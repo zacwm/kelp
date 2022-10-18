@@ -14,4 +14,5 @@ export default function resetRoom(socketManager: SocketManagerProps, ...args: an
   const room: Room = Rooms.getRoomById(roomId);
 
   room.resetRoom();
+  room.createEvent('reset the room.', user.name);
 }

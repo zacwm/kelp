@@ -18,6 +18,11 @@ export default function videoChangePlaybackTime(socketManager: SocketManagerProp
 
   if (currentRoom !== roomData.id) return;
   
-  Rooms.getRoomById(currentRoom).setTimePosition(time);
+  const room = Rooms.getRoomById(currentRoom);
+  room.setTimePosition(time);
+  
+  // TODO: Change this so it only sends to the room.
   io.emit('videoUpdateTimePosition', { roomId: roomData.id, newTimePosition: time });
+
+  room.createEvent(`seeked through the video.`, user.name);
 }
