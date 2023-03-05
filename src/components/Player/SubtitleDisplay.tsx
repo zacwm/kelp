@@ -50,7 +50,6 @@ const SubtitleDisplay: React.FC<SubtitleDisplayProps> = ({ currentTime, overlayS
     axios.get(video.subtitle)
       .then((response) => {
         if (response.status !== 200) return console.error('Failed to fetch subtitle data');
-        console.dir(response?.data);
         setSubtitleData(response?.data);
         setSubtitles(response.data?.tracks || []);
         if (response.data?.tracks?.length > 0) setSelectedSubtitle(0);
