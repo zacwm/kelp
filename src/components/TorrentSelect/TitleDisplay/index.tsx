@@ -50,7 +50,7 @@ type Props = {
   styles: any,
   title: any,
   type: string,
-  onTitleSelect: (url: string) => void,
+  onTitleSelect: (torrentData: any) => void,
   setGenre: React.Dispatch<React.SetStateAction<string | null>>,
   close: () => void,
 }

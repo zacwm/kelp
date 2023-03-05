@@ -10,7 +10,7 @@ import { faAngleDown } from '@fortawesome/free-solid-svg-icons';
 type Props = {
   torrents: any,
   forceLang?: string,
-  onTorrentSelect: (url: string) => void,
+  onTorrentSelect: (torrentData: any) => void,
 }
 
 const DownloadButton: React.FC<Props> = ({ torrents, forceLang, onTorrentSelect }) => {
@@ -86,7 +86,7 @@ const DownloadButton: React.FC<Props> = ({ torrents, forceLang, onTorrentSelect 
             borderRadius: '12px 0 0 12px',
             fontSize: 16,
           }}
-          onClick={() => onTorrentSelect(defaultTorrent.url)}
+          onClick={() => onTorrentSelect({ url: defaultTorrent.url, file: defaultTorrent?.file })}
         >
           Watch
         </Button>
@@ -130,7 +130,7 @@ const DownloadButton: React.FC<Props> = ({ torrents, forceLang, onTorrentSelect 
                         backgroundImage: 'linear-gradient(135deg, #00bc70 0%, #00a19b 100%)',
                       },
                     }}
-                    onClick={() => onTorrentSelect(torrent.url)}
+                    onClick={() => onTorrentSelect({ url: torrent.url, file: torrent?.file })}
                   >
                     {hasMultipleLanguages && `${torrent.language} - `}{torrent.quality}
                   </Button>

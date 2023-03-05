@@ -123,13 +123,15 @@ const Room: React.FC = () => {
     socket,
   ]);
 
-  const onTorrentStart = (torrentURL: string) => {
+  const onTorrentStart = (torrentData: any) => {
     if (!socket) return;
     if (!room) return;
-    if (!torrentURL) return;
+    if (!torrentData) return;
+    if (!torrentData.url) return;
     socket.emit('roomStartTorrent', {
       id: room.id,
-      url: torrentURL,
+      url: torrentData.url,
+      file: torrentData.file,
     }, (res) => {
       if (res.error) alert(res.error);
     });

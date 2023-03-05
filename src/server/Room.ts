@@ -206,14 +206,14 @@ class Room implements RoomInterface {
   }
 
   // Torrent controls
-  async startTorrent(url: string, callback?: any): Promise<void> {
+  async startTorrent(torrentData: any, callback?: any): Promise<void> {
     if (this.ffmpeg.process) return callback({ error: 'Already processing video...' });
     if (this.wtClient) return callback({ error: 'Already downloading...' });
     this.setStatus({ type: 'starting', message: 'Starting torrent download...' });
 
     await fs.emptyDir(path.join(__dirname, `../.temp/${this.id}`));
     if (!this.wtClient) this.wtClient = new WebTorrent();
-    this.wtClient.add(url, { path: path.join(__dirname, `../.temp/${this.id}`) }, (torrent: any) => {
+    this.wtClient.add(torrentData.url, { path: path.join(__dirname, `../.temp/${this.id}`) }, (torrent: any) => {
       this.torrent = torrent;
       this.files = torrent.files.filter(file => {
         return [

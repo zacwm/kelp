@@ -15,7 +15,7 @@ type Props = {
   searchDispatch: React.Dispatch<any>;
   loadingTitles: boolean;
   setLoadingTitles: React.Dispatch<React.SetStateAction<boolean>>;
-  onTorrentStart: (torrent: string) => void;
+  onTorrentStart: (torrentData: any) => void;
   selectedTitle: any;
   setSelectedTitle: React.Dispatch<React.SetStateAction<any>>;
 }
@@ -84,7 +84,7 @@ const TorrentSelect: React.FC<Props> = ({
             styles={styles}
             title={selectedTitle}
             type={search.category}
-            onTitleSelect={(url) => onTorrentStart(url)}
+            onTitleSelect={(data) => onTorrentStart(data)}
             setGenre={(genre) => searchDispatch({ type: 'genre', value: genre })}
             close={() => setSelectedTitle(null)}
           />
