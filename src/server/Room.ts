@@ -300,12 +300,10 @@ class Room implements RoomInterface {
                 this.setStatus(5, 'Converting - 2/3 files done');
                 this.ffmpeg.extractSubtitles(videoPath, this.id)
                   .then(() => {
-                    this.videoSubtitle = `/streams/${this.id}/subtitles.vtt`;
-                    this.setStatus(0, `Watching '${this.videoTitle}'`);
+                    this.videoSubtitle = `/streams/${this.id}/subtitles.json`;
                   })
-                  .catch((err) => {
-                    console.dir(err);
-                    return this.setStatus(0, `Watching '${this.videoTitle}'`);
+                  .finally(() => {
+                    this.setStatus(0, `Watching '${this.videoTitle}'`);
                   });
               })
               .catch((err) => {
@@ -399,20 +397,11 @@ export default Room;
 
 // Helper functions
 function readableBytesPerSecond(fileSizeInBytes) {
-  let i = -1;
-  const byteUnits = [
-    ' kbps',
-    ' Mbps',
-    ' Gbps',
-    ' Tbps',
-    ' Pbps',
-  ];
-  do {
-    fileSizeInBytes = fileSizeInBytes / 1024;
-    i++;
-  } while (fileSizeInBytes > 1024);
-
-  return Math.max(fileSizeInBytes, 0.1).toFixed(1) + byteUnits[i];
+  const fileSizeInMbps = fileSizeInBytes / 125000;
+  if (fileSizeInMbps > 1000) {
+    return `${(fileSizeInMbps / 1000).toFixed(1)} Gbps`;
+  }
+  return `${fileSizeInMbps.toFixed(1)} Mbps`;
 }
 
 function makeid(length) {

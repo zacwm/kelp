@@ -2,7 +2,7 @@ import * as React from 'react';
 
 import { useUser } from '../../../contexts/user.context';
 
-import { Box, Group, Button, Popover } from '@mantine/core';
+import { UnstyledButton, Group, Button, Popover } from '@mantine/core';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faAngleDown } from '@fortawesome/free-solid-svg-icons';
@@ -61,28 +61,30 @@ const DownloadButton: React.FC<Props> = ({ torrents, forceLang, onTorrentSelect 
   if (!hasPermission) return null;
 
   return (
-    <Box
+    <UnstyledButton
       sx={{
-        display: 'inline-block',
+        position: 'relative',
+        display: 'block',
         width: 'fit-content',
         borderRadius: 12,
         backgroundImage: 'linear-gradient(135deg, #00bc70 0%, #00a19b 100%)',
-        transition: 'transform 0.2s ease-in-out',
         cursor: 'pointer',
+        zIndex: 200,
+        transition: 'transform 0.2s ease-in-out',
         '&:hover': {
           transform: 'scale(1.05)',
         },
+        margin: '0 10px',
       }}
     >
-      <Group spacing={0}>
+      <Group
+        spacing={0}
+      >
         <Button
           sx={{
             backgroundImage: 'none',
             borderRadius: '12px 0 0 12px',
             fontSize: 16,
-            '&:hover': {
-              transform: 'none !important',
-            },
           }}
           onClick={() => onTorrentSelect(defaultTorrent.url)}
         >
@@ -98,9 +100,6 @@ const DownloadButton: React.FC<Props> = ({ torrents, forceLang, onTorrentSelect 
                 fontSize: 18,
                 padding: '0 12px',
                 color: '#3bd4ae',
-                '&:hover': {
-                  transform: 'none !important',
-                },
               }}
             >
               <FontAwesomeIcon icon={faAngleDown} />
@@ -112,6 +111,7 @@ const DownloadButton: React.FC<Props> = ({ torrents, forceLang, onTorrentSelect 
               backgroundColor: '#2f2f3d',
               border: 'none',
               padding: 0,
+              marginTop: 18,
             }}
           >
             {
@@ -140,7 +140,7 @@ const DownloadButton: React.FC<Props> = ({ torrents, forceLang, onTorrentSelect 
           </Popover.Dropdown>
         </Popover>
       </Group>
-    </Box>
+    </UnstyledButton>
   );
 };
 

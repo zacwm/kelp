@@ -8,8 +8,10 @@ import { useRoom } from 'contexts/room.context';
 import { useVideo } from 'contexts/video.context';
 
 import Overlay from './Overlay';
+import SubtitleDisplay from './SubtitleDisplay';
 
 import { Box, Stack } from '@mantine/core';
+import { useInterval } from '@mantine/hooks';
 
 type Props = {
   videoState: any;
@@ -41,6 +43,24 @@ const Player: React.FC<Props> = ({ videoState, setVideoState }) => {
 
   const refPlayer = React.useRef<ReactPlayer>(null);
 
+  const timeCheckInterval = useInterval(() => {
+    if (!refPlayer?.current) return;
+    // Fetch the player time position
+    const playerTimePosition = refPlayer.current.getCurrentTime();
+    // If the player time position is not the same as the videoPlayedSeconds state, update it
+    if (playerTimePosition !== videoPlayedSeconds) {
+      setVideoPlayedSeconds(playerTimePosition);
+    }
+  }, 100);
+
+  React.useEffect(() => {
+    if (videoState?.playing) {
+      timeCheckInterval.start();
+    } else {
+      timeCheckInterval.stop();
+    }
+  }, [videoState]);
+
   // Hover controls manager
   let mouseStopTimeout = null;
   React.useEffect(() => {
@@ -70,7 +90,7 @@ const Player: React.FC<Props> = ({ videoState, setVideoState }) => {
   React.useEffect(() => {
     if (!room) return;
     if (mouseOverControls) return setShowVideoOverlay(true);
-    setShowVideoOverlay(mouseOverVideo && mouseRecentMove);
+    setShowVideoOverlay(mouseRecentMove);
   }, [mouseOverVideo, mouseRecentMove, mouseOverControls]);
 
   // Socket events
@@ -184,7 +204,7 @@ const Player: React.FC<Props> = ({ videoState, setVideoState }) => {
   };
 
   const playerOnError = (error: any) => {
-    console.error(error);
+    if (error === 'hlsError') return;
     enqueueSnackbar('Something went wrong with the video. Try refreshing?', { variant: 'error' });
   };
 
@@ -238,19 +258,6 @@ const Player: React.FC<Props> = ({ videoState, setVideoState }) => {
             <ReactPlayer
               ref={refPlayer}
               url={video.url}
-              config={{
-                file: {
-                  tracks: [
-                    {
-                      label: 'subtitles',
-                      kind: 'subtitles',
-                      src: video.subtitle,
-                      srcLang: 'en',
-                      default: true,
-                    },
-                  ],
-                },
-              }}
               playing={videoState?.playing}
               volume={inputVolumeSlider / 100}
               width="100%"
@@ -261,6 +268,10 @@ const Player: React.FC<Props> = ({ videoState, setVideoState }) => {
               onEnded={playerEnded}
               onError={playerOnError}
               onDuration={playerOnDuration}
+            />
+            <SubtitleDisplay
+              currentTime={videoPlayedSeconds}
+              overlayShowing={showVideoOverlay}
             />
           </Box>
         </Stack>

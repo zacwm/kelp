@@ -78,6 +78,7 @@ const TitleDisplay: React.FC<Props> = ({
   React.useEffect(() => {
     socket.emit('getTitleDetails', { type, id: title['_id'] }, (response) => {
       setIsLoading(false);
+      console.dir(response);
       if (response.error) {
         return console.error(response.error);
       }
@@ -332,95 +333,100 @@ const TitleDisplay: React.FC<Props> = ({
               >
                 <Stack
                   sx={{
-                    padding: '150px 30% 0 0',
+                    padding: '140px 30% 0 0',
                     // TODO: Fix the margin bottom when there is an accordion. Height measurement is not working.
                     marginBottom: 150,
                   }}
                   spacing={0}
                 >
-                  <Text
-                    size={48}
-                    color="#fff"
-                    weight={700}
-                    sx={{
-                      lineHeight: 1,
-                      marginBottom: 60,
-                    }}
-                  >
-                    { titleOverview.title }
-                  </Text>
-                  <Text
-                    size={14}
-                    color="#98989a"
-                    sx={{
-                      marginBottom: 30,
-                      maxWidth: 930,
-                      lineHeight: 1.75,
-                    }}
-                  >
-                    { titleDetailed.synopsis }
-                  </Text>
+                  <Stack sx={{ padding: '0 0 0 10px' }} spacing={0}>
+                    <Text
+                      size={48}
+                      color="#fff"
+                      weight={700}
+                      sx={{
+                        lineHeight: 1,
+                        marginBottom: 60,
+                      }}
+                    >
+                      { titleOverview.title }
+                    </Text>
+                    <Text
+                      size={14}
+                      color="#98989a"
+                      sx={{
+                        marginBottom: 30,
+                        maxWidth: 930,
+                        lineHeight: 1.75,
+                      }}
+                    >
+                      { titleDetailed.synopsis }
+                    </Text>
+                  </Stack>
                   <DownloadButton torrents={titleOverview.torrents} onTorrentSelect={onTitleSelect} />
-                  {titleOverview.trailer && (
-                    <AspectRatio
-                      ratio={16 / 9}
-                      sx={{
-                        width: '100%',
-                        maxWidth: 800,
-                        borderRadius: 12,
-                        overflow: 'hidden',
-                        marginTop: 60,
-                      }}
-                    >
-                      <iframe
-                        width="100%"
-                        height="100%"
-                        src={ 'https://www.youtube.com/embed/' + titleOverview.trailer.split('watch?v=')[1] }
-                        title="YouTube video player"
-                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                        allowFullScreen
-                        frameBorder="0"
-                      />
-                    </AspectRatio>
-                  )}
-                  {(type === 'shows' && titleDetailed.episodes) && (
-                    <Accordion
-                      variant="separated"
-                      chevronPosition="left"
-                      radius={12}
-                      sx={{
-                        maxHeight: 500,
-                      }}
-                    >
-                      {
-                        Object.keys(seasonEpisodesData).sort((a, b) => {
-                          return parseInt(a) - parseInt(b);
-                        }).map((season, sIndex) => (
-                          <Accordion.Item value={`season${season}`} key={sIndex}>
-                            <Accordion.Control
-                              sx={{
-                                padding: 30,
-                                lineHeight: 1,
-                              }}
-                            >
-                              Season {season}
-                            </Accordion.Control>
-                            <Accordion.Panel>
-                              {
-                                seasonEpisodesData[season].map((episode, eIndex) => (
-                                  <EpisodeItem
-                                    key={eIndex}
-                                    episodeData={episode}
-                                    onSelect={onTitleSelect}
-                                  />
-                                ))
-                              }
-                            </Accordion.Panel>
-                          </Accordion.Item>
-                        ))
-                      }
-                    </Accordion>
-                  )}
+                  <Stack sx={{ padding: '0 0 0 10px' }} spacing={0}>
+
+                    {titleOverview.trailer && (
+                      <AspectRatio
+                        ratio={16 / 9}
+                        sx={{
+                          width: '100%',
+                          maxWidth: 800,
+                          borderRadius: 12,
+                          overflow: 'hidden',
+                          marginTop: 60,
+                        }}
+                      >
+                        <iframe
+                          width="100%"
+                          height="100%"
+                          src={ 'https://www.youtube.com/embed/' + titleOverview.trailer.split('watch?v=')[1] }
+                          title="YouTube video player"
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                          frameBorder="0"
+                        />
+                      </AspectRatio>
+                    )}
+                    {(type === 'shows' && titleDetailed.episodes) && (
+                      <Accordion
+                        variant="separated"
+                        chevronPosition="left"
+                        radius={12}
+                        sx={{
+                          maxHeight: 500,
+                        }}
+                      >
+                        {
+                          Object.keys(seasonEpisodesData).sort((a, b) => {
+                            return parseInt(a) - parseInt(b);
+                          }).map((season, sIndex) => (
+                            <Accordion.Item value={`season${season}`} key={sIndex}>
+                              <Accordion.Control
+                                sx={{
+                                  padding: 30,
+                                  lineHeight: 1,
+                                }}
+                              >
+                                Season {season}
+                              </Accordion.Control>
+                              <Accordion.Panel>
+                                {
+                                  seasonEpisodesData[season].map((episode, eIndex) => (
+                                    <EpisodeItem
+                                      key={eIndex}
+                                      episodeData={episode}
+                                      onSelect={onTitleSelect}
+                                    />
+                                  ))
+                                }
+                              </Accordion.Panel>
+                            </Accordion.Item>
+                          ))
+                        }
+                      </Accordion>
+                    )}
+                  </Stack>
                 </Stack>
               </ScrollArea>
             </Group>

@@ -5,13 +5,13 @@ import { useRoom } from 'contexts/room.context';
 import { useVideo } from 'contexts/video.context';
 import { useUser } from 'contexts/user.context';
 
-import { Box, Slider, Group, Stack, Text, Transition } from '@mantine/core';
+import { Box, Slider, Group, Stack, Text, Transition, Popover } from '@mantine/core';
 import TestingPopover from '../RoomNavigation/Popovers/Testing';
 import RoomsPopover from '../RoomNavigation/Popovers/Users';
 import ControllerPopover from '../RoomNavigation/Popovers/Controller';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft, faPlay, faPause, faExpand, faCompress } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faPlay, faPause, faExpand, faCompress, faClosedCaptioning } from '@fortawesome/free-solid-svg-icons';
 
 type Props = {
   show: boolean;
@@ -42,7 +42,12 @@ const Overlay: React.FC<Props> = ({
 }) => {
   const { socket } = useSocket();
   const { room } = useRoom();
-  const { video } = useVideo();
+  const {
+    video,
+    subtitles,
+    selectedSubtitle,
+    setSelectedSubtitle,
+  } = useVideo();
   const { user } = useUser();
 
   const buttonPlayback = () => {
@@ -211,7 +216,60 @@ const Overlay: React.FC<Props> = ({
                     {formatSeconds(videoPlayedSeconds || 0)} / {formatSeconds(videoDuration || 0)}
                   </Text>
                 </Group>
-                <Group>
+                <Group spacing="xl">
+                  {
+                    subtitles.length > 0 ? (
+
+                      <Popover
+                        width={200}
+                        position="bottom"
+                        shadow="md"
+                      >
+                        <Popover.Target>
+                          <FontAwesomeIcon 
+                            icon={faClosedCaptioning} 
+                            style={{ 
+                              fontSize: 23,
+                              cursor: 'pointer',
+                            }}
+                          />
+                        </Popover.Target>
+                        <Popover.Dropdown
+                          sx={{
+                            borderRadius: 12,
+                            backgroundColor: '#2f2f3d',
+                            border: 'none',
+                          }}
+                        >
+                          <Stack>
+                            <Text
+                              sx={(theme) => ({
+                                color: selectedSubtitle === -1 ? theme.colors.brand[7] : 'white',
+                                cursor: 'pointer',
+                                fontWeight: selectedSubtitle === -1 ? 'bold' : 'normal',
+                              })}
+                              onClick={() => setSelectedSubtitle(-1)}
+                            >
+                              Off
+                            </Text>
+                            {
+                              subtitles.map((subtitle, index) => (
+                                <Text
+                                  key={index}
+                                  sx={(theme) => ({
+                                    color: selectedSubtitle === index ? theme.colors.brand[7] : 'white',
+                                    cursor: 'pointer',
+                                    fontWeight: selectedSubtitle === index ? 'bold' : 'normal',
+                                  })}
+                                  onClick={() => setSelectedSubtitle(index)}
+                                >{subtitle.title}</Text>
+                              ))
+                            }
+                          </Stack>
+                        </Popover.Dropdown>
+                      </Popover>
+                    ) : null
+                  }
                   <FontAwesomeIcon 
                     icon={fullscreenMode ? faCompress : faExpand} 
                     style={{ 
