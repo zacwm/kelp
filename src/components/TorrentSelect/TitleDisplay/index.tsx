@@ -78,7 +78,6 @@ const TitleDisplay: React.FC<Props> = ({
   React.useEffect(() => {
     socket.emit('getTitleDetails', { type, id: title['_id'] }, (response) => {
       setIsLoading(false);
-      console.dir(response);
       if (response.error) {
         return console.error(response.error);
       }

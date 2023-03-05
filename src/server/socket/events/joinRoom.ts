@@ -27,7 +27,7 @@ export default function joinRoom(socketManager: SocketManagerProps, ...args: any
     hasPassword: true,
   });
   // Password was provided, but it was incorrect.
-  if (room.hasPassword() && roomData.password !== room.getPassword()) return callback({
+  if (room.hasPassword() && room.checkPassword(roomData.password)) return callback({
     userError: 'Room password is incorrect',
     hasPassword: true,
   });
@@ -51,7 +51,7 @@ export default function joinRoom(socketManager: SocketManagerProps, ...args: any
     name: room.name,
     users: room.getUsers(),
     videoData: room.getVideoData(),
-    videoState: room.statusCode === 0 ? room.getPlaybackState() : null,
+    videoState: room.status?.type == 'playing' ? room.getPlaybackState() : null,
   };
 
   callback({
@@ -59,9 +59,11 @@ export default function joinRoom(socketManager: SocketManagerProps, ...args: any
     room: roomDataToSend,
   });
 
+  socket.join(room.id);
+
   io.to(room.id).emit('updateRoom', roomDataToSend);
   io.to(room.id).emit('updateEvents', room.eventHistory);
+  io.to(room.id).emit('roomUpdateStatus', room.status);
 
-  socket.join(room.id);
   setCurrentRoom(room.id);
 }

@@ -4,12 +4,13 @@ import User from './User';
 import * as SocketIO from 'socket.io';
 import WebTorrent from 'webtorrent';
 import FFmpeg from './ffmpeg';
+import { RoomStatus, RoomStatusPresets } from '../types';
 
 interface RoomInterface {
   setName(name: string): void;
   setPassword(password: string): void;
   hasPassword(): boolean;
-  getPassword(): string;
+  checkPassword(passwordInput: string): boolean;
   getAuthToken(): string;
   addUser(user: User): void;
   getUsers(): User[];
@@ -25,7 +26,7 @@ interface RoomInterface {
   startTorrent(url: string, callback: any): void;
   convertFile(videoPath: string): void;
   // Internal
-  setStatus(statusCode: number, message: string, percentage: number, timeRemaining: number, speed: string): void;
+  setStatus(value: any): void;
 }
 
 class Room implements RoomInterface {
@@ -36,12 +37,7 @@ class Room implements RoomInterface {
   private authToken: string;
   private users: User[];
   eventHistory: any[];
-  // Room statuses
-  statusCode: number;
-  status: string;
-  statusPercentage: number;
-  statusTimeRemaining: number;
-  statusSpeed: string;
+  status: RoomStatus;
   // Video data
   private videoTitle: string;
   private videoURL: string;
@@ -67,11 +63,7 @@ class Room implements RoomInterface {
     this.users = [];
     this.eventHistory = [];
 
-    this.statusCode = 1;
-    this.status = 'Looking for something to watch...';
-    this.statusPercentage = 0;
-    this.statusTimeRemaining = 0;
-    this.statusSpeed = '';
+    this.status = RoomStatusPresets.WAITING;
 
     this.videoTitle = '';
     this.videoURL = '';
@@ -95,8 +87,8 @@ class Room implements RoomInterface {
     return this.password !== '';
   }
 
-  getPassword(): string {
-    return this.password;
+  checkPassword(passwordInput: string): boolean {
+    return this.password === passwordInput;
   }
 
   getAuthToken(): string {
@@ -142,15 +134,13 @@ class Room implements RoomInterface {
       name: this.name,
       users: this.getUsers(),
       videoData: this.getVideoData(),
-      videoState: this.statusCode === 0 ? this.getPlaybackState() : null,
+      videoState: this.status?.type == 'playing' ? this.getPlaybackState() : null,
     });
   }
 
   getVideoData(forceVideoData?: boolean): any {
-    if (this.statusCode === 0 || forceVideoData) {
+    if (this.status?.type == 'playing' || forceVideoData) {
       return {
-        statusCode: this.statusCode,
-        status: this.status,
         url: this.videoURL,
         title: this.videoTitle,
         subtitle: this.videoSubtitle,
@@ -159,17 +149,8 @@ class Room implements RoomInterface {
         }),
         extra: this.videoExtra,
       };
-    } else {
-      return {
-        statusCode: this.statusCode,
-        status: this.status,
-        percentage: this.statusPercentage,
-        timeRemaining: this.statusTimeRemaining,
-        downloadSpeed: this.statusSpeed,
-        extra: this.videoExtra,
-      };
     }
-
+    return undefined;
   }
 
   getPlaybackState(): any {
@@ -185,8 +166,8 @@ class Room implements RoomInterface {
 
     // Create the syncing interval
     if (playing) this.playbackTimePositionInterval = setInterval(() => {
-      if (!this.playbackPlaying || this.statusCode !== 0) {
-        // Ensure that the playback is paused, if the statusCode is not 0
+      if (!this.playbackPlaying || this.status.type !== 'playing') {
+        // Ensure that the playback is paused, if the status is not on the player
         this.playbackPlaying = false;
         clearInterval(this.playbackTimePositionInterval);
       } else {
@@ -228,7 +209,8 @@ class Room implements RoomInterface {
   async startTorrent(url: string, callback?: any): Promise<void> {
     if (this.ffmpeg.process) return callback({ error: 'Already processing video...' });
     if (this.wtClient) return callback({ error: 'Already downloading...' });
-    this.setStatus(2, 'Staring download...');
+    this.setStatus({ type: 'starting', message: 'Starting torrent download...' });
+
     await fs.emptyDir(path.join(__dirname, `../.temp/${this.id}`));
     if (!this.wtClient) this.wtClient = new WebTorrent();
     this.wtClient.add(url, { path: path.join(__dirname, `../.temp/${this.id}`) }, (torrent: any) => {
@@ -246,7 +228,7 @@ class Room implements RoomInterface {
       });
       if (this.files.length <= 0) {
         torrent.destroy();
-        return this.setStatus(-1, 'No video file found in torrent...');
+        return this.setStatus({ type: 'error', message: 'No video file found in torrent...' });
       }
 
       this.torrentCheckInterval = setInterval(() => {
@@ -261,7 +243,13 @@ class Room implements RoomInterface {
         };
 
         console.log(`Room: ${this.id} | Files: ${torrent.files.length} | ${(torrent.progress * 100).toFixed(2)}% @ ${readableBytesPerSecond(torrent.downloadSpeed)}`);
-        this.setStatus(3, 'Downloading...', torrent.progress * 100, torrent.timeRemaining, readableBytesPerSecond(torrent.downloadSpeed));
+        this.setStatus({
+          type: 'downloading',
+          message: 'Downloading...',
+          percentage: torrent.progress * 100,
+          timeRemaining: torrent.timeRemaining,
+          speed: readableBytesPerSecond(torrent.downloadSpeed),
+        });
       }, 500);
 
       torrent.on('done', () => {
@@ -280,75 +268,99 @@ class Room implements RoomInterface {
   async convertFile(videoPath: string): Promise<void> {
     if (this.ffmpeg.process) return this.ffmpeg.stop();
     await fs.emptyDir(path.join(__dirname, `../.streams/${this.id}`));
-    this.setStatus(4, 'Staring conversion...');
+    this.setStatus({ type: 'processing', message: 'Converting...' });
     this.playbackTimePosition = 0;
     this.playbackPlaying = false;
     fs.pathExists(videoPath, async (err, exists) => {
-      if (err) return this.setStatus(-1, 'Video file check failed...');
-      if (!exists) return this.setStatus(-1, 'Video file not found...');
+      if (err) return this.setStatus({ type: 'error', message: 'Video file check failed...' });
+      if (!exists) return this.setStatus({ type: 'error', message: 'Video file not found...' });
       const type = path.extname(videoPath);
 
       if (type === '.mkv') {
-        this.setStatus(5, 'Converting - 0/3 files done');
+        this.setStatus({
+          type: 'processing',
+          watching: 'Processing...',
+          percentage: (0 / 3) * 100,
+        });
         this.ffmpeg.convertVideoToMP4(videoPath, this.id)
           .then(({ mp4Path }) => {
-            this.setStatus(5, 'Converting - 1/3 files done');
+            this.setStatus({
+              type: 'processing',
+              watching: 'Processing...',
+              percentage: (1 / 3) * 100,
+            });
             this.ffmpeg.convertVideoToHLS(mp4Path, this.id)
               .then(() => {
                 this.videoURL = `/streams/${this.id}/index.m3u8`;
                 this.videoExtra = { ...this.videoExtra, hlsFileCount: fs.readdirSync(path.join(__dirname, `../.streams/${this.id}`)).length };
-                this.setStatus(5, 'Converting - 2/3 files done');
+                this.setStatus({
+                  type: 'processing',
+                  watching: 'Processing...',
+                  percentage: (2 / 3) * 100,
+                });
                 this.ffmpeg.extractSubtitles(videoPath, this.id)
                   .then(() => {
                     this.videoSubtitle = `/streams/${this.id}/subtitles.json`;
                   })
                   .finally(() => {
-                    this.setStatus(0, `Watching '${this.videoTitle}'`);
+                    this.setStatus({ type: 'playing', message: `Watching '${this.videoTitle}'` });
                   });
               })
               .catch((err) => {
                 console.error(err);
-                return this.setStatus(-1, 'File conversion failed...');
+                return this.setStatus({ type: 'error', message: 'File conversion failed...' });
               });
           })
           .catch((err) => {
             console.error(err);
-            return this.setStatus(-1, 'File conversion failed...');
+            return this.setStatus({ type: 'error', message: 'File conversion failed...' });
           });
       } else if (['.avi', '.wmv'].includes(type)) {
-        this.setStatus(5, 'Converting - 0/2 files done');
+        this.setStatus({
+          type: 'processing',
+          watching: 'Processing...',
+          percentage: (0 / 2) * 100,
+        });
         this.ffmpeg.convertVideoToMP4(videoPath, this.id)
           .then(({ mp4Path }) => {
-            this.setStatus(5, 'Converting - 1/2 files done');
+            this.setStatus({
+              type: 'processing',
+              watching: 'Processing...',
+              percentage: (1 / 2) * 100,
+            });
             this.ffmpeg.convertVideoToHLS(mp4Path, this.id)
               .then(() => {
                 this.videoURL = `/streams/${this.id}/index.m3u8`;
                 this.videoExtra = { ...this.videoExtra, hlsFileCount: fs.readdirSync(path.join(__dirname, `../.streams/${this.id}`)).length };
-                this.setStatus(0, `Watching '${this.videoTitle}'`);
+                this.setStatus({ type: 'playing', message: `Watching '${this.videoTitle}'` });
               })
               .catch((err) => {
                 console.error(err);
-                return this.setStatus(-1, 'File conversion failed...');
+                return this.setStatus({ type: 'error', message: 'File conversion failed...' });
               });
           })
           .catch((err) => {
             console.error(err);
-            return this.setStatus(-1, 'File conversion failed...');
+            return this.setStatus({ type: 'error', message: 'File conversion failed...' });
           });
       } else if (['.mp4', '.mov'].includes(type)) {
-        this.setStatus(5, 'Converting - 0/1 files done');
+        this.setStatus({
+          type: 'processing',
+          watching: 'Processing...',
+          percentage: (0 / 1) * 100,
+        });
         this.ffmpeg.convertVideoToHLS(videoPath, this.id)
           .then(() => {
             this.videoURL = `/streams/${this.id}/index.m3u8`;
             this.videoExtra = { ...this.videoExtra, hlsFileCount: fs.readdirSync(path.join(__dirname, `../.streams/${this.id}`)).length };
-            this.setStatus(0, `Watching '${this.videoTitle}'`);
+            this.setStatus({ type: 'playing', message: `Watching '${this.videoTitle}'` });
           })
           .catch((err) => {
             console.error(err);
-            return this.setStatus(-1, 'File conversion failed...');
+            return this.setStatus({ type: 'error', message: 'File conversion failed...' });
           });
       } else {
-        return this.setStatus(-1, 'Unsupported file type...');
+        return this.setStatus({ type: 'error', message: 'Unsupported file type...' });
       }
     });
   }
@@ -356,7 +368,10 @@ class Room implements RoomInterface {
   async resetRoom(noStatus?: boolean): Promise<void> {
     if (noStatus === true) noStatus = noStatus || false;
     
-    if (noStatus !== true) this.setStatus(10, 'Resetting room...');
+    if (noStatus !== true) this.setStatus({
+      type: 'resetting',
+      message: 'Resetting...',
+    });
     if (this.wtClient) {
       try {
         this.wtClient.destroy();
@@ -372,24 +387,36 @@ class Room implements RoomInterface {
     await fs.emptyDir(path.join(__dirname, `../.temp/${this.id}`));
     await fs.emptyDir(path.join(__dirname, `../.streams/${this.id}`));
 
-    this.setStatus(1, 'Looking for something to watch...');
+    this.setStatus({
+      'type': 'waiting',
+      'message': 'Looking for something to watch...',
+    });
   }
 
   // Internal class functions
-  setStatus(statusCode: number, message?: string, percentage?: number, timeRemaining?: number, speed?: string): void {
-    this.statusCode = statusCode;
-    this.status = message || '';
-    this.statusPercentage = percentage || 0;
-    this.statusTimeRemaining = timeRemaining || 0;
-    this.statusSpeed = speed || null;
-    this.SocketServer.emit('videoUpdateData', {
-      roomId: this.id,
-      newData: statusCode === 0 ? this.getVideoData(true) : this.getVideoData(),
-    });
-    this.SocketServer.emit('videoUpdateState', {
-      roomId: this.id,
-      newState: this.statusCode === 0 ? this.getPlaybackState() : null,
-    });
+  setStatus(value: any): void {
+    // New Status
+    if (value.percentage === undefined) {
+      value.percentage = null;
+    }
+
+    if (value.timeRemaining === undefined) {
+      value.timeRemaining = null;
+    }
+
+    if (value.speed === undefined) {
+      value.speed = null;
+    }
+
+    this.status = {...this.status, ...value};
+
+    if (this.status.type === 'playing') {
+      this.SocketServer.to(this.id).emit('videoUpdateData', this.getVideoData());
+      this.SocketServer.to(this.id).emit('videoUpdateState', this.getPlaybackState());
+    }
+    
+    // Update the room status to all users in the room
+    this.SocketServer.to(this.id).emit('roomUpdateStatus', this.status);
   }
 }
 

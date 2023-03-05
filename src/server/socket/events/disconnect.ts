@@ -36,7 +36,6 @@ export default function disconnect(socketManager: SocketManagerProps): void {
     name: room.name,
     users: room.getUsers(),
     videoData: room.getVideoData(),
-    videoState: room.statusCode === 0 ? room.getPlaybackState() : null,
+    videoState: room.status?.type == 'playing' ? room.getPlaybackState() : null,
   });
-
 }

@@ -24,7 +24,7 @@ class RoomManager implements RoomManagerInterface {
         id: room.id,
         name: room.name,
         hasPassword: room.hasPassword(),
-        status: room.status,
+        status: room.status.message,
       };
     });
   }

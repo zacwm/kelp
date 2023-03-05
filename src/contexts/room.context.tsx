@@ -1,9 +1,12 @@
 import React, { createContext, useReducer, useContext } from 'react';
+import { RoomStatus } from '../types';
 
 // Context value types.
 interface RoomContextInterface {
   room: any;
   setRoom: (data: any) => void;
+  status: RoomStatus | undefined;
+  setStatus: (data: RoomStatus) => void;
   closingRoom: boolean,
   setClosingRoom: () => void;
   eventLog: any[];
@@ -14,6 +17,8 @@ interface RoomContextInterface {
 const RoomState: RoomContextInterface = {
   room: undefined,
   setRoom: () => undefined,
+  status: undefined,
+  setStatus: () => undefined,
   closingRoom: false,
   setClosingRoom: () => undefined,
   eventLog: [],
@@ -38,6 +43,10 @@ export const RoomProvider: any = (props: any) => {
   // Context state functions
   state.setRoom = (data: any) => {
     dispatch({ type: 'room', value: data });
+  };
+
+  state.setStatus = (data: RoomStatus) => {
+    dispatch({ type: 'status', value: data });
   };
 
   state.setClosingRoom = () => {

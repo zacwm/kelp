@@ -59,7 +59,7 @@ const SubtitleDisplay: React.FC<SubtitleDisplayProps> = ({ currentTime, overlayS
   React.useEffect(() => {
     if (selectedSubtitle === -1) return setSubtitleCues([]);
     // Check if the selected subtitle is a valid index
-    if (!subtitleData.cues) return setSubtitleCues([]);
+    if (!subtitleData?.cues) return setSubtitleCues([]);
     if (selectedSubtitle < 0 || selectedSubtitle >= subtitleData.cues.length) return setSubtitleCues([]);
     setSubtitleCues(subtitleData.cues[selectedSubtitle]);
   }, [selectedSubtitle]);

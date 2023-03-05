@@ -2,7 +2,6 @@ import * as React from 'react';
 import Head from 'next/head';
 import type { NextPage } from 'next';
 import { CookiesProvider } from 'react-cookie';
-import moment from 'moment';
 
 import { SocketProvider, useSocket } from 'contexts/socket.context';
 import { RoomProvider, useRoom } from 'contexts/room.context';
@@ -13,12 +12,9 @@ import JoinModal from 'components/JoinModal';
 import RoomNavigation from 'components/RoomNavigation';
 import Player from 'components/Player';
 import TorrentSelect from 'components/TorrentSelect';
+import RoomLoadingScreen from 'components/RoomLoadingScreen';
 
-import { Box, Text, Paper, Stack, Group, Progress, Center, ActionIcon } from '@mantine/core';
-
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft, faDownload } from '@fortawesome/free-solid-svg-icons';
-import { faClock } from '@fortawesome/free-regular-svg-icons';
+import { Box } from '@mantine/core';
 
 // Reducer for search
 const initialSearchState = {
@@ -40,7 +36,7 @@ const searchReducer = (state, action) => {
 
 const Room: React.FC = () => {
   const { socket } = useSocket();
-  const { room, closingRoom, setRoom, setEventLog } = useRoom();
+  const { room, status, setStatus, closingRoom, setRoom, setEventLog } = useRoom();
   const { video, setVideo } = useVideo();
   const { user, setUser } = useUser();
 
@@ -65,10 +61,9 @@ const Room: React.FC = () => {
     if (!socket) return;
     if (!room) return;
 
-    const videoUpdateData = (data: any) => {
-      if (data.roomId !== room.id) return;
-      setVideo(data.newData);
-    };
+    const roomUpdateStatus = (data: any) => setStatus(data);
+
+    const videoUpdateData = (data: any) => setVideo(data);
 
     const videoUpdateState = (data: any) => {
       if (data.roomId !== room.id) return;
@@ -83,8 +78,6 @@ const Room: React.FC = () => {
     };
 
     const onUpdateRoom = (data: any) => {
-      // TODO: WHY DID I DO THIS, WHY DID I NOT USE SOCKET ROOMS?! THIS HURTS.
-      if (room.id !== data.id) return;
       setRoom(data);
 
       // Find self based on user id and update user context
@@ -101,8 +94,10 @@ const Room: React.FC = () => {
     };
 
     const onDisconnect = () => {
-      window.location.href = '/?connectionLost=1';
+      // window.location.href = '/?connectionLost=1';
     };
+
+    socket.on('roomUpdateStatus', roomUpdateStatus);
 
     socket.on('videoUpdateData', videoUpdateData);
     socket.on('videoUpdateState', videoUpdateState);
@@ -112,6 +107,8 @@ const Room: React.FC = () => {
     socket.on('disconnect', onDisconnect);
 
     return () => {
+      socket.off('roomUpdateStatus', roomUpdateStatus);
+
       socket.off('videoUpdateData', videoUpdateData);
       socket.off('videoUpdateState', videoUpdateState);
       socket.off('updateEvents', updateEvents);
@@ -138,14 +135,44 @@ const Room: React.FC = () => {
     });
   };
 
-  if (video?.statusCode === 0 && video?.url) {
+  if (status?.type == 'playing' && video?.url) {
     return (
-      <Player
-        videoState={videoState}
-        setVideoState={setVideoState}
-      />
+      <React.Fragment>
+        <Head>
+          <title>kelp - { room?.name || 'room' }</title>
+        </Head>
+        <Player
+          videoState={videoState}
+          setVideoState={setVideoState}
+        />
+      </React.Fragment>
     );
   }
+
+  const roomMenuToRender: any = () => {
+    if (!status) return;
+    // Torrent Select (waiting)
+    if (status.type == 'waiting') {
+      return (
+        <TorrentSelect
+          search={search}
+          searchDispatch={searchDispatch}
+          loadingTitles={loadingTitles}
+          setLoadingTitles={setLoadingTitles}
+          onTorrentStart={onTorrentStart}
+          selectedTitle={selectedTitle}
+          setSelectedTitle={setSelectedTitle}
+        />
+      );
+    } else {
+      return (
+        <RoomLoadingScreen
+          roomId={room.id}
+          status={status}
+        />
+      );
+    }
+  };
   
   return (
     <React.Fragment>
@@ -153,257 +180,39 @@ const Room: React.FC = () => {
         <title>kelp - { room?.name || 'room' }</title>
       </Head>
       <JoinModal />
-      {
-        room && (
-          <Box
-            sx={{
-              position: 'fixed',
-              top: 0,
-              height: '100vh',
-              width: '100vw',
-              display: 'flex',
-              flexDirection: 'column',
-              padding: '30px',
-              boxSizing: 'border-box',
-            }}
-          >
-            <RoomNavigation
-              search={search}
-              searchDispatch={searchDispatch}
-              loadingTitles={loadingTitles}
-              onTorrentStart={onTorrentStart}
-              setSelectedTitle={setSelectedTitle}
-            />
-            {/* "The screen" parent */}
-            <Box sx={{
-              position: 'relative',
-              marginTop: 30,
-              height: '100%',
-              flex: 1,
-              borderRadius: 12,
-              overflow: 'hidden',
-            }}>
-              {
-                // Torrent select screen
-                video?.statusCode === 1 ? (
-                  <TorrentSelect
-                    search={search}
-                    searchDispatch={searchDispatch}
-                    loadingTitles={loadingTitles}
-                    setLoadingTitles={setLoadingTitles}
-                    onTorrentStart={onTorrentStart}
-                    selectedTitle={selectedTitle}
-                    setSelectedTitle={setSelectedTitle}
-                  />
-                )
-                  // Starting download screen
-                  : video?.statusCode === 2 ? (
-                    <Box
-                      sx={{
-                        height: '100%',
-                        width: '100%',
-                        backgroundColor: '#000',
-                      }}
-                    >
-                      <ActionIcon
-                        sx={{
-                          position: 'absolute',
-                          top: 30,
-                          left: 30,
-                        }}
-                        onClick={() => {
-                          socket.emit('resetRoom', room.id);
-                        }}
-                      >
-                        <FontAwesomeIcon 
-                          icon={faArrowLeft} 
-                          style={{ 
-                            color: '#fff',
-                            fontSize: 20,
-                          }} 
-                        />
-                      </ActionIcon>
-                      <Center sx={{ height: '100%' }}>
-                        <Paper
-                          style={{
-                            position: 'relative',
-                            boxSizing: 'border-box',
-                            padding: 30,
-                            width: 465,
-                            borderRadius: 12,
-                            backgroundColor: '#191921',
-                          }}
-                        >
-                          <Stack
-                            sx={{
-                              minWidth: 400,
-                              maxWidth: 500,
-                            }}
-                            spacing={30}
-                          >
-                            <Text sx={{ fontSize: 18, color: '#98989a' }}>
-                              Starting download...
-                            </Text>
-                          </Stack>
-                        </Paper>
-                      </Center>
-                    </Box>
-                  )
-                  // Downloading screen
-                    : video?.statusCode >= 3 ? (
-                      <Box
-                        sx={{
-                          height: '100%',
-                          width: '100%',
-                          backgroundColor: '#000',
-                        }}
-                      >
-                        <ActionIcon
-                          sx={{
-                            position: 'absolute',
-                            top: 30,
-                            left: 30,
-                          }}
-                          onClick={() => {
-                            socket.emit('resetRoom', room.id);
-                          }}
-                        >
-                          <FontAwesomeIcon 
-                            icon={faArrowLeft} 
-                            style={{ 
-                              color: '#fff',
-                              fontSize: 20,
-                            }} 
-                          />
-                        </ActionIcon>
-                        <Center sx={{ height: '100%' }}>
-                          <Paper
-                            style={{
-                              position: 'relative',
-                              boxSizing: 'border-box',
-                              padding: 30,
-                              width: 465,
-                              borderRadius: 12,
-                              backgroundColor: '#191921',
-                            }}
-                          >
-                            <Stack
-                              sx={{
-                                minWidth: 400,
-                                maxWidth: 500,
-                              }}
-                              spacing={30}
-                            >
-                              <Text sx={{ fontSize: 18, color: '#98989a' }}>
-                                { video.status }
-                              </Text>
-                              { video.percentage !== 0 && (
-                                <Progress
-                                  value={video.percentage}
-                                  sx={{ width: '100%' }}
-                                  size={5}
-                                />
-                              )}
-                              {
-                                (video.percentage !== 0 || video.downloadSpeed) && (
-                                  <Group spacing={20}>
-                                    { video.timeRemaining && (
-                                      <Group spacing={10}>
-                                        <FontAwesomeIcon 
-                                          icon={faDownload} 
-                                          style={{ 
-                                            color: '#98989a',
-                                            fontSize: 18,
-                                          }} 
-                                        />
-                                        <Text sx={{ fontSize: 14, color: '#98989a' }}>
-                                          {video.downloadSpeed}
-                                        </Text>
-                                      </Group>
-                                    ) }
-                                    { video.downloadSpeed && (
-                                      <Group spacing={10}>
-                                        <FontAwesomeIcon 
-                                          icon={faClock} 
-                                          style={{ 
-                                            color: '#98989a',
-                                            fontSize: 18,
-                                          }} 
-                                        />
-                                        <Text sx={{ fontSize: 14, color: '#98989a' }}>
-                                          {moment().to(moment().add(video.timeRemaining, 'ms'), true)} remaining
-                                        </Text>
-                                      </Group>
-                                    ) }
-                                  </Group>
-                                )
-                              }
-                            </Stack>
-                          </Paper>
-                        </Center>
-                      </Box>
-                    )
-                    // Error screen
-                      : video?.statusCode === -1 ? (
-                        <Box
-                          sx={{
-                            height: '100%',
-                            width: '100%',
-                            backgroundColor: '#000',
-                          }}
-                        >
-                          <ActionIcon
-                            sx={{
-                              position: 'absolute',
-                              top: 30,
-                              left: 30,
-                            }}
-                            onClick={() => {
-                              socket.emit('resetRoom', room.id);
-                            }}
-                          >
-                            <FontAwesomeIcon 
-                              icon={faArrowLeft} 
-                              style={{ 
-                                color: '#fff',
-                                fontSize: 20,
-                              }} 
-                            />
-                          </ActionIcon>
-                          <Center sx={{ height: '100%' }}>
-                            <Paper
-                              style={{
-                                position: 'relative',
-                                boxSizing: 'border-box',
-                                padding: 30,
-                                width: 465,
-                                borderRadius: 12,
-                                backgroundColor: '#191921',
-                              }}
-                            >
-                              <Stack
-                                sx={{
-                                  minWidth: 400,
-                                  maxWidth: 500,
-                                }}
-                                spacing={30}
-                              >
-                                <Text sx={{ fontSize: 18, color: '#98989a' }}>
-                                  There was an error...
-                                </Text>
-                                <Text sx={{ fontSize: 14, color: '#98989a' }}>
-                                  {video.status}
-                                </Text>
-                              </Stack>
-                            </Paper>
-                          </Center>
-                        </Box>
-                      ) : null
-              }
-            </Box>
+      { room ?(
+        <Box
+          sx={{
+            position: 'fixed',
+            top: 0,
+            height: '100vh',
+            width: '100vw',
+            display: 'flex',
+            flexDirection: 'column',
+            padding: '30px',
+            boxSizing: 'border-box',
+          }}
+        >
+          <RoomNavigation
+            search={search}
+            searchDispatch={searchDispatch}
+            loadingTitles={loadingTitles}
+            onTorrentStart={onTorrentStart}
+            setSelectedTitle={setSelectedTitle}
+          />
+          {/* "The screen" parent */}
+          <Box sx={{
+            position: 'relative',
+            marginTop: 30,
+            height: '100%',
+            flex: 1,
+            borderRadius: 12,
+            overflow: 'hidden',
+          }}>
+            { roomMenuToRender() }
           </Box>
-        )
-      }
+        </Box>
+      ) : null}
     </React.Fragment>
   );
 };
