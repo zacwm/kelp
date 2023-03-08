@@ -6,6 +6,7 @@ import { useVideo } from 'contexts/video.context';
 import { useUser } from 'contexts/user.context';
 
 import { Box, Slider, Group, Stack, Text, Transition, Popover } from '@mantine/core';
+import FilesPopover from '../RoomNavigation/Popovers/Files';
 import TestingPopover from '../RoomNavigation/Popovers/Testing';
 import RoomsPopover from '../RoomNavigation/Popovers/Users';
 import ControllerPopover from '../RoomNavigation/Popovers/Controller';
@@ -119,6 +120,7 @@ const Overlay: React.FC<Props> = ({
                   gap: '30px',
                 }}
               >
+                { (video?.files || []).length > 1 ? <FilesPopover /> : null }
                 <TestingPopover />
                 <ControllerPopover />
                 <RoomsPopover />
@@ -219,7 +221,6 @@ const Overlay: React.FC<Props> = ({
                 <Group spacing="xl">
                   {
                     subtitles.length > 0 ? (
-
                       <Popover
                         width={200}
                         position="bottom"
@@ -262,7 +263,9 @@ const Overlay: React.FC<Props> = ({
                                     fontWeight: selectedSubtitle === index ? 'bold' : 'normal',
                                   })}
                                   onClick={() => setSelectedSubtitle(index)}
-                                >{subtitle.title}</Text>
+                                >
+                                  {subtitle.title}
+                                </Text>
                               ))
                             }
                           </Stack>

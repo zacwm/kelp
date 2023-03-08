@@ -5,7 +5,7 @@ import DownloadButton from './DownloadButton';
 
 type Props = {
   episodeData: any,
-  onSelect: (url: string) => void,
+  onSelect: (data: any) => void,
 }
 
 const EpisodeItem: React.FC<Props> = ({ episodeData, onSelect }) => {

@@ -1,10 +1,11 @@
 import fs from 'fs-extra';
 import path from 'path';
-import User from './User';
 import * as SocketIO from 'socket.io';
 import WebTorrent from 'webtorrent';
-import FFmpeg from './ffmpeg';
+import fluentFfmpeg from 'fluent-ffmpeg';
+import User from './User';
 import { RoomStatus, RoomStatusPresets } from '../types';
+import subtitleExtract from './subtitleExtract';
 
 interface RoomInterface {
   setName(name: string): void;
@@ -25,6 +26,7 @@ interface RoomInterface {
   // Torrent controls
   startTorrent(url: string, callback: any): void;
   convertFile(videoPath: string): void;
+  cancelFfmpegProcesses(): void;
   // Internal
   setStatus(value: any): void;
 }
@@ -52,7 +54,7 @@ class Room implements RoomInterface {
   private wtClient: any; // TODO: should be webtorrent client type, but cant find it rn...
   private torrent: any;
   private torrentCheckInterval: any;
-  private ffmpeg: FFmpeg;
+  private ffmpegProcesses: any[];
 
   constructor(socketServer: SocketIO.Server, name: string, password?: string) {
     this.SocketServer = socketServer;
@@ -70,7 +72,7 @@ class Room implements RoomInterface {
     this.playbackPlaying = false;
     this.playbackTimePosition = 0;
     this.playbackTimePositionInterval = null;
-    this.ffmpeg = new FFmpeg();
+    this.ffmpegProcesses = [];
 
     fs.emptyDir(path.join(__dirname, `../.temp/${this.id}`));
   }
@@ -145,7 +147,13 @@ class Room implements RoomInterface {
         title: this.videoTitle,
         subtitle: this.videoSubtitle,
         files: (this.files || []).map(file => {
-          return { id: file.id, name: file.name };
+          return {
+            id: file.id,
+            name: file.name,
+            selected: file.selected,
+            downloadProgress: file.downloadProgress,
+            ready: file.ready,
+          };
         }),
         extra: this.videoExtra,
       };
@@ -207,12 +215,28 @@ class Room implements RoomInterface {
 
   // Torrent controls
   async startTorrent(torrentData: any, callback?: any): Promise<void> {
-    if (this.ffmpeg.process) return callback({ error: 'Already processing video...' });
+    if (this.ffmpegProcesses.length > 0) return callback({ error: 'Already processing video...' });
     if (this.wtClient) return callback({ error: 'Already downloading...' });
     this.setStatus({ type: 'starting', message: 'Starting torrent download...' });
 
     await fs.emptyDir(path.join(__dirname, `../.temp/${this.id}`));
     if (!this.wtClient) this.wtClient = new WebTorrent();
+    let selectedFile;
+
+    const updateFileDownloadProgress = (filePath: string, progress?: number) => {
+      progress = progress || 0;
+      const files = this.files;
+      const filePos = files.findIndex(file => file.path === filePath);
+      // Check if file exists
+      if (filePos !== -1) {
+        const file = files[filePos];
+        file.downloadProgress = (progress * 100).toFixed(2);
+        file.ready = progress == 1;
+        files[filePos] = file;
+      }
+      this.files = files;
+    };
+
     this.wtClient.add(torrentData.url, { path: path.join(__dirname, `../.temp/${this.id}`) }, (torrent: any) => {
       this.torrent = torrent;
       this.files = torrent.files.filter(file => {
@@ -224,145 +248,200 @@ class Room implements RoomInterface {
           '.wmv',
         ].includes(path.extname(file.path));
       }).map((file, index) => {
-        return { id: makeid(16), name: file.name, path: file.path, selected: index === 0 };
+        return {
+          id: makeid(16),
+          name: file.name,
+          path: file.path,
+          downloadProgress: 0,
+          ready: false,
+          selected: torrentData?.file ? torrentData.file === file.name : index === 0,
+        };
       });
       if (this.files.length <= 0) {
         torrent.destroy();
         return this.setStatus({ type: 'error', message: 'No video file found in torrent...' });
       }
 
-      this.torrentCheckInterval = setInterval(() => {
-        if (this.torrent.done || !this.wtClient) return clearInterval(this.torrentCheckInterval);
+      let selectedFileFinished = false;
+      let torrentFinished = false;
 
-        this.videoExtra = {
-          ...this.videoExtra,
-          maxDownloadSpeed: this.videoExtra?.maxDownloadSpeed || 0 < torrent.downloadSpeed ? torrent.downloadSpeed : this.videoExtra?.maxDownloadSpeed || 0,
-          lowDownloadSpeed: this.videoExtra?.lowDownloadSpeed || 0 > torrent.downloadSpeed ? torrent.downloadSpeed : this.videoExtra?.lowDownloadSpeed || 0,
-          torrentFiles: torrent.files.length,
-          torrentSize: readableBytesPerSecond(torrent.length),
-        };
+      const setFinished = (type: string) => {
+        if (type === 'selectedFile') selectedFileFinished = true;
+        if (type === 'torrent') torrentFinished = true;
+  
+        if (selectedFileFinished && torrentFinished) {
+          torrent.destroy();
+          this.wtClient = null;
+        }
+      };
 
-        console.log(`Room: ${this.id} | Files: ${torrent.files.length} | ${(torrent.progress * 100).toFixed(2)}% @ ${readableBytesPerSecond(torrent.downloadSpeed)}`);
+      selectedFile = torrent.files.find(file => file.path === this.files.find(file => file.selected).path);
+      if (!selectedFile) {
+        torrent.destroy();
+        return this.setStatus({ type: 'error', message: 'No video file found in torrent...' });
+      }
+
+      const fileStream = selectedFile.createReadStream();
+
+      fileStream.on('data', () => {
+        if (!['starting', 'downloading'].includes(this.status?.type)) return;
         this.setStatus({
           type: 'downloading',
           message: 'Downloading...',
-          percentage: torrent.progress * 100,
+          percentage: (selectedFile.progress * 100).toFixed(2),
+          timeRemaining: torrent.timeRemaining,
+          speed: readableBytesPerSecond(this.torrent.downloadSpeed),
+          peers: torrent.numPeers,
+        });
+      });
+  
+      fileStream.on('end', () => {
+        this.videoTitle = torrentData?.name || torrent.name;
+        this.convertFile(selectedFile.path);
+        setFinished('selectedFile');
+      });
+
+      
+      this.torrentCheckInterval = setInterval(() => {
+        if (this.torrent.done || !this.wtClient) return clearInterval(this.torrentCheckInterval);
+        console.info(`Room: ${this.id} | Files: ${torrent.files.length} | ${(torrent.progress * 100).toFixed(2)}% @ ${readableBytesPerSecond(torrent.downloadSpeed)}`);
+
+        torrent.files.forEach((file: any) => {
+          updateFileDownloadProgress(file.path, file.progress);
+        });
+        this.SocketServer.to(this.id).emit('videoUpdateData', this.getVideoData());
+        
+        if (!['starting', 'downloading'].includes(this.status?.type)) return;
+        this.setStatus({
+          type: 'downloading',
+          message: 'Downloading...',
+          percentage: selectedFile.progress * 100,
           timeRemaining: torrent.timeRemaining,
           speed: readableBytesPerSecond(torrent.downloadSpeed),
+          peers: torrent.numPeers,
         });
-      }, 500);
+      }, 1000);
 
       torrent.on('done', () => {
-        /* // TODO: This issue marked as a bug from over 2 years ago... https://github.com/webtorrent/webtorrent/issues/1931
-        if (this.wtClient) this.wtClient.destory();
-        */
-        torrent.destroy();
-        this.wtClient = null;
         if (this.torrentCheckInterval) clearInterval(this.torrentCheckInterval);
-        this.videoTitle = torrent.name;
-        this.convertFile(this.files[0].path);
+        torrent.files.forEach((file: any) => {
+          updateFileDownloadProgress(file.path, 1);
+        });
+        this.SocketServer.to(this.id).emit('videoUpdateData', this.getVideoData());
+        setFinished('torrent');
       });
     });
   }
   
   async convertFile(videoPath: string): Promise<void> {
-    if (this.ffmpeg.process) return this.ffmpeg.stop();
+    if (this.ffmpegProcesses.length > 0) return this.cancelFfmpegProcesses();
     await fs.emptyDir(path.join(__dirname, `../.streams/${this.id}`));
-    this.setStatus({ type: 'processing', message: 'Converting...' });
+    this.setStatus({ type: 'processing', message: 'Processing...' });
     this.playbackTimePosition = 0;
     this.playbackPlaying = false;
     fs.pathExists(videoPath, async (err, exists) => {
       if (err) return this.setStatus({ type: 'error', message: 'Video file check failed...' });
       if (!exists) return this.setStatus({ type: 'error', message: 'Video file not found...' });
       const type = path.extname(videoPath);
+      const roomId = this.id;
+      const setStatus = this.setStatus.bind(this);
+      const getFfmpegProcesses = () => {
+        return this.ffmpegProcesses;
+      };
+      const addFfmpegProcess = (process) => {
+        this.ffmpegProcesses.push(process);
+      };
+      let progress = [0];
+      
+      const setVideoPlayable = () => {
+        this.videoURL = `/streams/${roomId}/index.m3u8`;
+        setStatus({ type: 'playing', message: 'Watching a video' });
+        getFfmpegProcesses().forEach((process) => {
+          if (process) process.kill();
+        });
+        this.ffmpegProcesses = [];
+      };
 
       if (type === '.mkv') {
-        this.setStatus({
-          type: 'processing',
-          watching: 'Processing...',
-          percentage: (0 / 3) * 100,
-        });
-        this.ffmpeg.convertVideoToMP4(videoPath, this.id)
-          .then(({ mp4Path }) => {
-            this.setStatus({
-              type: 'processing',
-              watching: 'Processing...',
-              percentage: (1 / 3) * 100,
-            });
-            this.ffmpeg.convertVideoToHLS(mp4Path, this.id)
-              .then(() => {
-                this.videoURL = `/streams/${this.id}/index.m3u8`;
-                this.videoExtra = { ...this.videoExtra, hlsFileCount: fs.readdirSync(path.join(__dirname, `../.streams/${this.id}`)).length };
-                this.setStatus({
-                  type: 'processing',
-                  watching: 'Processing...',
-                  percentage: (2 / 3) * 100,
-                });
-                this.ffmpeg.extractSubtitles(videoPath, this.id)
-                  .then(() => {
-                    this.videoSubtitle = `/streams/${this.id}/subtitles.json`;
-                  })
-                  .finally(() => {
-                    this.setStatus({ type: 'playing', message: `Watching '${this.videoTitle}'` });
-                  });
-              })
-              .catch((err) => {
-                console.error(err);
-                return this.setStatus({ type: 'error', message: 'File conversion failed...' });
-              });
+        progress = [0, 0, 0];
+        Promise.all([convertToMp4(1), subtitleExtract(videoPath, roomId)])
+          .then((responses) => {
+            if (responses[1]) {
+              this.videoSubtitle = `/streams/${this.id}/subtitles.json`;
+            }
+            updateProgress(2, 99);
+            return convertToHLS(3);
           })
-          .catch((err) => {
-            console.error(err);
-            return this.setStatus({ type: 'error', message: 'File conversion failed...' });
-          });
-      } else if (['.avi', '.wmv'].includes(type)) {
-        this.setStatus({
-          type: 'processing',
-          watching: 'Processing...',
-          percentage: (0 / 2) * 100,
-        });
-        this.ffmpeg.convertVideoToMP4(videoPath, this.id)
-          .then(({ mp4Path }) => {
-            this.setStatus({
-              type: 'processing',
-              watching: 'Processing...',
-              percentage: (1 / 2) * 100,
-            });
-            this.ffmpeg.convertVideoToHLS(mp4Path, this.id)
-              .then(() => {
-                this.videoURL = `/streams/${this.id}/index.m3u8`;
-                this.videoExtra = { ...this.videoExtra, hlsFileCount: fs.readdirSync(path.join(__dirname, `../.streams/${this.id}`)).length };
-                this.setStatus({ type: 'playing', message: `Watching '${this.videoTitle}'` });
-              })
-              .catch((err) => {
-                console.error(err);
-                return this.setStatus({ type: 'error', message: 'File conversion failed...' });
-              });
-          })
-          .catch((err) => {
-            console.error(err);
-            return this.setStatus({ type: 'error', message: 'File conversion failed...' });
-          });
+          .then(() => setVideoPlayable() );
       } else if (['.mp4', '.mov'].includes(type)) {
-        this.setStatus({
-          type: 'processing',
-          watching: 'Processing...',
-          percentage: (0 / 1) * 100,
-        });
-        this.ffmpeg.convertVideoToHLS(videoPath, this.id)
-          .then(() => {
-            this.videoURL = `/streams/${this.id}/index.m3u8`;
-            this.videoExtra = { ...this.videoExtra, hlsFileCount: fs.readdirSync(path.join(__dirname, `../.streams/${this.id}`)).length };
-            this.setStatus({ type: 'playing', message: `Watching '${this.videoTitle}'` });
-          })
-          .catch((err) => {
-            console.error(err);
-            return this.setStatus({ type: 'error', message: 'File conversion failed...' });
-          });
+        progress = [0];
+        convertToHLS(1, videoPath)
+          .then(() => setVideoPlayable() );
       } else {
-        return this.setStatus({ type: 'error', message: 'Unsupported file type...' });
+        progress = [0, 0];
+        convertToMp4(1)
+          .then(() => {
+            return convertToHLS(2);
+          })
+          .then(() => setVideoPlayable() );
+      }
+
+      function updateProgress(step: number, percentage: number) {
+        progress[step - 1] = percentage;
+        const total = progress.reduce((a, b) => a + b, 0) / progress.length;
+        setStatus({ type: 'processing', message: 'Processing...', percentage: total });
+      }
+
+      function convertToMp4(step: number) {
+        return new Promise((resolve) => {
+          addFfmpegProcess(fluentFfmpeg(videoPath)
+            .outputOptions(['-codec copy', '-movflags +faststart'])
+            .on('error', convertError)
+            .on('progress', (progress) => {
+              if (progress?.percent) updateProgress(step, progress.percent);
+            })
+            .on('end', resolve)
+            .save(path.join(__dirname, `../.temp/${roomId}/convert.mp4`)),
+          );
+        });
+      }
+
+      function convertToHLS(step: number, filePath?: string) {
+        return new Promise((resolve) => {
+          addFfmpegProcess(fluentFfmpeg(filePath || path.join(__dirname, `../.temp/${roomId}/convert.mp4`))
+            .outputOptions([
+              '-codec: copy',
+              '-start_number 0',
+              '-hls_time 10',
+              '-hls_list_size 0',
+              '-f hls',
+            ])
+            .on('error', convertError)
+            .on('progress', (progress) => {
+              if (progress?.percent) updateProgress(step, progress.percent);
+            })
+            .on('end', resolve)
+            .save(path.join(__dirname, `../.streams/${roomId}/index.m3u8`)),
+          );
+        });
+      }
+      
+      function convertError(err) {
+        console.log(err);
+        getFfmpegProcesses().forEach((process) => {
+          if (process) process.kill();
+        });
+        this.ffmpegProcesses = [];
+        setStatus({ type: 'error', message: 'Conversion failed...' });
       }
     });
+  }
+
+  cancelFfmpegProcesses(): void {
+    this.ffmpegProcesses.forEach((process) => {
+      if (process) process.kill();
+    });
+    this.ffmpegProcesses = [];
   }
 
   async resetRoom(noStatus?: boolean): Promise<void> {
@@ -380,8 +459,9 @@ class Room implements RoomInterface {
       }
       this.wtClient = null;
     }
-    if (this.ffmpeg.process) {
-      this.ffmpeg.stop();
+    
+    if (this.ffmpegProcesses.length > 0) {
+      this.cancelFfmpegProcesses();
     }
 
     await fs.emptyDir(path.join(__dirname, `../.temp/${this.id}`));
@@ -406,6 +486,10 @@ class Room implements RoomInterface {
 
     if (value.speed === undefined) {
       value.speed = null;
+    }
+
+    if (value.peers === undefined) {
+      value.peers = null;
     }
 
     this.status = {...this.status, ...value};

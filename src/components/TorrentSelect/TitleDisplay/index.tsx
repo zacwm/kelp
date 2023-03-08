@@ -362,7 +362,12 @@ const TitleDisplay: React.FC<Props> = ({
                       { titleDetailed.synopsis }
                     </Text>
                   </Stack>
-                  <DownloadButton torrents={titleOverview.torrents} onTorrentSelect={onTitleSelect} />
+                  <DownloadButton torrents={titleOverview.torrents} onTorrentSelect={(data) => {
+                    onTitleSelect({
+                      ...data,
+                      name: titleOverview.title,
+                    });
+                  }} />
                   <Stack sx={{ padding: '0 0 0 10px' }} spacing={0}>
 
                     {titleOverview.trailer && (
@@ -415,7 +420,12 @@ const TitleDisplay: React.FC<Props> = ({
                                     <EpisodeItem
                                       key={eIndex}
                                       episodeData={episode}
-                                      onSelect={onTitleSelect}
+                                      onSelect={(data) => {
+                                        onTitleSelect({
+                                          ...data,
+                                          name: `${titleOverview.title} - S${season}E${episode.episode} - ${episode.title}`,
+                                        });
+                                      }}
                                     />
                                   ))
                                 }

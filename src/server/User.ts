@@ -1,12 +1,4 @@
-interface UserInterface {
-  id: string;
-  name: string;
-  joinUnixTime: number;
-  setName(name: string): void;
-  permission: string; // can be 'viewer', 'controller', or 'host'
-  setPermission(permission: string): void;
-}
-
+import { User as UserInterface } from '../types';
 class User implements UserInterface {
   id: string;
   name: string;

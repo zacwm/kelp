@@ -4,6 +4,7 @@ export interface RoomStatus {
   percentage: number | null;
   timeRemaining: number | null;
   speed: string | null;
+  peers: number | null;
 }
 
 // Some pre defined room statuses.
@@ -18,6 +19,7 @@ export const RoomStatusPresets: RoomStatusPresets = {
     percentage: null,
     timeRemaining: null,
     speed: null,
+    peers: null,
   },
   STARTING: {
     type: 'starting',
@@ -25,6 +27,7 @@ export const RoomStatusPresets: RoomStatusPresets = {
     percentage: null,
     timeRemaining: null,
     speed: null,
+    peers: null,
   },
   RESETTING: {
     type: 'resetting',
@@ -32,5 +35,6 @@ export const RoomStatusPresets: RoomStatusPresets = {
     percentage: null,
     timeRemaining: null,
     speed: null,
+    peers: null,
   },
 };

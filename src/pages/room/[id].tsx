@@ -57,6 +57,10 @@ const Room: React.FC = () => {
     });
   }, [room]);
 
+  React.useEffect(() => {
+    console.dir(video);
+  }, [video]);
+
   React.useEffect((): any => {
     if (!socket) return;
     if (!room) return;
@@ -132,6 +136,7 @@ const Room: React.FC = () => {
       id: room.id,
       url: torrentData.url,
       file: torrentData.file,
+      name: torrentData.name,
     }, (res) => {
       if (res.error) alert(res.error);
     });

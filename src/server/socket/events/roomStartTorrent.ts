@@ -16,6 +16,6 @@ export default function roomStartTorrent(socketManager: SocketManagerProps, ...a
   const room: Room = Rooms.getRoomById(data.id);
   if (room?.status?.type !== 'waiting') return;
 
-  room.startTorrent({ url: data.url, file: data.file }, callback);
+  room.startTorrent({ url: data.url, file: data.file, name: data.name }, callback);
   room.createEvent('started a torrent download.', user.name);
 }

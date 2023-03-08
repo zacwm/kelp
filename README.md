@@ -23,10 +23,10 @@ A slimy torrent downloader, temporary hosting & playback syncing server.
 
 ## Features
   - No database, no logins, all temporary! (BYO authentication)
-  - Supports MKV, MP4 and AVI (finds first matching file in torrent)
+  - Supports MKV, MP4, AVI, MOV and WMV.
   - Simultaneous room support (room limit configurable)
   - Playback syncing with other users in the room
-  - Extracts subtitles if found
+  - Subtitle support.
 
 ## Setup
   1. Clone the repository, and navigate to the root folder (containing the package.json file) in the terminal/command prompt
@@ -37,6 +37,8 @@ A slimy torrent downloader, temporary hosting & playback syncing server.
 
 ## Important
   **Before using, you must know that, I [(Zachary)](https://github.com/zacimac) and all contribuitors are not responsible for any torrents downloaded on YOUR instance of ['kelp'](https://github.com/zacimac/kelp) (such as legal, viruses, etc). Use at your own risk.** *Maybe use some sort of VPN on whatever its hosted on? (any VPN sponsors? :eyes:)*
+  
+  All titles on the torrent select screen are fetched from any Popcorn Time API design that you specify in the config and are never stored on the server. It is up to **you** to use a API that returns legal titles.
 
   [❤️ **Also maybe considor sponsoring me so I can work on projects like this more often?**](https://github.com/sponsors/zacimac)
 

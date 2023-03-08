@@ -5,7 +5,7 @@ import { useSocket } from 'contexts/socket.context';
 
 import { ActionIcon, Box, Paper, Progress, Group, Text, Stack, Center } from '@mantine/core';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faArrowLeft, faDownload } from '@fortawesome/free-solid-svg-icons';
+import { faArrowLeft, faDownload, faSatelliteDish } from '@fortawesome/free-solid-svg-icons';
 import { faClock } from '@fortawesome/free-regular-svg-icons';
 
 interface RoomLoadingScreenProps {
@@ -97,6 +97,20 @@ const RoomLoadingScreen: React.FC<RoomLoadingScreenProps> = ({ roomId, status })
                     />
                     <Text sx={{ fontSize: 14, color: '#98989a' }}>
                       {moment().to(moment().add(status.timeRemaining, 'ms'), true)} remaining
+                    </Text>
+                  </Group>
+                ) : null }
+                { status.peers ? (
+                  <Group spacing={10}>
+                    <FontAwesomeIcon 
+                      icon={faSatelliteDish} 
+                      style={{ 
+                        color: '#98989a',
+                        fontSize: 18,
+                      }} 
+                    />
+                    <Text sx={{ fontSize: 14, color: '#98989a' }}>
+                      {status.peers} peers
                     </Text>
                   </Group>
                 ) : null }
