@@ -5,8 +5,10 @@ import { useSocket } from 'contexts/socket.context';
 import TitleDisplay from './TitleDisplay';
 import VirtualList from './VirtualList';
 
-import { 
+import {
   Paper,
+  Center,
+  Text,
   Transition,
 } from '@mantine/core';
 
@@ -32,7 +34,7 @@ const TorrentSelect: React.FC<Props> = ({
   const { socket } = useSocket();
 
   const [torrentList, setTorrentList] = React.useState<object[]>([]);
-  
+
   React.useEffect((): any => {
     // 'isSubscribed' is used to prevent overfetching when search reducer is changed during a search.
     let isSubscribed = true;
@@ -48,8 +50,8 @@ const TorrentSelect: React.FC<Props> = ({
     }, (response: any) => {
       if (isSubscribed) {
         setLoadingTitles(false);
-  
-        setTorrentList(response.titles || []); 
+
+        setTorrentList(response.titles || []);
       }
     });
 
@@ -59,6 +61,7 @@ const TorrentSelect: React.FC<Props> = ({
   React.useEffect(() => {
     setSelectedTitle(null);
   }, [loadingTitles]);
+
 
   return (
     <Paper
@@ -90,17 +93,42 @@ const TorrentSelect: React.FC<Props> = ({
           />
         )}
       </Transition>
-      <VirtualList
-        titleCategory={search.category}
-        itemData={torrentList}
-        isLoading={loadingTitles}
-        setSelectedTitle={setSelectedTitle}
-        search={search}
-        setLoadingTitles={setLoadingTitles}
-        torrentList={torrentList}
-        setTorrentList={setTorrentList}
-      />
-    </Paper>
+      {
+        torrentList.length === 0 ? (
+          <Center
+            sx={{
+              position: 'relative',
+              height: '100%',
+              flex: 1,
+              width: '100%',
+              boxSizing: 'border-box',
+              background: '#191921',
+              overflow: 'hidden',
+            }}
+          >
+            <Text
+              sx={{
+                'margin-top': '2vw',
+                'text-align': 'center',
+              }}
+            >
+              No results could be found or the API could not be reached..
+            </Text>
+          </Center>
+        ) : (
+          <VirtualList
+            titleCategory={search.category}
+            itemData={torrentList}
+            isLoading={loadingTitles}
+            setSelectedTitle={setSelectedTitle}
+            search={search}
+            setLoadingTitles={setLoadingTitles}
+            torrentList={torrentList}
+            setTorrentList={setTorrentList}
+          />
+        )
+      }
+    </Paper >
   );
 };
 
