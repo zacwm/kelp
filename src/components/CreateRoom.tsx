@@ -20,7 +20,7 @@ const CreateRooms: React.FC = () => {
   const { socket } = useSocket();
 
   const [createRoomPending, setCreateRoomPending] = React.useState(false);
-  const [createRoomErrorMessage, setCreateRoomErrorMessage] = React.useState(null);
+  const [createRoomErrorMessage, setCreateRoomErrorMessage] = React.useState<string>("");
   
   const [inputRoomName, setInputRoomName] = React.useState<string>('');
   const [inputRoomPassword, setInputRoomPassword] = React.useState<string>('');
@@ -34,7 +34,7 @@ const CreateRooms: React.FC = () => {
     if (createRoomPending) return;
     setCreateRoomPending(true);
     if (createRoomErrorMessage) {
-      setCreateRoomErrorMessage(null);
+      setCreateRoomErrorMessage("");
       await timeout(300);
     }
     socket.emit('createRoom', {
@@ -61,33 +61,30 @@ const CreateRooms: React.FC = () => {
         width: 540,
       }}
     >
-      <Collapse
-        in={createRoomErrorMessage} 
-        sx={{
-          width: '100%',
-        }}
-      >
-        <Alert
-          icon={<IconAlertCircle size={16} />}
-          title="Oh, uhh..."
-          withCloseButton
-          variant="outline"
-          color="kelpPalette.7"
-          onClose={() => setCreateRoomErrorMessage(null)}
-          radius={12}
-          styles={{
-            root: {
-              backgroundColor: '#191921',
-              marginBottom: 30,
-            },
-            message: {
-              color: '#98989a',
-            },
-          }}
-        >
-          {createRoomErrorMessage}
-        </Alert>
-      </Collapse>
+      {
+        createRoomErrorMessage !== "" ? (
+          <Alert
+            icon={<IconAlertCircle size={16} />}
+            title="Oh, uhh..."
+            withCloseButton
+            variant="outline"
+            color="kelpPalette.7"
+            onClose={() => setCreateRoomErrorMessage("")}
+            radius={12}
+            styles={{
+              root: {
+                backgroundColor: '#191921',
+                marginBottom: 30,
+              },
+              message: {
+                color: '#98989a',
+              },
+            }}
+          >
+            {createRoomErrorMessage}
+          </Alert>   
+        ) : null
+      }
       <Paper 
         shadow="xs" 
         radius={12} 
